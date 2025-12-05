@@ -1,6 +1,6 @@
 {
-  "name": "newco-fe",
-  "description": "newco fe app",
+  "name": "karate-app-fe",
+  "description": "karate app fe app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
