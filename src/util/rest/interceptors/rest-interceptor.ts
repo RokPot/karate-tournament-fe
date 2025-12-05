@@ -1,0 +1,24 @@
+import { AxiosInstance } from "axios";
+
+export class RestInterceptor<T extends any[]> {
+  private interceptorIdMap: { client: AxiosInstance; interceptorId: number }[] = [];
+
+  constructor(private applyInterceptor: (client: AxiosInstance, ...args: T) => number) {}
+
+  public addInterceptor(client: AxiosInstance, ...args: T) {
+    this.removeInterceptor(client);
+    const interceptorId = this.applyInterceptor(client, ...args);
+    this.interceptorIdMap.push({ client, interceptorId });
+  }
+
+  public removeInterceptor(client: AxiosInstance) {
+    const interceptorId = this.interceptorIdMap.find((i) => i.client === client)?.interceptorId;
+
+    if (interceptorId != null) {
+      // Eject from both chains to support request and response interceptors
+      client.interceptors.request.eject(interceptorId);
+      client.interceptors.response.eject(interceptorId);
+      this.interceptorIdMap = this.interceptorIdMap.filter((i) => i.client !== client);
+    }
+  }
+}

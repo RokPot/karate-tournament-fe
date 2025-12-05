@@ -1,0 +1,28 @@
+region: us-east-1
+accountId: "872515261725"
+
+configs:
+  destination: ./.env.local
+  values:
+    - name: "@"
+      configFrom: template
+
+deploy:
+  buildPath: "./out"
+  # includeGlob: "**"
+  # ignoreGlob:
+
+  s3:
+    acl: "public-read"
+    bucket: karateapp-ld-dev-spa
+    # prefix:
+    purge: true
+    force: true
+    # extra glob for invalidation
+    cacheControlGlob:
+      - glob: "*.html"
+        cacheControl: "no-cache, no-store, must-revalidate"
+
+  cloudfront:
+    distributionId: E29Z13S3BNEP2B
+    invalidatePaths: "/*"

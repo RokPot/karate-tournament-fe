@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@import url("./scrollbar.css");
+
+body,
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+:root {
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+
+  --yellow-gradient: linear-gradient(0deg, #ffd001 0%, #fffc9d 100%);
+  --yellow-gradient-box: linear-gradient(0deg, #ffd001 0%, #fff808 100%);
+  --skeleton-gradient: linear-gradient(138deg, #232323 14.32%, #656565 126.83%);
+}
+
+.dark {
+  /* Pill gradient variables for dark mode */
+  --pill-gradient: radial-gradient(432.14% 272.32% at 47.01% 42.59%, #e0e0e0 0%, #989898 100%);
+  --pill-gradient-hover: linear-gradient(212.01deg, #7d7d7d 34.25%, #676767 73.44%);
+  --yellow-gradient: linear-gradient(0deg, #ffd001 0%, #fffc9d 100%);
+  --yellow-gradient-box: linear-gradient(0deg, #ffd001 0%, #fff808 100%);
+  --skeleton-gradient: linear-gradient(138deg, #232323 14.32%, #656565 126.83%);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px rgb(var(--text-inverted-secondary)) inset !important;
+  -webkit-text-fill-color: rgb(var(--text-default-primary)) !important;
+  color: rgb(var(--text-default-primary)) !important;
+  caret-color: rgb(var(--text-default-primary)) !important;
+}
+
+.top-safe {
+  top: var(--sat, 0px);
+}
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}

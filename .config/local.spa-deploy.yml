@@ -1,0 +1,8 @@
+region: us-east-1
+accountId: "000000000000"
+
+configs:
+  destination: ./.env.local
+  values:
+    - name: "@"
+      configFrom: template

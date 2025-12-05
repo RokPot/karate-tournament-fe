@@ -1,0 +1,70 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "airbnb",
+    "airbnb/hooks",
+    "airbnb-typescript",
+    "plugin:storybook/recommended",
+    "plugin:jsx-a11y/recommended",
+    "prettier"
+  ],
+  "plugins": ["tailwindcss", "no-relative-import-paths", "n", "jsx-a11y", "unused-imports"],
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "."
+  },
+  "settings": {
+    "tailwindcss": {
+      "config": "tailwind.config.ts"
+    }
+  },
+  "root": true,
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "warn",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/no-autofocus": "warn",
+    "jsx-a11y/aria-role": "warn",
+    "react/jsx-props-no-spreading": "off",
+    "import/prefer-default-export": "off",
+    "react/function-component-definition": "off",
+    "arrow-body-style": "off",
+    "import/no-cycle": "off",
+    "no-await-in-loop": "off",
+    "@typescript-eslint/no-loop-func": "off",
+    "react/require-default-props": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "tailwindcss/no-custom-classname": ["error"],
+    "react/destructuring-assignment": "off",
+    "no-bitwise": "off",
+    "no-plusplus": "off",
+    "no-restricted-syntax": "off",
+    "max-classes-per-file": "off",
+    "@typescript-eslint/no-namespace": "off",
+    "no-console": "error",
+    "no-continue": "off",
+    "no-relative-import-paths/no-relative-import-paths": ["error", { "allowSameFolder": true }],
+    "n/no-process-env": "error",
+    "react/no-array-index-key": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "error",
+    "unused-imports/no-unused-vars": [
+      "error",
+      {
+        "vars": "all",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "no-param-reassign": ["error", { "props": true, "ignorePropertyModificationsFor": ["state"] }]
+  },
+  "overrides": [
+    {
+      "files": "src/components/ui/**/*",
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ]
+}
