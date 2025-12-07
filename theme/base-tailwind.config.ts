@@ -1,10 +1,6 @@
-import type { Config } from "tailwindcss";
-
 const pxToRem = (px: number) => `${px / 16}rem`;
 
-const withMT = require("@material-tailwind/react/utils/withMT");
-
-const baseTailwindConfig: Config = withMT({
+const baseTailwindConfig = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -213,6 +209,6 @@ const baseTailwindConfig: Config = withMT({
     },
   },
   plugins: [],
-});
+};
 
 export default baseTailwindConfig;

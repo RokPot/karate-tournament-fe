@@ -1,9 +1,6 @@
-import { fontFamily } from "tailwindcss/defaultTheme";
-import { OptionalConfig } from "tailwindcss/types/config";
-
 import baseTailwindConfig from "./theme/base-tailwind.config";
 
-const config: Partial<OptionalConfig> = {
+const config = {
   presets: [baseTailwindConfig],
   darkMode: "class",
   theme: {
@@ -424,10 +421,10 @@ const config: Partial<OptionalConfig> = {
         ],
       },
       fontFamily: {
-        secondary: ["var(--font-secondary)", ...fontFamily.sans],
-        syne: ["var(--font-syne)", ...fontFamily.sans],
-        primary: ["var(--font-primary)", ...fontFamily.sans],
-        inter: ["var(--font-inter)", ...fontFamily.sans],
+        secondary: ["var(--font-secondary)", "sans-serif"],
+        syne: ["var(--font-syne)", "sans-serif"],
+        primary: ["var(--font-primary)", "sans-serif"],
+        inter: ["var(--font-inter)", "sans-serif"],
       },
       fontWeight: {
         "weight-300": "300",
