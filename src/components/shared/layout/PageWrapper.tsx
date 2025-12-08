@@ -7,16 +7,12 @@ import Footer from "@/components/shared/layout/footer/Footer";
 import { Navbar } from "./navbar/Navbar";
 
 export const PageWrapper = ({ children }: PropsWithChildren) => {
-  const isLoggedIn  = true;
+  const isLoggedIn = true;
   const isCheckingAuth = false;
 
   const shouldShowFooter = useMemo(() => {
-    return (
-      isLoggedIn
-    );
+    return isLoggedIn;
   }, [isLoggedIn]);
-
-
 
   if (isCheckingAuth) {
     return <LoadingState />;
@@ -28,13 +24,10 @@ export const PageWrapper = ({ children }: PropsWithChildren) => {
         height: "100dvh",
         position: "relative",
       }}
-      className={cx(
-        "flex bg-secondary-400",
-         "flex-col",
-      )}
+      className={cx("flex", "flex-col")}
     >
       <Navbar />
-      <div className={cx("flex",  "h-full")}>
+      <div className={cx("flex", "h-full")}>
         <main
           className="flex flex-1 flex-col"
           style={{

@@ -1,4 +1,4 @@
-import { Checkbox } from "@material-tailwind/react";
+import Checkbox from "@mui/material/Checkbox";
 
 interface IProps {
   checked?: boolean;
@@ -12,7 +12,6 @@ const TableCheckboxCell = ({ className, checked, onChange }: IProps) => {
       <Checkbox
         checked={!!checked}
         className={`${className} w-1 cursor-pointer`}
-        crossOrigin={undefined}
         onChange={(e) => {
           onChange?.((e.target as HTMLInputElement).checked);
         }}

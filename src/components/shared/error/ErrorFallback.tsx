@@ -1,4 +1,4 @@
-import { Button } from "@material-tailwind/react";
+import Button from "@mui/material/Button";
 import { useTranslation } from "react-i18next";
 
 import { ThinPageWrapper } from "@/components/shared/layout/ThinPageWrapper";
@@ -28,7 +28,7 @@ export const ErrorFallback = ({ error, resetError }: ErrorFallbackProps) => {
         <Typography size="special-label-5" variant="prominent-1" as="h2">
           {t("shared.errorFallback.heading")}
         </Typography>
-        <Typography size="h4" className="text-center text-danger">
+        <Typography size="h4" className="text-danger text-center">
           {t("shared.errorFallback.subheading", {
             error: ErrorHandler.getErrorMessage(error),
           })}

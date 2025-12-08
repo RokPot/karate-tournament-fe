@@ -1,4 +1,4 @@
-import { Button } from "@material-tailwind/react";
+import Button from "@mui/material/Button";
 import { ToastPosition } from "react-toastify";
 
 import { CheckIcon } from "@/assets/icons/general/Check";
@@ -27,7 +27,7 @@ const ToastConsumer = ({ position, actions }: ToastConsumerProps) => {
   return (
     <div>
       <Button
-        variant="filled"
+        variant="contained"
         onClick={() =>
           successToast({
             icon: CheckIcon,
@@ -40,7 +40,7 @@ const ToastConsumer = ({ position, actions }: ToastConsumerProps) => {
         Success
       </Button>
       <Button
-        variant="filled"
+        variant="contained"
         onClick={() =>
           errorToast({
             icon: CheckIcon,
@@ -53,7 +53,7 @@ const ToastConsumer = ({ position, actions }: ToastConsumerProps) => {
         Error
       </Button>
       <Button
-        variant="filled"
+        variant="contained"
         onClick={() =>
           neutralToast({
             icon: CheckIcon,
@@ -66,7 +66,7 @@ const ToastConsumer = ({ position, actions }: ToastConsumerProps) => {
         Neutral
       </Button>
       <Button
-        variant="filled"
+        variant="contained"
         onClick={() =>
           warningToast({
             icon: CheckIcon,

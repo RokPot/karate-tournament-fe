@@ -1,4 +1,4 @@
-import { Button } from "@material-tailwind/react";
+import Button from "@mui/material/Button";
 import { PaginationState, Table } from "@tanstack/react-table";
 import { cx } from "class-variance-authority";
 import { Fragment } from "react";
@@ -52,7 +52,7 @@ export const Pagination = ({ pagination, table }: { pagination: PaginationState;
             {showEllipsis && (
               <Button
                 key={`ellipsis-${pageNum}`}
-                className="h-12 w-12 border border-secondary-300 bg-neutral-500"
+                className="border-secondary-300 h-12 w-12 border bg-neutral-500"
                 disabled
               >
                 <Typography size="body-paragraph-xs" variant="prominent-2" className="text-white">
@@ -63,7 +63,7 @@ export const Pagination = ({ pagination, table }: { pagination: PaginationState;
             <Button
               key={pageNum}
               className={cx(
-                "border-elevation-outline-1 bg-elevation-surface-1 h-12 w-12 border !outline-none focus-visible:!outline-none",
+                "border-elevation-outline-1 bg-elevation-surface-1 h-12 w-12 border outline-hidden! focus-visible:outline-hidden!",
                 pageIndex === pageNum && "bg-elevation-surface-2",
               )}
               onClick={() => {

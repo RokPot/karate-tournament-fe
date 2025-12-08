@@ -1,6 +1,6 @@
 import { cva } from "class-variance-authority";
 
-export const statusIcon = cva("h-6 w-6 flex-shrink-0", {
+export const statusIcon = cva("h-6 w-6 shrink-0", {
   variants: {
     variant: {
       neutral: "text-secondary-50",
@@ -14,7 +14,7 @@ export const statusIcon = cva("h-6 w-6 flex-shrink-0", {
   },
 });
 
-export const statusSeparator = cva("h-px flex-shrink-0 self-stretch t:h-auto t:w-px", {
+export const statusSeparator = cva("h-px shrink-0 self-stretch t:h-auto t:w-px", {
   variants: {
     variant: {
       neutral: "bg-secondary-75",

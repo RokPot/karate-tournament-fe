@@ -3,4 +3,5 @@ export const RouteConfig = {
   home: "/",
   signin: "/sign-in/",
   signup: "/sign-up/",
+  bugReport: "/bug-report/",
 };

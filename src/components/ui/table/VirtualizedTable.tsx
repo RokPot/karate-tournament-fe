@@ -217,7 +217,7 @@ export const VirtualizedTable = <TData,>({
   return (
     <div
       data-virtual-table="container"
-      className={clsx("flex w-full flex-[1_1_0] flex-col", tableClasses.table, noBorder && "!rounded-none border-0")}
+      className={clsx("flex w-full flex-[1_1_0] flex-col", tableClasses.table, noBorder && "rounded-none! border-0")}
     >
       {table.getHeaderGroups().map((headerGroup) => (
         <div

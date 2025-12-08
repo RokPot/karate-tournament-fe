@@ -12,7 +12,7 @@ export const DatePeriodSegment = ({
   const endDate = period.end_date ? DateUtils.getLocalizedDate(period.end_date, "MMM yyyy") : "";
 
   return (
-    <Typography size="labels-input-m" className="!font-primary text-secondary-50">
+    <Typography size="labels-input-m" className="font-primary! text-secondary-50">
       {startDate} {startDate && endDate ? " - " : ""} {endDate}
     </Typography>
   );

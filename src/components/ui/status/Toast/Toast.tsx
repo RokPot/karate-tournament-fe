@@ -1,4 +1,4 @@
-import { Button } from "@material-tailwind/react";
+import Button from "@mui/material/Button";
 import { cva, VariantProps } from "class-variance-authority";
 import clsx from "clsx";
 import { ToastContainer as ToastifyToastContainer, TypeOptions as ToastifyVariants } from "react-toastify";
@@ -10,21 +10,21 @@ import { Typography } from "@/components/ui/text/Typography/Typography";
 const toastContainer = cva("m-8 w-auto p-0", {
   variants: {
     position: {
-      "bottom-right": "bottom-0 right-0",
+      "bottom-right": "right-0 bottom-0",
       "bottom-left": "bottom-0 left-0",
-      "top-right": "right-0 top-0",
-      "top-left": "left-0 top-0",
+      "top-right": "top-0 right-0",
+      "top-left": "top-0 left-0",
       "bottom-center": "bottom-0",
       "top-center": "top-0",
     },
   },
 });
 
-const toastWrapper = cva("min-h-0 w-auto max-w-toast overflow-hidden rounded-sm border bg-secondary-300 p-0 shadow-4", {
+const toastWrapper = cva("max-w-toast bg-secondary-300 shadow-4 min-h-0 w-auto overflow-hidden rounded-sm border p-0", {
   variants: {
     variant: {
       neutral: "border-secondary-75",
-      success: "border-success !bg-success-75",
+      success: "border-success bg-success-75!",
       warning: "border-warning",
       error: "border-danger",
     },
@@ -50,9 +50,9 @@ type ToastProps = ToastVariantProps & StatusParams;
 
 export const Toast = ({ variant, text, isLoading = false, actions = [], icon: Icon }: ToastProps) => {
   return (
-    <div className="flex w-auto flex-col items-center t:flex-row">
-      <div className="flex items-center gap-3 px-4 py-3-5">
-        {isLoading && <Loader size="default" className="flex-shrink-0" />}
+    <div className="t:flex-row flex w-auto flex-col items-center">
+      <div className="py-3-5 flex items-center gap-3 px-4">
+        {isLoading && <Loader size="default" className="shrink-0" />}
         {!isLoading && Icon && <Icon className={statusIcon({ variant })} />}
         <Typography
           size="labels-s"
@@ -67,7 +67,7 @@ export const Toast = ({ variant, text, isLoading = false, actions = [], icon: Ic
       {actions.length > 0 && (
         <>
           <div className={statusSeparator({ variant })} />
-          <div className="flex w-full flex-shrink-0 flex-wrap items-center justify-end gap-4 px-4 py-3 t:w-auto t:justify-center">
+          <div className="t:w-auto t:justify-center flex w-full shrink-0 flex-wrap items-center justify-end gap-4 px-4 py-3">
             {actions.map(({ text: buttonText, onPress, className }) => (
               <Button variant="text" key={buttonText} onClick={onPress} className={className}>
                 {buttonText}

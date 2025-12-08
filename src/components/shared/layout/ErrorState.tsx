@@ -1,4 +1,4 @@
-import { Button } from "@material-tailwind/react";
+import { Button } from "@mui/material";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 
@@ -21,7 +21,7 @@ export const ErrorState = ({ error, onRetry, className }: IProps) => {
       </Typography>
 
       {onRetry && (
-        <Button type="button" onClick={onRetry} variant="filled">
+        <Button type="button" onClick={onRetry} variant="contained">
           {t("shared.errorState.retryBtn")}
         </Button>
       )}

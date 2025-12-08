@@ -1,15 +1,12 @@
 import { useMediaQuery } from "react-responsive";
-import { Config } from "tailwindcss";
-import resolveConfig from "tailwindcss/resolveConfig";
 
 // eslint-disable-next-line no-relative-import-paths/no-relative-import-paths
-import config from "@/../tailwind.config";
+import baseConfig from "@/../theme/base-tailwind.config";
 
-const fullConfig = resolveConfig(config as unknown as Config);
+type Breakpoint = "dm" | "t" | "m" | "dd" | "dl";
 
-type Breakpoint = "sm" | "dm" | "t" | "dd" | "dl" | "m";
-
-const breakpoints = fullConfig.theme?.screens as Record<Breakpoint, string>;
+// In Tailwind v4, screens are defined in the base config
+const breakpoints = baseConfig.theme?.screens as Record<Breakpoint, string>;
 
 export function useBreakpoint(breakpointKey: Breakpoint) {
   if (!breakpoints) {

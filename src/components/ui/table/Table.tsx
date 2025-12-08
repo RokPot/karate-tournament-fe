@@ -1,4 +1,4 @@
-import { Button } from "@material-tailwind/react";
+import Button from "@mui/material/Button";
 import {
   ColumnDef,
   flexRender,
@@ -149,7 +149,7 @@ export const Table = <TData,>({
             {!isLoading && seeAllData && table.getRowModel().rows.length > 0 && (
               <tr className={tableClasses.tableRow}>
                 <td colSpan={columns.length} className={tableClasses.tableCell}>
-                  <Button onClick={seeAllData.onSeeAll} className="w-auto !p-3 text-left" variant="text">
+                  <Button onClick={seeAllData.onSeeAll} className="w-auto p-3! text-left" variant="text">
                     {seeAllData.buttonText || t("table.seeAll", { count: seeAllData.totalItemsCount })}
                   </Button>
                 </td>
