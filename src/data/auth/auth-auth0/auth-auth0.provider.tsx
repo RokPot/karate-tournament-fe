@@ -14,7 +14,7 @@ export const AuthAuth0Provider = ({ children }: React.PropsWithChildren) => {
       cacheLocation="localstorage"
       authorizationParams={{
         redirect_uri: AppConfig.authAuth0.loginRedirectPath?.replace(/\/$/, ""),
-        audience: AppConfig.authAuth0.audience,
+        audience: AppConfig.authAuth0.audience?.replace(/\/$/, ""),
       }}
     >
       <Auth0>{children}</Auth0>
@@ -33,8 +33,32 @@ const Auth0 = ({ children }: React.PropsWithChildren) => {
     }
   }
 
+  async function handleLogin<T>(req: T | null) {
+    await loginWithRedirect({
+      authorizationParams: {
+        redirect_uri: AppConfig.authAuth0.loginRedirectPath?.replace(/\/$/, ""),
+        audience: AppConfig.authAuth0.audience?.replace(/\/$/, ""),
+      },
+    });
+  }
+
+  async function handleRegister<T>(req: T | null) {
+    try {
+      await loginWithRedirect({
+        authorizationParams: {
+          redirect_uri: AppConfig.authAuth0.loginRedirectPath?.replace(/\/$/, ""),
+          audience: AppConfig.authAuth0.audience?.replace(/\/$/, ""),
+          screen_hint: "signup",
+        },
+      });
+    } catch (e) {
+      alert(e);
+      console.error(e);
+    }
+  }
+
   const useLogin: AuthContext.Type["useLogin"] = useMutation({
-    mutationFn: handleOperation,
+    mutationFn: handleLogin,
   });
 
   const useSocialLogin: AuthContext.Type["useSocialLogin"] = useMutation({
@@ -42,7 +66,7 @@ const Auth0 = ({ children }: React.PropsWithChildren) => {
   });
 
   const useRegister: AuthContext.Type["useRegister"] = useMutation({
-    mutationFn: handleOperation,
+    mutationFn: handleRegister,
   });
 
   const useForgotPassword: AuthContext.Type["useForgotPassword"] = useMutation({

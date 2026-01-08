@@ -43,7 +43,7 @@ export namespace UsersModels {
    * UserEnumSchema
    * @type { enum }
    */
-  export const UserEnumSchema = z.enum(["organizer", "coach", "competitor", "judge", "staff"]);
+  export const UserEnumSchema = z.enum(["admin", "organizer", "coach", "competitor", "judge", "staff"]);
   export type UserEnum = z.infer<typeof UserEnumSchema>;
   export const UserEnum = UserEnumSchema.enum;
 

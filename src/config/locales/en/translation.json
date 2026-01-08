@@ -73,103 +73,13 @@
         "weak": "Password is too weak",
         "required": "Password is required"
       },
-      "socials": {
-        "google": "Continue with Google",
-        "facebook": "Continue with Facebook",
-        "amazon": "Continue with Amazon",
-        "apple": "Continue with Apple"
+      "sign-up": {
+        "title": "Sign up",
+        "lostPassword": "Lost your password?"
       }
-    },
-    "register": {
-      "head": {
-        "title": "Register",
-        "description": "Create a new account"
-      },
-      "title": "Create an account",
-      "firstName": {
-        "label": "First Name",
-        "required": "First name is required"
-      },
-      "fullName": {
-        "label": "Full name",
-        "required": "Full name is required"
-      },
-      "lastName": {
-        "label": "Last Name",
-        "required": "Last name is required"
-      },
-      "dateOfBirth": {
-        "label": "Date of Birth",
-        "required": "Date of birth is required",
-        "tooOld": "Date of birth can't be that old",
-        "inFuture": "Date of birth can't be in the future"
-      },
-      "emailExists": "Email already exists",
-      "submitBtn": "Create Account",
-      "successToast": "You've successfully created an account!"
-    },
-    "login": {
-      "head": {
-        "title": "Login",
-        "description": "Login to your account"
-      },
-      "title": "Welcome back",
-      "submitBtn": "Log in",
-      "invalidCredentials": "Invalid email/password",
-      "confirmAccount": "Click here to confirm your account",
-      "notConfirmed": "Your account is not confirmed",
-      "successToast": "You've successfully logged in!"
-    },
-    "forgotPassword": {
-      "head": {
-        "title": "Forgot password",
-        "description": "Forgot your password?"
-      },
-      "link": "Forgot your password?",
-      "invalidCode": "Invalid verification code",
-      "title": "Forgot your password?",
-      "description": "Enter your email address and we'll send you a code to reset your password.",
-      "successToast": "We've sent you a code to reset your password.",
-      "submitBtn": "Send code"
-    },
-    "resetPassword": {
-      "head": {
-        "title": "Reset password",
-        "description": "Reset your password"
-      },
-      "title": "Reset your password",
-      "description": "Enter the code you've received in the email and your new password to reset your password.",
-      "noEmailLink": "I didn't receive an email",
-      "code": {
-        "label": "Code",
-        "invalid": "Invalid verification code. Please try again.",
-        "sixCharacters": "The code must be 6 characters long",
-        "required": "Code is required"
-      },
-      "newPassword": {
-        "label": "New Password"
-      },
-      "submitBtn": "Reset password",
-      "successToast": "You've successfully reset your password!"
-    },
-    "confirm": {
-      "head": {
-        "title": "Confirm account",
-        "description": "Confirm your account"
-      },
-      "title": "We've sent you a code. Please input it below.",
-      "success": "Your account has been verified. You can now log in.",
-      "resend": {
-        "btn": "Resend code",
-        "success": "We've resent you the code.",
-        "error": "Error resending the code, please try again."
-      },
-      "code": {
-        "label": "Code",
-        "required": "Code is required"
-      },
-      "submitBtn": "Confirm"
     }
+
+   
   },
   "table": {
     "noData": "No data found",

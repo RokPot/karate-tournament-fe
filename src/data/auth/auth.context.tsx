@@ -164,6 +164,9 @@ export namespace AuthContext {
         //     performLogoutAsync();
         //   },
         // });
+        applyAccessToken();
+        refetchProfile();
+        setIsLoggedIn(true);
       } else {
         applyAccessToken();
         refetchProfile();
@@ -172,6 +175,15 @@ export namespace AuthContext {
     }, [applyAccessToken, setIsLoggedIn, getAuthHeader, performLogoutAsync, refetchProfile, shouldPerformSync]);
 
     useEffect(() => {
+      console.log("isInitializing", isInitializing);
+      console.log("authIsLoggedIn", authIsLoggedIn);
+      console.log("isLoggedIn", isLoggedIn);
+      console.log("isLoggedInRef", isLoggedInRef.current);
+      console.log("queryClient", queryClient);
+      console.log("setIsLoggedIn", setIsLoggedIn);
+      console.log("syncProfile", syncProfile);
+      console.log("unapplyAccessToken", unapplyAccessToken);
+      console.log("children", children);
       if (isInitializing) {
         return undefined;
       }
