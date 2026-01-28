@@ -2,14 +2,12 @@ import { Button, Input, TextField } from "@mui/material";
 
 import { RouteConfig } from "@/config/route.config";
 import { AuthGuard } from "@/data/auth/AuthGuard";
+import HomePage from "@/components/home/HomePage";
 
-export default function HomePage() {
+export default function Component() {
   return (
     <AuthGuard type="private" redirectTo={RouteConfig.signin}>
-      <div>
-        <Button>Click me</Button>
-        <TextField placeholder="Enter your name" variant="outlined" label="Name" />
-      </div>
+      <HomePage />
     </AuthGuard>
   );
 }

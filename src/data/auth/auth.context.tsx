@@ -1,6 +1,7 @@
 import { UseMutationResult, useQueryClient } from "@tanstack/react-query";
 import { createContext, use, useCallback, useEffect, useMemo, useState } from "react";
 
+import { CommonModels } from "@/data/common/common.models";
 import { UsersModels } from "@/data/users/users.models";
 import { UsersQueries } from "@/data/users/users.queries";
 import { useStateAndRef } from "@/hooks/useStateAndRef";
@@ -34,7 +35,7 @@ export namespace AuthContext {
       AuthErrors.RegisterErrorCodes
     >;
     isLoggedIn: boolean;
-    user: UsersModels.UserResponseDto | undefined;
+    user: CommonModels.UserResponseDto | undefined;
     isInitializing: boolean;
     shouldPerformSync: boolean;
   }
@@ -175,15 +176,6 @@ export namespace AuthContext {
     }, [applyAccessToken, setIsLoggedIn, getAuthHeader, performLogoutAsync, refetchProfile, shouldPerformSync]);
 
     useEffect(() => {
-      console.log("isInitializing", isInitializing);
-      console.log("authIsLoggedIn", authIsLoggedIn);
-      console.log("isLoggedIn", isLoggedIn);
-      console.log("isLoggedInRef", isLoggedInRef.current);
-      console.log("queryClient", queryClient);
-      console.log("setIsLoggedIn", setIsLoggedIn);
-      console.log("syncProfile", syncProfile);
-      console.log("unapplyAccessToken", unapplyAccessToken);
-      console.log("children", children);
       if (isInitializing) {
         return undefined;
       }

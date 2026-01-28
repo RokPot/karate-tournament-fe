@@ -4,6 +4,9 @@ export const enum QueryModule {
   Healthcheck = "HealthcheckQueries",
   Users = "UsersQueries",
   Clubs = "ClubsQueries",
+  Registrations = "RegistrationsQueries",
+  Tournaments = "TournamentsQueries",
+  Categories = "CategoriesQueries",
   Test = "TestQueries",
 }
 

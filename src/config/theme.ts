@@ -187,6 +187,28 @@ export const createUnifiedTheme = (isDarkMode: boolean = false) => {
           root: {
             "& .MuiOutlinedInput-root": {
               borderRadius: "0.375rem", // input-rounding
+              // Style calendar picker icons for date/datetime-local inputs (Chrome/Safari/Edge)
+              "& input[type='date']::-webkit-calendar-picker-indicator": {
+                cursor: "pointer",
+                opacity: 0.9,
+                filter: isDarkMode ? "invert(1) brightness(1.5)" : "invert(0) brightness(0.8)",
+              },
+              "& input[type='datetime-local']::-webkit-calendar-picker-indicator": {
+                cursor: "pointer",
+                opacity: 0.9,
+                filter: isDarkMode ? "invert(1) brightness(1.5)" : "invert(0) brightness(0.8)",
+              },
+              // Firefox support
+              "& input[type='date']::-moz-calendar-picker-indicator": {
+                cursor: "pointer",
+                opacity: 0.9,
+                filter: isDarkMode ? "invert(1) brightness(1.5)" : "invert(0) brightness(0.8)",
+              },
+              "& input[type='datetime-local']::-moz-calendar-picker-indicator": {
+                cursor: "pointer",
+                opacity: 0.9,
+                filter: isDarkMode ? "invert(1) brightness(1.5)" : "invert(0) brightness(0.8)",
+              },
             },
           },
         },

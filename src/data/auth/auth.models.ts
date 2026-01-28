@@ -39,7 +39,7 @@ export namespace AuthModels {
   export type ResendConfirmRequest = z.infer<typeof ResendConfirmRequestSchema>;
 
   export const ConfirmFormSchema = z.object({
-    code: z.string().min(1, i18n.t("auth.confirm.code.required")),
+    code: z.string().min(1, i18n.t("auth.shared.password.required")),
   });
 
   export type ConfirmForm = z.infer<typeof ConfirmFormSchema>;
@@ -69,7 +69,7 @@ export namespace AuthModels {
   export const ResetPasswordRequestSchema = z.object({
     email: SharedModels.OptionalEmailModel,
     password: SharedModels.PasswordModel,
-    code: z.string().min(1, i18n.t("auth.resetPassword.code.required")),
+    code: z.string().min(1, i18n.t("auth.shared.password.required")),
   });
 
   export type ResetPasswordRequest = z.infer<typeof ResetPasswordRequestSchema>;

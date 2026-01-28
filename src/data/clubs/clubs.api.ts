@@ -11,7 +11,7 @@ export namespace ClubsApi {
   };
 
   export const findAll = () => {
-    return AppRestClient.get({ resSchema: ClubsModels.FindAllResponseSchema }, `/clubs`);
+    return AppRestClient.get({ resSchema: ClubsModels.ClubsFindAllResponseSchema }, `/clubs`);
   };
 
   export const findOne = (id: string) => {

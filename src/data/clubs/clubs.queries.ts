@@ -44,7 +44,7 @@ export namespace ClubsQueries {
    * @summary Get all clubs
    * @description Retrieves a list of all clubs
    * @param { AppQueryOptions } options Query options
-   * @returns { UseQueryResult<ClubsModels.FindAllResponse> } List of clubs
+   * @returns { UseQueryResult<ClubsModels.ClubsFindAllResponse> } List of clubs
    * @statusCodes [200, 401]
    */
   export const useFindAll = <TData>(options?: AppQueryOptions<typeof ClubsApi.findAll, TData>) => {

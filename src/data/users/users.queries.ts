@@ -20,7 +20,7 @@ export namespace UsersQueries {
    * @summary Get current user profile
    * @description Retrieves the profile of the currently authenticated user
    * @param { AppQueryOptions } options Query options
-   * @returns { UseQueryResult<UsersModels.UserResponseDto> } User profile
+   * @returns { UseQueryResult<CommonModels.UserResponseDto> } User profile
    * @statusCodes [200, 401]
    */
   export const useGetProfile = <TData>(options?: AppQueryOptions<typeof UsersApi.getProfile, TData>) => {
@@ -37,7 +37,7 @@ export namespace UsersQueries {
    * @description Updates the profile of the currently authenticated user
    * @param { UsersModels.UpdateUserDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
-   * @returns { UseMutationResult<UsersModels.UserResponseDto> } User profile updated
+   * @returns { UseMutationResult<CommonModels.UserResponseDto> } User profile updated
    * @statusCodes [200, 400, 401]
    */
   export const useUpdateProfile = (
@@ -62,7 +62,7 @@ export namespace UsersQueries {
    * @description Retrieves a specific user by their ID
    * @param { string } object.id Path parameter
    * @param { AppQueryOptions } options Query options
-   * @returns { UseQueryResult<UsersModels.UserResponseDto> } User found
+   * @returns { UseQueryResult<CommonModels.UserResponseDto> } User found
    * @statusCodes [200, 401, 404]
    */
   export const useFindOne = <TData>(

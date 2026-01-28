@@ -4,4 +4,7 @@ export const RouteConfig = {
   signin: "/sign-in/",
   signup: "/sign-up/",
   bugReport: "/bug-report/",
+  tournaments: "/tournaments/",
 };
+
+export const getTournamentDetailRoute = (id: string) => `/tournament/${id}/`;

@@ -30,9 +30,9 @@ export namespace ClubsModels {
   export type UpdateClubDto = z.infer<typeof UpdateClubDtoSchema>;
 
   /**
-   * FindAllResponseSchema
+   * ClubsFindAllResponseSchema
    * @type { array }
    */
-  export const FindAllResponseSchema = z.array(CommonModels.ClubResponseDtoSchema);
-  export type FindAllResponse = z.infer<typeof FindAllResponseSchema>;
+  export const ClubsFindAllResponseSchema = z.array(CommonModels.ClubResponseDtoSchema);
+  export type ClubsFindAllResponse = z.infer<typeof ClubsFindAllResponseSchema>;
 }
