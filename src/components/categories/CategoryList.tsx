@@ -19,7 +19,7 @@ export const CategoryList = ({ categories }: IProps) => {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {categories.map((category) => (
-        <Card key={category.id}>
+        <Card key={category.id} className="shadow-card!">
           <CardContent>
             <Typography size="h6" className="mb-2">
               {category.name}

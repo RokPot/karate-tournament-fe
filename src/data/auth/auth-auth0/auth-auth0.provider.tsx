@@ -4,6 +4,7 @@ import { useCallback } from "react";
 
 import { AppConfig } from "@/config/app.config";
 import { AuthContext } from "@/data/auth/auth.context";
+import { logger } from "@/util/logger";
 
 export const AuthAuth0Provider = ({ children }: React.PropsWithChildren) => {
   return (
@@ -33,7 +34,7 @@ const Auth0 = ({ children }: React.PropsWithChildren) => {
     }
   }
 
-  async function handleLogin<T>(req: T | null) {
+  async function handleLogin<T>(_req: T | null) {
     await loginWithRedirect({
       authorizationParams: {
         redirect_uri: AppConfig.authAuth0.loginRedirectPath?.replace(/\/$/, ""),
@@ -42,7 +43,7 @@ const Auth0 = ({ children }: React.PropsWithChildren) => {
     });
   }
 
-  async function handleRegister<T>(req: T | null) {
+  async function handleRegister<T>(_req: T | null) {
     try {
       await loginWithRedirect({
         authorizationParams: {
@@ -52,8 +53,7 @@ const Auth0 = ({ children }: React.PropsWithChildren) => {
         },
       });
     } catch (e) {
-      alert(e);
-      console.error(e);
+      logger.error(e);
     }
   }
 

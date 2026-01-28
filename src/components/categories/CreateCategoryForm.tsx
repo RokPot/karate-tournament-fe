@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem, FormControl, InputLabel, Checkbox, FormControlLabel, FormGroup, FormLabel } from "@mui/material";
+import { Button, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem, FormControl, InputLabel, Checkbox, FormControlLabel, FormGroup, FormLabel } from "@mui/material";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CategoriesModels } from "@/data/categories/categories.models";
 import { CategoriesQueries } from "@/data/categories/categories.queries";
 import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
-import { TournamentsApi } from "@/data/tournaments/tournaments.api";
 import { CommonModels } from "@/data/common/common.models";
 import { useToast } from "@/components/ui/status/Toast/useToast";
 import { QueryModule } from "@/data/invalidateQueries";
@@ -21,11 +20,10 @@ interface IProps {
   currentCategoryIds: string[];
 }
 
-export const CreateCategoryForm = ({ open, onClose, tournamentId, currentCategoryIds }: IProps) => {
+export const CreateCategoryForm = ({ open, onClose, tournamentId, }: IProps) => {
   const { successToast, errorToast } = useToast();
   const queryClient = useQueryClient();
-  const { data: tournament } = TournamentsQueries.useFindOne({ id: tournamentId });
-  console.log(tournament);
+
   const createCategoryMutation = CategoriesQueries.useCreateAndAssign({
     invalidateCurrentModule: true,
     onSuccess: async () => {

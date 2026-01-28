@@ -8,15 +8,16 @@
     "plugin:jsx-a11y/recommended",
     "prettier"
   ],
-  "plugins": ["tailwindcss", "no-relative-import-paths", "n", "jsx-a11y", "unused-imports"],
+  "plugins": [
+    "no-relative-import-paths",
+    "n",
+    "jsx-a11y",
+    "unused-imports",
+    "tailwind-v4"
+  ],
   "parserOptions": {
     "project": "./tsconfig.json",
     "tsconfigRootDir": "."
-  },
-  "settings": {
-    "tailwindcss": {
-      "config": "tailwind.config.ts"
-    }
   },
   "root": true,
   "rules": {
@@ -35,7 +36,7 @@
     "@typescript-eslint/no-loop-func": "off",
     "react/require-default-props": "off",
     "@typescript-eslint/no-use-before-define": "off",
-    "tailwindcss/no-custom-classname": ["error"],
+    "tailwind-v4/no-undefined-classes": "off",
     "react/destructuring-assignment": "off",
     "no-bitwise": "off",
     "no-plusplus": "off",
@@ -44,7 +45,13 @@
     "@typescript-eslint/no-namespace": "off",
     "no-console": "error",
     "no-continue": "off",
-    "no-relative-import-paths/no-relative-import-paths": ["error", { "allowSameFolder": true }],
+    "react-hooks/exhaustive-deps": "warn",
+    "no-relative-import-paths/no-relative-import-paths": [
+      "error",
+      {
+        "allowSameFolder": true
+      }
+    ],
     "n/no-process-env": "error",
     "react/no-array-index-key": "off",
     "@typescript-eslint/no-unused-vars": "off",
@@ -57,7 +64,15 @@
         "argsIgnorePattern": "^_"
       }
     ],
-    "no-param-reassign": ["error", { "props": true, "ignorePropertyModificationsFor": ["state"] }]
+    "no-param-reassign": [
+      "error",
+      {
+        "props": true,
+        "ignorePropertyModificationsFor": [
+          "state"
+        ]
+      }
+    ]
   },
   "overrides": [
     {

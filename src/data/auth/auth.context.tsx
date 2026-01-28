@@ -2,7 +2,6 @@ import { UseMutationResult, useQueryClient } from "@tanstack/react-query";
 import { createContext, use, useCallback, useEffect, useMemo, useState } from "react";
 
 import { CommonModels } from "@/data/common/common.models";
-import { UsersModels } from "@/data/users/users.models";
 import { UsersQueries } from "@/data/users/users.queries";
 import { useStateAndRef } from "@/hooks/useStateAndRef";
 import { AppRestClient } from "@/util/rest/clients/app-rest-client";

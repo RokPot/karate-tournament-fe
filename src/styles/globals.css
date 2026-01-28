@@ -15,27 +15,34 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
+
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: red;;
+    border-color: #101010;
+    ;
     /* @apply border-neutral-300; */
   }
 }
 
 @utility no-scrollbar {
+
   /* Hide scrollbar for Chrome, Safari and Opera */
   &::-webkit-scrollbar {
     display: none;
   }
+
   /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 @layer utilities {
+
   body,
   html {
     height: 100%;
@@ -50,11 +57,9 @@
 
     --yellow-gradient: linear-gradient(0deg, #ffd001 0%, #fffc9d 100%);
     --yellow-gradient-box: linear-gradient(0deg, #ffd001 0%, #fff808 100%);
-    --skeleton-gradient: linear-gradient(
-      138deg,
-      #232323 14.32%,
-      #656565 126.83%
-    );
+    --skeleton-gradient: linear-gradient(138deg,
+        #232323 14.32%,
+        #656565 126.83%);
   }
 
   input:-webkit-autofill,

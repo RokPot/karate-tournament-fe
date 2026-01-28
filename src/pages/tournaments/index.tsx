@@ -57,7 +57,7 @@ const TournamentsPage = () => {
                                     Location: {tournament.location}
                                 </Typography>
                                 <Typography size="body-paragraph-m" className="mb-1 text-gray-600">
-                                    Date: {new Date(tournament.date).toLocaleDateString()}
+                                    Date: {new Date(tournament.startDate).toLocaleDateString()}
                                 </Typography>
                                 <Typography size="body-paragraph-m" className="mb-1 text-gray-600">
                                     Start Time: {new Date(tournament.startDate).toLocaleTimeString()}

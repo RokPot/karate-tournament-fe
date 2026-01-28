@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { TournamentsModels } from "@/data/tournaments/tournaments.models";
 import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
 import { useToast } from "@/components/ui/status/Toast/useToast";
-import { getTournamentDetailRoute, RouteConfig } from "@/config/route.config";
+import { getTournamentDetailRoute } from "@/config/route.config";
 import { useRouter } from "next/router";
 import CustomDialog from "@/components/ui/overlays/CustomDialog";
 
@@ -42,12 +42,11 @@ export const CreateTournamentForm = ({ open, onClose }: IProps) => {
     // Convert date and datetime-local inputs to proper formats
     const formattedData: TournamentsModels.CreateTournamentDto = {
       ...data,
-      // date is already in YYYY-MM-DD format from date input
-      // registrationDeadline needs to be converted from datetime-local (YYYY-MM-DDTHH:mm) to ISO string
       registrationDeadline: data.registrationDeadline
         ? new Date(data.registrationDeadline).toISOString()
         : data.registrationDeadline,
-      startDate: data.startDate,
+      startDate: data.startDate ? new Date(data.startDate).toISOString()
+        : data.startDate,
     };
     createMutation.mutate({ data: formattedData });
   };

@@ -202,6 +202,7 @@ const config = {
         "highlight-blue": "0px 0px 6px 0px #3B82F6",
         "avatar-menu": "0 4px 23px 0 rgba(78, 78, 78, 0.46)",
         menu: " 0 1px 10px 0 rgba(255, 255, 255, 0.10)",
+        card: "0 1px 6px 0 rgba(255, 255, 255, 0.15)",
       },
       blur: {
         "0": "0px",

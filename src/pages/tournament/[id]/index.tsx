@@ -41,11 +41,11 @@ const TournamentDetailPage = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <Button variant="outlined" onClick={() => router.back()} className="mb-4">
+      <Button variant="outlined" onClick={() => router.back()} className="mb-4!">
         Back
       </Button>
 
-      <Card className="mb-6">
+      <Card className="mb-6 shadow-card!">
         <CardContent>
           <Typography size="h2" className="mb-4">
             {tournament.name}
