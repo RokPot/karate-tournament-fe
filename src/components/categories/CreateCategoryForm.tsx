@@ -12,6 +12,7 @@ import { QueryModule } from "@/data/invalidateQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import CustomDialog from "@/components/ui/overlays/CustomDialog";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
   open: boolean;
@@ -23,12 +24,13 @@ interface IProps {
 export const CreateCategoryForm = ({ open, onClose, tournamentId, }: IProps) => {
   const { successToast, errorToast } = useToast();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const createCategoryMutation = CategoriesQueries.useCreateAndAssign({
     invalidateCurrentModule: true,
     onSuccess: async () => {
 
-      successToast({ text: "Category created successfully" });
+      successToast({ text: t("categories.create.success") });
       await queryClient.invalidateQueries({ queryKey: [QueryModule.Categories] });
       await queryClient.invalidateQueries({ queryKey: [QueryModule.Tournaments] });
       await queryClient.invalidateQueries({ queryKey: [TournamentsQueries.keys.findOne(tournamentId)] });
@@ -36,7 +38,7 @@ export const CreateCategoryForm = ({ open, onClose, tournamentId, }: IProps) => 
       onClose();
     },
     onError: (error) => {
-      errorToast({ text: error?.message || "Failed to create category" });
+      errorToast({ text: error?.message || t("categories.create.error") });
     },
   });
 
@@ -79,10 +81,10 @@ export const CreateCategoryForm = ({ open, onClose, tournamentId, }: IProps) => 
   return (
     <CustomDialog open={open} onClose={handleClose} maxWidth="md">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogTitle>Create Category</DialogTitle>
+        <DialogTitle>{t("categories.create.title")}</DialogTitle>
         <DialogContent className="flex flex-col gap-4 pt-4!">
           <TextField
-            label="Name"
+            label={t("categories.create.name")}
             {...register("name")}
             error={!!errors.name}
             helperText={errors.name?.message}
@@ -91,15 +93,15 @@ export const CreateCategoryForm = ({ open, onClose, tournamentId, }: IProps) => 
           />
 
           <FormControl fullWidth required error={!!errors.discipline}>
-            <InputLabel>Discipline</InputLabel>
+            <InputLabel>{t("shared.discipline")}</InputLabel>
             <Select
               value={discipline || ""}
               onChange={(e) => setValue("discipline", e.target.value as CategoriesModels.DisciplineEnum)}
-              label="Discipline"
+              label={t("shared.discipline")}
             >
-              <MenuItem value="kata">Kata</MenuItem>
-              <MenuItem value="kumite">Kumite</MenuItem>
-              <MenuItem value="yako-soku">Yako-soku</MenuItem>
+              <MenuItem value="kata">{t("shared.kata")}</MenuItem>
+              <MenuItem value="kumite">{t("shared.kumite")}</MenuItem>
+              <MenuItem value="yako-soku">{t("shared.yako-soku")}</MenuItem>
             </Select>
             {errors.discipline && (
               <Typography size="body-paragraph-xs" className="text-danger mt-1">
@@ -110,7 +112,7 @@ export const CreateCategoryForm = ({ open, onClose, tournamentId, }: IProps) => 
 
           <FormControl fullWidth required error={!!errors.gender} component="fieldset">
             <FormLabel component="legend" required>
-              Gender
+              {t("shared.gender")}
             </FormLabel>
             <FormGroup>
               <FormControlLabel
@@ -120,7 +122,7 @@ export const CreateCategoryForm = ({ open, onClose, tournamentId, }: IProps) => 
                     onChange={() => handleGenderChange("male")}
                   />
                 }
-                label="Male"
+                label={t("categories.create.male")}
               />
               <FormControlLabel
                 control={
@@ -129,7 +131,7 @@ export const CreateCategoryForm = ({ open, onClose, tournamentId, }: IProps) => 
                     onChange={() => handleGenderChange("female")}
                   />
                 }
-                label="Female"
+                label={t("categories.create.female")}
               />
             </FormGroup>
             {errors.gender && (
@@ -141,28 +143,26 @@ export const CreateCategoryForm = ({ open, onClose, tournamentId, }: IProps) => 
 
           <div className="grid grid-cols-2 gap-4">
             <TextField
-              label="Min Age"
+              label={t("categories.create.ageMin")}
               type="number"
               {...register("ageMin", { valueAsNumber: true })}
               error={!!errors.ageMin}
               helperText={errors.ageMin?.message}
               fullWidth
-              required
             />
             <TextField
-              label="Max Age"
+              label={t("categories.create.ageMax")}
               type="number"
               {...register("ageMax", { valueAsNumber: true })}
               error={!!errors.ageMax}
               helperText={errors.ageMax?.message}
               fullWidth
-              required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <TextField
-              label="Min Weight (kg)"
+              label={t("categories.create.weightMin")}
               type="number"
               {...register("weightMin", { valueAsNumber: true })}
               error={!!errors.weightMin}
@@ -170,7 +170,7 @@ export const CreateCategoryForm = ({ open, onClose, tournamentId, }: IProps) => 
               fullWidth
             />
             <TextField
-              label="Max Weight (kg)"
+              label={t("categories.create.weightMax")}
               type="number"
               {...register("weightMax", { valueAsNumber: true })}
               error={!!errors.weightMax}
@@ -179,56 +179,58 @@ export const CreateCategoryForm = ({ open, onClose, tournamentId, }: IProps) => 
             />
           </div>
 
-          <FormControl fullWidth required error={!!errors.beltMin}>
-            <InputLabel>Min Belt</InputLabel>
-            <Select
-              value={beltMin || ""}
-              onChange={(e) => setValue("beltMin", e.target.value as CommonModels.BeltEnum)}
-              label="Min Belt"
-            >
-              {Object.values(CommonModels.BeltEnum).map((belt) => (
-                <MenuItem key={belt} value={belt}>
-                  {belt.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.beltMin && (
-              <Typography size="body-paragraph-xs" className="text-danger mt-1">
-                {errors.beltMin.message}
-              </Typography>
-            )}
-          </FormControl>
+          <div className="grid grid-cols-2 gap-4">
+            <FormControl fullWidth required error={!!errors.beltMin}>
+              <InputLabel>{t("categories.create.beltMin")}</InputLabel>
+              <Select
+                value={beltMin || ""}
+                onChange={(e) => setValue("beltMin", e.target.value as CommonModels.BeltEnum)}
+                label={t("categories.create.beltMin")}
+              >
+                {Object.values(CommonModels.BeltEnum).map((belt) => (
+                  <MenuItem key={belt} value={belt}>
+                    {belt.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.beltMin && (
+                <Typography size="body-paragraph-xs" className="text-danger mt-1">
+                  {errors.beltMin.message}
+                </Typography>
+              )}
+            </FormControl>
 
-          <FormControl fullWidth required error={!!errors.beltMax}>
-            <InputLabel>Max Belt</InputLabel>
-            <Select
-              value={beltMax || ""}
-              onChange={(e) => setValue("beltMax", e.target.value as CommonModels.BeltEnum)}
-              label="Max Belt"
-            >
-              {Object.values(CommonModels.BeltEnum).map((belt) => (
-                <MenuItem key={belt} value={belt}>
-                  {belt.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.beltMax && (
-              <Typography size="body-paragraph-xs" className="text-danger mt-1">
-                {errors.beltMax.message}
-              </Typography>
-            )}
-          </FormControl>
+            <FormControl fullWidth required error={!!errors.beltMax}>
+              <InputLabel>{t("categories.create.beltMax")}</InputLabel>
+              <Select
+                value={beltMax || ""}
+                onChange={(e) => setValue("beltMax", e.target.value as CommonModels.BeltEnum)}
+                label={t("categories.create.beltMax")}
+              >
+                {Object.values(CommonModels.BeltEnum).map((belt) => (
+                  <MenuItem key={belt} value={belt}>
+                    {belt.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.beltMax && (
+                <Typography size="body-paragraph-xs" className="text-danger mt-1">
+                  {errors.beltMax.message}
+                </Typography>
+              )}
+            </FormControl>
+          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} disabled={createCategoryMutation.isPending}>
-            Cancel
+            {t("shared.cancel")}
           </Button>
           <Button
             type="submit"
             variant="contained"
             disabled={createCategoryMutation.isPending || genderSelection.length === 0}
           >
-            {createCategoryMutation.isPending ? "Creating..." : "Create"}
+            {createCategoryMutation.isPending ? t("shared.creating") : t("shared.create")}
           </Button>
         </DialogActions>
       </form>

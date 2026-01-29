@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import { Loader } from "@/components/ui/status/Loader/Loader";
 import { Pagination } from "@/components/ui/table/Pagination";
 import { Typography } from "@/components/ui/text/Typography/Typography";
+import { cx } from "class-variance-authority";
 
 export type PaginationParams = PaginationState;
 export type SortParams = { sortBy: `${string}.${"asc" | "desc"}` };
@@ -96,6 +97,7 @@ export const Table = <TData,>({
     defaultColumn: {
       size: undefined,
     },
+
   });
 
   return (
@@ -107,7 +109,7 @@ export const Table = <TData,>({
         <table className="w-full px-3" style={{ tableLayout }}>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className={tableClasses.tableHeader}>
+              <tr key={headerGroup.id} className={cx(tableClasses.tableHeader, "sticky top-0")}>
                 {headerGroup.headers.map((header) => {
                   return (
                     <th
@@ -131,8 +133,9 @@ export const Table = <TData,>({
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className={clsx(rowClassname?.(row.original), tableClasses.tableRow, onRowClick && "cursor-pointer")}
-                  onClick={() => onRowClick?.(row.original)}
+
+                  className={clsx(rowClassname?.(row.original), tableClasses.tableRow, onRowClick && "cursor-pointer", row.getIsSelected() && "bg-primary-500 hover:bg-primary-500/70!")}
+                  onClick={() => { onRowClick?.(row.original); table.toggleAllRowsSelected(false); row.toggleSelected(); }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td

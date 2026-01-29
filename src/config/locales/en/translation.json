@@ -39,7 +39,22 @@
     },
     "pagination": {
       "loadMore": "Load more"
-    }
+    },
+    "cancel": "Cancel",
+    "create": "Create",
+    "creating": "Creating...",
+    "edit": "Edit",
+    "location": "Location",
+    "startDate": "Start Date",
+    "registrationDeadline": "Registration Deadline",
+    "weight": "Weight",
+    "age": "Age",
+    "belt": "Belt",
+    "discipline": "Discipline",
+    "gender": "Gender",
+    "kata": "Kata",
+    "kumite": "Kumite",
+    "yako-soku": "Yako-soku"
   },
   "ui": {
     "dropdown": {
@@ -60,7 +75,6 @@
       "createNewBtn": "Create"
     }
   },
-
   "auth": {
     "shared": {
       "email": {
@@ -78,11 +92,31 @@
         "lostPassword": "Lost your password?"
       }
     }
-
-   
   },
   "table": {
     "noData": "No data found",
     "seeAll": "See all ({{count}})"
+  },
+  "categories": {
+    "title": "Categories",
+    "noCategories": "No categories found",
+    "create": {
+      "success": "Category created successfully",
+      "error": "Failed to create category",
+      "title": "Create Category",
+      "name": "Name",
+      "ageMin": "Age Min",
+      "ageMax": "Age Max",
+      "weightMin": "Weight Min (kg)",
+      "weightMax": "Weight Max (kg)",
+      "beltMin": "Belt Min",
+      "beltMax": "Belt Max",
+      "male": "Male",
+      "female": "Female"
+    }
+  },
+  "registrations": {
+    "attendees": "Attendees",
+    "noAttendees": "No attendees found"
   }
 }
