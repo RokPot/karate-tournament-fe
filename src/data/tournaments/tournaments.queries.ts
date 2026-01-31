@@ -128,4 +128,33 @@ export namespace TournamentsQueries {
       },
     });
   };
+
+  /**
+   * Mutation `useAssignCategories`
+   * @summary Assign categories to tournament
+   * @description Sets the tournament&#x27;s categories to the given list. Any previously assigned categories not in the list are unassigned.
+   * @param { string } mutation.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { TournamentsModels.AssignCategoriesDto } mutation.data Body parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<TournamentsModels.TournamentResponseDto> } Categories assigned successfully
+   * @statusCodes [200, 400, 401, 404]
+   */
+  export const useAssignCategories = (
+    options?: AppMutationOptions<
+      typeof TournamentsApi.assignCategories,
+      { id: string; data: TournamentsModels.AssignCategoriesDto }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id, data }) => TournamentsApi.assignCategories(id, data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
 }

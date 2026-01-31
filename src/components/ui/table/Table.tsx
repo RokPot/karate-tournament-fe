@@ -33,7 +33,7 @@ export interface SeeAllData {
 }
 
 export const tableClasses = {
-  table: "min-h-[90px] w-full max-w-[1300px] overflow-x-auto rounded-xs border border-secondary-200",
+  table: "min-h-[90px] w-full max-w-[1500px] overflow-x-auto rounded-xs border border-secondary-200",
   tableHeader: "border-b border-secondary-200 bg-secondary-200",
   tableRow: "group border-b border-secondary-200  transition-colors duration-150 hover:bg-secondary-200",
   tableCell: "min-w-11",

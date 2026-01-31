@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { CategoriesModels } from "@/data/categories/categories.models";
 import { CategoriesQueries } from "@/data/categories/categories.queries";
-import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
 import { CommonModels } from "@/data/common/common.models";
 import { useToast } from "@/components/ui/status/Toast/useToast";
 import { QueryModule } from "@/data/invalidateQueries";
@@ -16,26 +15,24 @@ import { useTranslation } from "react-i18next";
 
 interface IProps {
   open: boolean;
-  onClose: () => void;
-  tournamentId: string;
-  currentCategoryIds: string[];
+  onClose: (category?: CategoriesModels.CategoryResponseDto) => void;
+
 }
 
-export const CreateCategoryForm = ({ open, onClose, tournamentId, }: IProps) => {
+export const CreateCategoryForm = ({ open, onClose }: IProps) => {
   const { successToast, errorToast } = useToast();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
 
-  const createCategoryMutation = CategoriesQueries.useCreateAndAssign({
+  const createCategoryMutation = CategoriesQueries.useCreate({
     invalidateCurrentModule: true,
-    onSuccess: async () => {
+    onSuccess: async (data) => {
 
       successToast({ text: t("categories.create.success") });
       await queryClient.invalidateQueries({ queryKey: [QueryModule.Categories] });
-      await queryClient.invalidateQueries({ queryKey: [QueryModule.Tournaments] });
-      await queryClient.invalidateQueries({ queryKey: [TournamentsQueries.keys.findOne(tournamentId)] });
+
       reset();
-      onClose();
+      onClose(data);
     },
     onError: (error) => {
       errorToast({ text: error?.message || t("categories.create.error") });
@@ -63,7 +60,7 @@ export const CreateCategoryForm = ({ open, onClose, tournamentId, }: IProps) => 
   const beltMax = watch("beltMax");
 
   const onSubmit = (data: CategoriesModels.CreateCategoryDto) => {
-    createCategoryMutation.mutate({ data: { ...data, gender: genderSelection, tournamentId } });
+    createCategoryMutation.mutate({ data: { ...data, gender: genderSelection } });
   };
 
   const handleClose = () => {

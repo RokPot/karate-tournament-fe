@@ -24,4 +24,12 @@ export namespace TournamentsApi {
   export const remove = (id: string) => {
     return AppRestClient.delete({ resSchema: z.void() }, `/tournaments/${id}`);
   };
+
+  export const assignCategories = (id: string, data: TournamentsModels.AssignCategoriesDto) => {
+    return AppRestClient.put(
+      { resSchema: TournamentsModels.TournamentResponseDtoSchema },
+      `/tournaments/${id}/categories`,
+      data,
+    );
+  };
 }
