@@ -16,4 +16,5 @@ export interface TableProps<TData> {
   rowHeight?: number;
   containerClassName?: string;
   flexibleColumnId?: string;
+  emptyState?: React.ReactNode;
 }

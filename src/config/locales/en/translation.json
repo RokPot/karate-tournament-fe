@@ -39,7 +39,46 @@
     },
     "pagination": {
       "loadMore": "Load more"
-    }
+    },
+    "cancel": "Cancel",
+    "create": "Create",
+    "creating": "Creating...",
+    "edit": "Edit",
+    "location": "Location",
+    "startDate": "Start Date",
+    "registrationDeadline": "Registration Deadline",
+    "weight": "Weight",
+    "age": "Age",
+    "belt": "Belt",
+    "discipline": "Discipline",
+    "gender": "Gender",
+    "kata": "Kata",
+    "kumite": "Kumite",
+    "yako-soku": "Yako-soku",
+    "back": "Back",
+    "createNew": "Create New",
+    "save": "Save",
+    "remove": "Remove"
+  },
+  "belt": {
+    "white": "White",
+    "yellow": "Yellow",
+    "orange": "Orange",
+    "green": "Green",
+    "blue": "Blue",
+    "purple": "Purple",
+    "brown": "Brown",
+    "black": "Black",
+    "black_dan_1": "Black Dan 1",
+    "black_dan_2": "Black Dan 2",
+    "black_dan_3": "Black Dan 3",
+    "black_dan_4": "Black Dan 4",
+    "black_dan_5": "Black Dan 5",
+    "black_dan_6": "Black Dan 6",
+    "black_dan_7": "Black Dan 7",
+    "black_dan_8": "Black Dan 8",
+    "black_dan_9": "Black Dan 9",
+    "black_dan_10": "Black Dan 10"
   },
   "ui": {
     "dropdown": {
@@ -60,7 +99,6 @@
       "createNewBtn": "Create"
     }
   },
-
   "auth": {
     "shared": {
       "email": {
@@ -78,11 +116,36 @@
         "lostPassword": "Lost your password?"
       }
     }
-
-   
   },
   "table": {
     "noData": "No data found",
     "seeAll": "See all ({{count}})"
+  },
+  "categories": {
+    "title": "Categories",
+    "noCategories": "No categories found",
+    "addCategory": "Add Category",
+    "create": {
+      "success": "Category created successfully",
+      "error": "Failed to create category",
+      "title": "Create Category",
+      "name": "Name",
+      "ageMin": "Age Min",
+      "ageMax": "Age Max",
+      "weightMin": "Weight Min (kg)",
+      "weightMax": "Weight Max (kg)",
+      "beltMin": "Belt Min",
+      "beltMax": "Belt Max",
+      "male": "Male",
+      "female": "Female"
+    },
+    "addCategoryModal": {
+      "success": "Categories added successfully",
+      "error": "Failed to add categories"
+    }
+  },
+  "registrations": {
+    "attendees": "Attendees",
+    "noAttendees": "No attendees found"
   }
 }

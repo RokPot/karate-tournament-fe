@@ -3,7 +3,7 @@ import { observeElementRect, useVirtualizer } from "@tanstack/react-virtual";
 import { cx } from "class-variance-authority";
 import clsx from "clsx";
 import { throttle } from "lodash-es";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Loader } from "@/components/ui/status/Loader/Loader";
@@ -26,24 +26,11 @@ export const VirtualizedTable = <TData,>({
   noBorder,
   showAllColumns = false, // 👈 NEW PROP WITH DEFAULT VALUE
   rowHeight = 47,
-  flexibleColumnId,
+  flexibleColumnId, // Column that should grow to fill remaining space
+  emptyState,
 }: TableProps<TData>) => {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({});
   const [columnOrder, setColumnOrder] = useState<ColumnOrderState>([]);
-  const [manuallyToggledColumns, setManuallyToggledColumns] = useState<Set<string>>(new Set());
-
-  // Use refs to avoid dependency loops in callbacks
-  const columnVisibilityRef = useRef(columnVisibility);
-  const manuallyToggledColumnsRef = useRef(manuallyToggledColumns);
-
-  // Keep refs in sync with state
-  useEffect(() => {
-    columnVisibilityRef.current = columnVisibility;
-  }, [columnVisibility]);
-
-  useEffect(() => {
-    manuallyToggledColumnsRef.current = manuallyToggledColumns;
-  }, [manuallyToggledColumns]);
   const table = useReactTable({
     data,
     columns,
@@ -57,24 +44,7 @@ export const VirtualizedTable = <TData,>({
     manualFiltering: true,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    onColumnVisibilityChange: (updater) => {
-      setColumnVisibility(updater);
-      // Track which columns have been manually toggled
-      if (typeof updater === "function") {
-        const newVisibility = updater(columnVisibilityRef.current);
-        Object.keys(newVisibility).forEach((columnId) => {
-          if (newVisibility[columnId] !== columnVisibilityRef.current[columnId]) {
-            setManuallyToggledColumns((prev) => new Set(prev).add(columnId));
-          }
-        });
-      } else {
-        Object.keys(updater).forEach((columnId) => {
-          if (updater[columnId] !== columnVisibilityRef.current[columnId]) {
-            setManuallyToggledColumns((prev) => new Set(prev).add(columnId));
-          }
-        });
-      }
-    },
+    onColumnVisibilityChange: setColumnVisibility,
     onColumnOrderChange: setColumnOrder,
     defaultColumn: {
       size: undefined,
@@ -151,8 +121,9 @@ export const VirtualizedTable = <TData,>({
     [table, showAllColumns], // 👈 ADDED showAllColumns TO DEPENDENCIES
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleResize = useCallback(
-    (parentWidth: number) => {
+    throttle((parentWidth: number) => {
       // 👈 NEW: Skip resize handling if showAllColumns is true
       if (showAllColumns) {
         const allColumns = table.getAllColumns();
@@ -167,40 +138,33 @@ export const VirtualizedTable = <TData,>({
       const allColumns = table.getAllColumns();
       const visibleColumnIds = calculateVisibleColumns(parentWidth);
       const newVisibility: Record<string, boolean> = {};
-
       allColumns.forEach((column) => {
-        // If column was manually toggled, preserve its current visibility
-        if (manuallyToggledColumnsRef.current.has(column.id)) {
-          newVisibility[column.id] = columnVisibilityRef.current[column.id] ?? true;
-        } else {
-          // Otherwise, use automatic width-based visibility
-          newVisibility[column.id] = visibleColumnIds.includes(column.id);
-        }
+        newVisibility[column.id] = visibleColumnIds.includes(column.id);
       });
 
       setColumnVisibility(newVisibility);
-    },
-    [table, calculateVisibleColumns, showAllColumns],
+    }, 30),
+    [table, calculateVisibleColumns, showAllColumns], // 👈 ADDED showAllColumns TO DEPENDENCIES
   );
 
-  const throttledHandleResize = useMemo(() => throttle(handleResize, 30), [handleResize]);
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      throttledHandleResize(parentRef.current?.clientWidth ?? 0);
+      handleResize(parentRef.current?.clientWidth ?? 0);
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [throttledHandleResize]);
+  }, [handleResize]);
 
   useEffect(() => {
     const handleWindowResize = () => {
-      throttledHandleResize(parentRef.current?.clientWidth ?? 0);
+      handleResize(parentRef.current?.clientWidth ?? 0);
     };
 
     window.addEventListener("resize", handleWindowResize);
     return () => window.removeEventListener("resize", handleWindowResize);
-  }, [throttledHandleResize]);
+  }, [handleResize]);
 
   const virtualizer = useVirtualizer({
     count: rows.length,
@@ -208,16 +172,28 @@ export const VirtualizedTable = <TData,>({
     estimateSize: () => rowHeight,
     observeElementRect: (instance, cb) => {
       observeElementRect(instance, (rect) => {
+
+
         cb(rect);
-        throttledHandleResize(rect.width);
+        handleResize(rect.width);
       });
     },
   });
 
+  if (data.length === 0 && !isLoading) {
+    return (
+      emptyState ?? (
+        <Typography size="body-paragraph-m" variant="default" className="text-text-default-primary">
+          {t("table.noData")}
+        </Typography>
+      )
+    );
+  }
+
   return (
     <div
       data-virtual-table="container"
-      className={clsx("flex w-full flex-[1_1_0] flex-col", tableClasses.table, noBorder && "rounded-none! border-0")}
+      className={clsx("flex w-full flex-[1_1_0] flex-col", tableClasses.table, noBorder && "!rounded-none border-0")}
     >
       {table.getHeaderGroups().map((headerGroup) => (
         <div
@@ -227,6 +203,7 @@ export const VirtualizedTable = <TData,>({
         >
           {headerGroup.headers.map((header) => {
             const isFlexibleColumn = TableUtils.isColumnFlexible(header.column, flexibleColumnId);
+
             return (
               <div
                 key={header.id}
@@ -286,7 +263,7 @@ export const VirtualizedTable = <TData,>({
             })}
           {!isLoading && table.getRowModel().rows.length === 0 && (
             <div>
-              <Typography size="body-paragraph-m" variant="default" className="text-white">
+              <Typography size="body-paragraph-m" variant="default" className="text-text-default-primary">
                 {t("table.noData")}
               </Typography>
             </div>
