@@ -14,6 +14,8 @@ import { CategoriesModels } from "@/data/categories/categories.models";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAdd, faPencil } from "@fortawesome/free-solid-svg-icons";
 import AddOrCreateCategoryModal from "@/components/categories/AddOrCreateCategoryModal";
+import Pill from "@/components/ui/Pill";
+import { useAuthRoles } from "@/hooks/useAuthRoles";
 
 const TournamentDetailPage = () => {
   const router = useRouter();
@@ -29,6 +31,8 @@ const TournamentDetailPage = () => {
     refetch: refetchTournament,
   } = TournamentsQueries.useFindOne({ id: tournamentId }, { enabled: !!tournamentId });
 
+  const { isClubOwner } = useAuthRoles();
+
   const { data: allCategories } = CategoriesQueries.useFindAll();
 
   // Filter categories that belong to this tournament
@@ -36,6 +40,8 @@ const TournamentDetailPage = () => {
     if (!tournament || !allCategories) return [];
     return allCategories.filter((category) => tournament.categoryIds.includes(category.id));
   }, [tournament, allCategories]);
+
+
 
   if (isTournamentLoading) {
     return <LoadingState />;
@@ -52,32 +58,32 @@ const TournamentDetailPage = () => {
           <Typography size="h2" >
             {tournament.name}
           </Typography>
-          <IconButton className="h-10 w-10">
+          {isClubOwner && <IconButton className="h-10 w-10">
             <FontAwesomeIcon icon={faPencil} className="text-primary-200" size="xs" />
-          </IconButton>
+          </IconButton>}
         </div>
         <div className="flex flex-row gap-1 flex-wrap">
-          <div className="flex flex-row flex-wrap items-center gap-0-5 rounded-[22px] bg-secondary-100 border border-elevation-outline-1 px-3 py-1-5 w-fit">
+          <Pill>
             <Typography size="body-paragraph-s" className="text-text-inverted-secondary">
               {t("shared.location")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">
               {tournament.location}
             </Typography>
-          </div>
-          <div className="flex flex-row flex-wrap items-center gap-0-5 rounded-[22px] bg-secondary-100 border border-elevation-outline-1 px-3 py-1-5 w-fit">
+          </Pill>
+          <Pill>
             <Typography size="body-paragraph-s" className="font-weight-500">
               {new Date(tournament.startDate).toLocaleDateString()}
             </Typography>
-          </div>
-          <div className="flex flex-row flex-wrap items-center gap-0-5 rounded-[22px] bg-secondary-100 border border-elevation-outline-1 px-3 py-1-5 w-fit">
+          </Pill>
+          <Pill>
             <Typography size="body-paragraph-s" className="text-text-inverted-secondary">
               {t("shared.registrationDeadline")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">
               {new Date(tournament.registrationDeadline).toLocaleDateString()}
             </Typography>
-          </div>
+          </Pill>
         </div>
 
       </div>
@@ -89,12 +95,12 @@ const TournamentDetailPage = () => {
         </div>
         <div className="mb-5 flex items-center justify-between">
           <Typography size="h3">{t("categories.title")} ({tournamentCategories.length})</Typography>
-          <Button variant="contained" onClick={() => setCreateCategoryDialogOpen(true)}>
+          {isClubOwner && <Button variant="contained" onClick={() => setCreateCategoryDialogOpen(true)}>
             <div className="flex flex-row items-center gap-0-5">
               <FontAwesomeIcon icon={faAdd} />
               {t("categories.addCategory")}
             </div>
-          </Button>
+          </Button>}
         </div>
         <div className="max-w-[calc(100vw-330px)] pb-5">
           <CategoryList categories={tournamentCategories} setSelectedCategory={setSelectedCategory} />
@@ -110,13 +116,6 @@ const TournamentDetailPage = () => {
         </div>
 
       </div>
-
-      {/* <CreateCategoryForm
-        open={createCategoryDialogOpen}
-        onClose={() => setCreateCategoryDialogOpen(false)}
-        tournamentId={tournamentId}
-        currentCategoryIds={tournament.categoryIds}
-      /> */}
 
       <AddOrCreateCategoryModal
         open={createCategoryDialogOpen}

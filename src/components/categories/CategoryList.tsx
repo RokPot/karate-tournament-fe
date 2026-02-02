@@ -78,7 +78,7 @@ export const CategoryList = ({ categories, setSelectedCategory }: IProps) => {
   return (
     <div className="max-h-[400px] min-h-[90px] h-fit flex w-full flex-[1_1_0]">
       <Table
-        data={[...categories, ...categories, ...categories, ...categories]}
+        data={categories}
         columns={columns}
         sorting={[]}
         onSortingChange={() => { }}

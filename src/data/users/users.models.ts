@@ -12,7 +12,7 @@ export namespace UsersModels {
    * @property { string } birthDate Birth date. Example: `1990-01-01`
    * @property { number } weight Weight in kg. Maximum: `999.99`. Example: `75.5`
    * @property { string } beltLevel Belt level. Example: `black`
-   * @property { string[] } roles User roles. Example: `competitor,coach`
+   * @property { string[] } roles User roles. Example: `club_member,club_coach`
    * @property { string } clubId Club ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    */
   export const UpdateUserDtoSchema = z

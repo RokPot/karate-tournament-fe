@@ -14,6 +14,14 @@ export namespace ClubsApi {
     return AppRestClient.get({ resSchema: ClubsModels.ClubsFindAllResponseSchema }, `/clubs`);
   };
 
+  export const getMembers = (id: string) => {
+    return AppRestClient.get({ resSchema: ClubsModels.GetMembersResponseSchema }, `/clubs/${id}/members`);
+  };
+
+  export const getTournaments = (id: string) => {
+    return AppRestClient.get({ resSchema: ClubsModels.GetTournamentsResponseSchema }, `/clubs/${id}/tournaments`);
+  };
+
   export const findOne = (id: string) => {
     return AppRestClient.get({ resSchema: CommonModels.ClubResponseDtoSchema }, `/clubs/${id}`);
   };

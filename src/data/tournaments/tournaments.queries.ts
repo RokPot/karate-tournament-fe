@@ -21,7 +21,7 @@ export namespace TournamentsQueries {
    * @description Creates a new karate tournament
    * @param { TournamentsModels.CreateTournamentDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
-   * @returns { UseMutationResult<TournamentsModels.TournamentResponseDto> } Tournament created successfully
+   * @returns { UseMutationResult<CommonModels.TournamentResponseDto> } Tournament created successfully
    * @statusCodes [201, 400, 401]
    */
   export const useCreate = (
@@ -62,7 +62,7 @@ export namespace TournamentsQueries {
    * @description Retrieves a specific tournament by its ID
    * @param { string } object.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { AppQueryOptions } options Query options
-   * @returns { UseQueryResult<TournamentsModels.TournamentResponseDto> } Tournament found
+   * @returns { UseQueryResult<CommonModels.TournamentResponseDto> } Tournament found
    * @statusCodes [200, 401, 404]
    */
   export const useFindOne = <TData>(
@@ -83,7 +83,7 @@ export namespace TournamentsQueries {
    * @param { string } mutation.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { TournamentsModels.UpdateTournamentDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
-   * @returns { UseMutationResult<TournamentsModels.TournamentResponseDto> } Tournament updated successfully
+   * @returns { UseMutationResult<CommonModels.TournamentResponseDto> } Tournament updated successfully
    * @statusCodes [200, 400, 401, 404]
    */
   export const useUpdate = (
@@ -136,7 +136,7 @@ export namespace TournamentsQueries {
    * @param { string } mutation.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { TournamentsModels.AssignCategoriesDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
-   * @returns { UseMutationResult<TournamentsModels.TournamentResponseDto> } Categories assigned successfully
+   * @returns { UseMutationResult<CommonModels.TournamentResponseDto> } Categories assigned successfully
    * @statusCodes [200, 400, 401, 404]
    */
   export const useAssignCategories = (

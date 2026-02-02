@@ -22,6 +22,7 @@ export namespace AuthContext {
       AuthModels.RegisterResult | void,
       AuthErrors.RegisterErrorCodes
     >;
+    useLoginForInvite: AuthAction<{ token: string }, void>;
     useResendConfirm: AuthAction<AuthModels.ResendConfirmRequest>;
     useForgotPassword: AuthAction<AuthModels.ForgotPasswordRequest>;
     useResetPassword: AuthAction<AuthModels.ResetPasswordRequest, void, AuthErrors.ResetPasswordErrorCodes>;
@@ -51,6 +52,7 @@ export namespace AuthContext {
     useLogin: Type["useLogin"];
     useSocialLogin: Type["useSocialLogin"];
     useRegister: Type["useRegister"];
+    useLoginForInvite: Type["useLoginForInvite"];
     useLogout: Type["useLogout"];
     useResendConfirm: Type["useResendConfirm"];
     useForgotPassword: Type["useForgotPassword"];
@@ -68,6 +70,7 @@ export namespace AuthContext {
     useLogin,
     useSocialLogin,
     useRegister,
+    useLoginForInvite,
     useResendConfirm,
     useConfirm,
     useForgotPassword,
@@ -88,12 +91,22 @@ export namespace AuthContext {
     const resetAllAuthMutations = useCallback(() => {
       useLogin.reset();
       useRegister.reset();
+      useLoginForInvite.reset();
       useResendConfirm.reset();
       useConfirm.reset();
       useLogout.reset();
       useRefresh?.reset();
       useSocialCredentials?.reset();
-    }, [useLogin, useRegister, useResendConfirm, useConfirm, useLogout, useRefresh, useSocialCredentials]);
+    }, [
+      useLogin,
+      useRegister,
+      useLoginForInvite,
+      useResendConfirm,
+      useConfirm,
+      useLogout,
+      useRefresh,
+      useSocialCredentials,
+    ]);
 
     RoutingUtils.useOnPageChange(resetAllAuthMutations);
 
@@ -204,6 +217,7 @@ export namespace AuthContext {
         useLogin,
         useSocialLogin,
         useRegister,
+        useLoginForInvite,
         useResendConfirm,
         useForgotPassword,
         useResetPassword,
@@ -219,6 +233,7 @@ export namespace AuthContext {
         useLogin,
         useSocialLogin,
         useRegister,
+        useLoginForInvite,
         useResendConfirm,
         useForgotPassword,
         useResetPassword,

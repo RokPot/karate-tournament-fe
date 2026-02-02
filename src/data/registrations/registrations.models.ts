@@ -4,13 +4,13 @@ import { CommonModels } from "@/data/common/common.models";
 
 export namespace RegistrationsModels {
   /**
-   * StatusEnumSchema
+   * RegistrationStatusEnumSchema
    * @type { enum }
    * @description Registration status,E,x,a,m,p,l,e,:, ,`,p,e,n,d,i,n,g,`
    */
-  export const StatusEnumSchema = z.enum(["pending", "approved", "rejected"]);
-  export type StatusEnum = z.infer<typeof StatusEnumSchema>;
-  export const StatusEnum = StatusEnumSchema.enum;
+  export const RegistrationStatusEnumSchema = z.enum(["pending", "approved", "rejected"]);
+  export type RegistrationStatusEnum = z.infer<typeof RegistrationStatusEnumSchema>;
+  export const RegistrationStatusEnum = RegistrationStatusEnumSchema.enum;
 
   /**
    * RegistrationResponseDtoSchema
@@ -33,7 +33,7 @@ export namespace RegistrationsModels {
     clubId: z.string(),
     tournamentId: z.string(),
     categoryId: z.string(),
-    status: StatusEnumSchema,
+    status: RegistrationStatusEnumSchema,
     finalWeight: z.number().nullish(),
     user: CommonModels.UserResponseDtoSchema.nullish(),
     club: CommonModels.ClubResponseDtoSchema.nullish(),
