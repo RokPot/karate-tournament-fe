@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Link } from "@/components/ui/text/Link/Link";
 import { useMemo } from "react";
 import logo from "src/assets/images/logo-4.png";
-import { ProfileMenu } from "./ProfileMenu.jsx";
+import { ProfileMenu } from "./ProfileMenu";
 
 interface NavbarLinkData {
   href: string;

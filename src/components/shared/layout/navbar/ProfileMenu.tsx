@@ -1,23 +1,20 @@
 import * as React from "react";
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Avatar from "@mui/material/Avatar";
 import { Link } from "@/components/ui/text/Link/Link";
 
 export const ProfileMenu: React.FC = () => {
-  // State for menu open/close
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  // Hard-coded menu links (black box)
   const profileLinks = [
     { href: "/profile", label: "Profile" },
     { href: "/settings", label: "Settings" },
     { href: "/logout", label: "Logout" },
   ];
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -27,16 +24,29 @@ export const ProfileMenu: React.FC = () => {
 
   return (
     <div>
-      <button type="button" onClick={handleClick}>
-        <FontAwesomeIcon size="lg" icon={faUser} style={{ color: "#edc000" }} />
-      </button>
+      <Avatar
+        onClick={handleClick}
+        aria-controls={open ? "profile-menu" : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? "true" : undefined}
+        sx={{
+          cursor: "pointer",
+          bgcolor: "#edc000",
+          width: 40,
+          height: 40,
+        }}
+      >
+        {/* Optional: initials or icon */}
+        U
+      </Avatar>
 
       <Menu
+        id="profile-menu"
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
         {profileLinks.map((link) => (
           <MenuItem key={link.href} onClick={handleClose}>
