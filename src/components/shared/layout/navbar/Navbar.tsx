@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Link } from "@/components/ui/text/Link/Link";
 import { useMemo } from "react";
 import logo from "src/assets/images/logo-4.png";
-import { ProfileMenu } from "./ProfileMenu";
+import { ProfileMenu } from "./ProfileMenu.jsx";
 
 interface NavbarLinkData {
   href: string;
@@ -36,6 +36,5 @@ export const Navbar = () => {
         ))}
       </div>
       <ProfileMenu />
-    </header>
-  );
+    </header>  );
 };
