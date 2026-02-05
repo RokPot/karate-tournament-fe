@@ -41,7 +41,14 @@ export namespace CommonModels {
    * UserEnumSchema
    * @type { enum }
    */
-  export const UserEnumSchema = z.enum(["admin", "club_owner", "club_member", "club_coach", "free_member", "judge"]);
+  export const UserEnumSchema = z.enum([
+    "admin",
+    "club_owner",
+    "club_member",
+    "club_coach",
+    "free_member",
+    "judge",
+  ]);
   export type UserEnum = z.infer<typeof UserEnumSchema>;
   export const UserEnum = UserEnumSchema.enum;
 
@@ -52,6 +59,7 @@ export namespace CommonModels {
    * @property { string } name Club name. Example: `Tokyo Karate Club`
    * @property { string } address Club address. Example: `123 Main Street, Tokyo, Japan`
    * @property { string } country Club country. Example: `Japan`
+   * @property { number } membersCount Number of members (users) in the club. Example: `42`
    * @property { string } createdAt Creation timestamp. Example: `2024-01-01T00:00:00.000Z`
    * @property { string } updatedAt Last update timestamp. Example: `2024-01-01T00:00:00.000Z`
    * @property { string } inviteUrl Invite URL for club owner (present only when club was created with ownerEmail). Example: `http://localhost:8000/invite/abc123`
@@ -61,6 +69,7 @@ export namespace CommonModels {
     name: z.string(),
     address: z.string().nullish(),
     country: z.string().nullish(),
+    membersCount: z.number(),
     createdAt: z.string().datetime({ offset: true }),
     updatedAt: z.string().datetime({ offset: true }),
     inviteUrl: z.string().nullish(),
@@ -75,6 +84,7 @@ export namespace CommonModels {
    * @property { string } clubId Club ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { string } firstName First name. Example: `John`
    * @property { string } lastName Last name. Example: `Doe`
+   * @property { string } email Email (for display and future Auth0 linking). Example: `member@example.com`
    * @property { string } gender Gender. Example: `male`
    * @property { string } birthDate Birth date. Example: `1990-01-01`
    * @property { number } weight Weight in kg. Example: `75.5`
@@ -90,6 +100,7 @@ export namespace CommonModels {
     clubId: z.string().nullish(),
     firstName: z.string().nullish(),
     lastName: z.string().nullish(),
+    email: z.string().nullish(),
     gender: CommonModels.GenderEnumSchema.nullish(),
     birthDate: z.string().nullish(),
     weight: z.number().nullish(),
@@ -131,5 +142,7 @@ export namespace CommonModels {
     createdAt: z.string().datetime({ offset: true }),
     updatedAt: z.string().datetime({ offset: true }),
   });
-  export type TournamentResponseDto = z.infer<typeof TournamentResponseDtoSchema>;
+  export type TournamentResponseDto = z.infer<
+    typeof TournamentResponseDtoSchema
+  >;
 }

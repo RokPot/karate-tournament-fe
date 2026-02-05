@@ -38,7 +38,7 @@ const ClubsPage = () => {
             {
                 header: ({ header }) => HeaderCell(header, t("shared.membersCount")),
                 accessorKey: "membersCount",
-                cell: () => TextCell("0"),
+                cell: ({ row }) => TextCell(row.original.membersCount.toString()),
             }
         ]
     }, [t])
@@ -53,10 +53,15 @@ const ClubsPage = () => {
 
     return (
         <div className="p-5">
-            <div className="flex items-center justify-between pb-4">
+            <div className="flex items-center justify-between pb-4 h-14">
                 <Typography size="h3" >{t("clubs.title")}</Typography>
-                <Button variant="contained" color="primary" onClick={() => setCreateModalOpen(true)}>
-                    <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                <Button
+                    variant="contained"
+                    color="primary"
+                    className="flex items-center gap-2"
+                    onClick={() => setCreateModalOpen(true)}
+                >
+                    <FontAwesomeIcon icon={faPlus} />
                     {t("clubs.createNew")}
                 </Button>
             </div>

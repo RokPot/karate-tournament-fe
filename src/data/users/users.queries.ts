@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-import { QueryModule, InvalidateQueryOptions, invalidateQueries } from "@/data/invalidateQueries";
+import {
+  QueryModule,
+  InvalidateQueryOptions,
+  invalidateQueries,
+} from "@/data/invalidateQueries";
 import { AppQueryOptions, AppMutationOptions } from "@/types/react-query";
-
-import { UsersApi } from "./users.api";
 import { UsersModels } from "./users.models";
+import { UsersApi } from "./users.api";
 
 export namespace UsersQueries {
   export const moduleName = QueryModule.Users;
@@ -23,7 +25,9 @@ export namespace UsersQueries {
    * @returns { UseQueryResult<CommonModels.UserResponseDto> } User profile
    * @statusCodes [200, 401]
    */
-  export const useGetProfile = <TData>(options?: AppQueryOptions<typeof UsersApi.getProfile, TData>) => {
+  export const useGetProfile = <TData>(
+    options?: AppQueryOptions<typeof UsersApi.getProfile, TData>,
+  ) => {
     return useQuery({
       queryKey: keys.getProfile(),
       queryFn: UsersApi.getProfile,
@@ -41,7 +45,10 @@ export namespace UsersQueries {
    * @statusCodes [200, 400, 401]
    */
   export const useUpdateProfile = (
-    options?: AppMutationOptions<typeof UsersApi.updateProfile, { data: UsersModels.UpdateUserDto }> &
+    options?: AppMutationOptions<
+      typeof UsersApi.updateProfile,
+      { data: UsersModels.UpdateUserDto }
+    > &
       InvalidateQueryOptions,
   ) => {
     const queryClient = useQueryClient();

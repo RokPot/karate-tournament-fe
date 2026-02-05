@@ -94,7 +94,7 @@ export const InvitationsPage = () => {
 
   return (
     <div className="p-5">
-      <div className="pb-4">
+      <div className="pb-4 h-14 flex items-center justify-start">
         <Typography size="h3">{t("invitations.title")}</Typography>
       </div>
       {!invitations?.length ? (

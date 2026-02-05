@@ -26,7 +26,13 @@ export const AuthAuth0Provider = ({ children }: React.PropsWithChildren) => {
 };
 
 const Auth0 = ({ children }: React.PropsWithChildren) => {
-  const { loginWithRedirect, logout, getAccessTokenSilently, isLoading, isAuthenticated } = useAuth0();
+  const {
+    loginWithRedirect,
+    logout,
+    getAccessTokenSilently,
+    isLoading,
+    isAuthenticated,
+  } = useAuth0();
 
   async function handleOperation<T>(req: T | null) {
     if (!req) {
@@ -49,7 +55,10 @@ const Auth0 = ({ children }: React.PropsWithChildren) => {
     try {
       await loginWithRedirect({
         authorizationParams: {
-          redirect_uri: AppConfig.authAuth0.loginRedirectPath?.replace(/\/$/, ""),
+          redirect_uri: AppConfig.authAuth0.loginRedirectPath?.replace(
+            /\/$/,
+            "",
+          ),
           audience: AppConfig.authAuth0.audience?.replace(/\/$/, ""),
           screen_hint: "signup",
         },
@@ -65,7 +74,10 @@ const Auth0 = ({ children }: React.PropsWithChildren) => {
       localStorage.setItem(PENDING_INVITE_TOKEN_KEY, req.token);
       await loginWithRedirect({
         authorizationParams: {
-          redirect_uri: AppConfig.authAuth0.loginRedirectPath?.replace(/\/$/, ""),
+          redirect_uri: AppConfig.authAuth0.loginRedirectPath?.replace(
+            /\/$/,
+            "",
+          ),
           audience: AppConfig.authAuth0.audience?.replace(/\/$/, ""),
           screen_hint: "signup",
         },

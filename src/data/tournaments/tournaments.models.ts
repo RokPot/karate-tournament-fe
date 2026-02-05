@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { CommonModels } from "@/data/common/common.models";
 
 export namespace TournamentsModels {
@@ -26,7 +25,9 @@ export namespace TournamentsModels {
    * @type { object }
    * @property { string[] } categoryIds Category IDs to assign to the tournament. Any previously assigned categories not in this list are unassigned.. Example: `123e4567-e89b-12d3-a456-426614174000,223e4567-e89b-12d3-a456-426614174001`
    */
-  export const AssignCategoriesDtoSchema = z.object({ categoryIds: z.array(z.string().uuid()) });
+  export const AssignCategoriesDtoSchema = z.object({
+    categoryIds: z.array(z.string().uuid()),
+  });
   export type AssignCategoriesDto = z.infer<typeof AssignCategoriesDtoSchema>;
 
   /**
@@ -53,6 +54,10 @@ export namespace TournamentsModels {
    * TournamentsFindAllResponseSchema
    * @type { array }
    */
-  export const TournamentsFindAllResponseSchema = z.array(CommonModels.TournamentResponseDtoSchema);
-  export type TournamentsFindAllResponse = z.infer<typeof TournamentsFindAllResponseSchema>;
+  export const TournamentsFindAllResponseSchema = z.array(
+    CommonModels.TournamentResponseDtoSchema,
+  );
+  export type TournamentsFindAllResponse = z.infer<
+    typeof TournamentsFindAllResponseSchema
+  >;
 }

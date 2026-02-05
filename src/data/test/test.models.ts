@@ -44,6 +44,10 @@ export namespace TestModels {
    * @property { string } timestamp Timestamp of the response. Example: `2024-01-01T00:00:00.000Z`
    * @property { object } data Request data that was received. Example: `[object Object]`
    */
-  export const TestResponseDtoSchema = z.object({ message: z.string(), timestamp: z.string(), data: z.object({}) });
+  export const TestResponseDtoSchema = z.object({
+    message: z.string(),
+    timestamp: z.string(),
+    data: z.object({}),
+  });
   export type TestResponseDto = z.infer<typeof TestResponseDtoSchema>;
 }

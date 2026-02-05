@@ -4,12 +4,17 @@ import { RoutingUtils } from "@/util/routing.utils";
 
 export namespace AuthUtils {
   export function getRedirectUri(provider: AuthModels.SocialProvider): string {
-    return RoutingUtils.getCompleteUrlFromPath(`${AppConfig.authAuth0.socialRedirectPath}/${provider}`, {
-      noTrailingSlash: true,
-    });
+    return RoutingUtils.getCompleteUrlFromPath(
+      `${AppConfig.authAuth0.socialRedirectPath}/${provider}`,
+      {
+        noTrailingSlash: true,
+      },
+    );
   }
 
-  export function generateGoogleLoginUrl(credentials: AuthModels.SocialCredentialsResponse): string {
+  export function generateGoogleLoginUrl(
+    credentials: AuthModels.SocialCredentialsResponse,
+  ): string {
     const { baseUrl, clientId, scopes, responseType } = credentials;
     const redirectUri = getRedirectUri("google");
 
@@ -17,7 +22,9 @@ export namespace AuthUtils {
     return `${baseUrl}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=${responseType}&scope=${encodeURIComponent(scopeParam)}`;
   }
 
-  export function generateFacebookLoginUrl(credentials: AuthModels.SocialCredentialsResponse): string {
+  export function generateFacebookLoginUrl(
+    credentials: AuthModels.SocialCredentialsResponse,
+  ): string {
     const { baseUrl, clientId, responseType, scopes } = credentials;
     const redirectUri = getRedirectUri("facebook");
 
@@ -37,7 +44,9 @@ export namespace AuthUtils {
         return generateFacebookLoginUrl(credentials);
       }
       default:
-        throw new Error(`Login with social provider "${provider}" is not supported`);
+        throw new Error(
+          `Login with social provider "${provider}" is not supported`,
+        );
     }
   }
 }

@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-import { QueryModule, InvalidateQueryOptions, invalidateQueries } from "@/data/invalidateQueries";
+import {
+  QueryModule,
+  InvalidateQueryOptions,
+  invalidateQueries,
+} from "@/data/invalidateQueries";
 import { AppQueryOptions, AppMutationOptions } from "@/types/react-query";
-
-import { ClubsApi } from "./clubs.api";
 import { ClubsModels } from "./clubs.models";
+import { ClubsApi } from "./clubs.api";
 
 export namespace ClubsQueries {
   export const moduleName = QueryModule.Clubs;
@@ -12,8 +14,10 @@ export namespace ClubsQueries {
   export const keys = {
     all: [moduleName] as const,
     findAll: () => [...keys.all, "/clubs"] as const,
-    getMembers: (id: string) => [...keys.all, "/clubs/:id/members", id] as const,
-    getTournaments: (id: string) => [...keys.all, "/clubs/:id/tournaments", id] as const,
+    getMembers: (id: string) =>
+      [...keys.all, "/clubs/:id/members", id] as const,
+    getTournaments: (id: string) =>
+      [...keys.all, "/clubs/:id/tournaments", id] as const,
     findOne: (id: string) => [...keys.all, "/clubs/:id", id] as const,
   };
 
@@ -27,7 +31,11 @@ export namespace ClubsQueries {
    * @statusCodes [201, 400, 401]
    */
   export const useCreate = (
-    options?: AppMutationOptions<typeof ClubsApi.create, { data: ClubsModels.CreateClubDto }> & InvalidateQueryOptions,
+    options?: AppMutationOptions<
+      typeof ClubsApi.create,
+      { data: ClubsModels.CreateClubDto }
+    > &
+      InvalidateQueryOptions,
   ) => {
     const queryClient = useQueryClient();
 
@@ -49,11 +57,42 @@ export namespace ClubsQueries {
    * @returns { UseQueryResult<ClubsModels.ClubsFindAllResponse> } List of clubs
    * @statusCodes [200, 401]
    */
-  export const useFindAll = <TData>(options?: AppQueryOptions<typeof ClubsApi.findAll, TData>) => {
+  export const useFindAll = <TData>(
+    options?: AppQueryOptions<typeof ClubsApi.findAll, TData>,
+  ) => {
     return useQuery({
       queryKey: keys.findAll(),
       queryFn: ClubsApi.findAll,
       ...options,
+    });
+  };
+
+  /**
+   * Mutation `useAddMember`
+   * @summary Add a member to the club
+   * @description Creates a new user (without Auth0) and adds them to the club with the given role. The user can be linked to Auth0 later.
+   * @param { string } mutation.id Path parameter. Club ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { ClubsModels.AddMemberDto } mutation.data Body parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<CommonModels.UserResponseDto> } Member created and added to club
+   * @statusCodes [201, 400, 401, 404]
+   */
+  export const useAddMember = (
+    options?: AppMutationOptions<
+      typeof ClubsApi.addMember,
+      { id: string; data: ClubsModels.AddMemberDto }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id, data }) => ClubsApi.addMember(id, data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
     });
   };
 
@@ -128,7 +167,10 @@ export namespace ClubsQueries {
    * @statusCodes [200, 400, 401, 404]
    */
   export const useUpdate = (
-    options?: AppMutationOptions<typeof ClubsApi.update, { id: string; data: ClubsModels.UpdateClubDto }> &
+    options?: AppMutationOptions<
+      typeof ClubsApi.update,
+      { id: string; data: ClubsModels.UpdateClubDto }
+    > &
       InvalidateQueryOptions,
   ) => {
     const queryClient = useQueryClient();
@@ -153,7 +195,8 @@ export namespace ClubsQueries {
    * @statusCodes [204, 401, 404]
    */
   export const useRemove = (
-    options?: AppMutationOptions<typeof ClubsApi.remove, { id: string }> & InvalidateQueryOptions,
+    options?: AppMutationOptions<typeof ClubsApi.remove, { id: string }> &
+      InvalidateQueryOptions,
   ) => {
     const queryClient = useQueryClient();
 

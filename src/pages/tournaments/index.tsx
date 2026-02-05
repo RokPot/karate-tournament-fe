@@ -2,7 +2,7 @@ import { Button, Card, CardContent } from "@mui/material";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
-import { CreateTournamentForm } from "@/components/tournaments/CreateTournamentForm";
+import { CreateTournamentModal } from "@/components/tournaments/CreateTournamentModal";
 import { ErrorState } from "@/components/shared/layout/ErrorState";
 import { LoadingState } from "@/components/shared/layout/LoadingState";
 import { Typography } from "@/components/ui/text/Typography/Typography";
@@ -72,7 +72,16 @@ const TournamentsPage = () => {
                 </div>
             )}
 
-            <CreateTournamentForm open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} />
+
+            <CreateTournamentModal
+                open={createDialogOpen}
+                onClose={(newTournament) => {
+                    setCreateDialogOpen(false);
+                    if (newTournament) {
+                        router.push(getTournamentDetailRoute(newTournament.id));
+                    }
+                }}
+            />
         </div>
     );
 };

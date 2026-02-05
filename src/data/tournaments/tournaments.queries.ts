@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-import { QueryModule, InvalidateQueryOptions, invalidateQueries } from "@/data/invalidateQueries";
+import {
+  QueryModule,
+  InvalidateQueryOptions,
+  invalidateQueries,
+} from "@/data/invalidateQueries";
 import { AppQueryOptions, AppMutationOptions } from "@/types/react-query";
-
-import { TournamentsApi } from "./tournaments.api";
 import { TournamentsModels } from "./tournaments.models";
+import { TournamentsApi } from "./tournaments.api";
 
 export namespace TournamentsQueries {
   export const moduleName = QueryModule.Tournaments;
@@ -25,7 +27,10 @@ export namespace TournamentsQueries {
    * @statusCodes [201, 400, 401]
    */
   export const useCreate = (
-    options?: AppMutationOptions<typeof TournamentsApi.create, { data: TournamentsModels.CreateTournamentDto }> &
+    options?: AppMutationOptions<
+      typeof TournamentsApi.create,
+      { data: TournamentsModels.CreateTournamentDto }
+    > &
       InvalidateQueryOptions,
   ) => {
     const queryClient = useQueryClient();
@@ -48,7 +53,9 @@ export namespace TournamentsQueries {
    * @returns { UseQueryResult<TournamentsModels.TournamentsFindAllResponse> } List of tournaments
    * @statusCodes [200, 401]
    */
-  export const useFindAll = <TData>(options?: AppQueryOptions<typeof TournamentsApi.findAll, TData>) => {
+  export const useFindAll = <TData>(
+    options?: AppQueryOptions<typeof TournamentsApi.findAll, TData>,
+  ) => {
     return useQuery({
       queryKey: keys.findAll(),
       queryFn: TournamentsApi.findAll,
@@ -115,7 +122,8 @@ export namespace TournamentsQueries {
    * @statusCodes [204, 401, 404]
    */
   export const useRemove = (
-    options?: AppMutationOptions<typeof TournamentsApi.remove, { id: string }> & InvalidateQueryOptions,
+    options?: AppMutationOptions<typeof TournamentsApi.remove, { id: string }> &
+      InvalidateQueryOptions,
   ) => {
     const queryClient = useQueryClient();
 

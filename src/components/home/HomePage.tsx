@@ -8,12 +8,13 @@ import { useEffect } from "react";
 const HomePage = () => {
     const router = useRouter();
     const { isAdmin, isClubOwner } = useAuthRoles();
-    console.log(isAdmin, isClubOwner);
+
     useEffect(() => {
         if (isClubOwner) {
             router.push(RouteConfig.myClub);
         }
     }, [isAdmin, isClubOwner])
+
     return (
         <div className="flex flex-col items-center justify-center gap-4 p-10">
             <h1 className="text-2xl font-bold">Welcome to Karate Tournament Manager</h1>

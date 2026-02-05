@@ -1,10 +1,12 @@
 import { AppRestClient } from "@/util/rest/clients/app-rest-client";
-
 import { InvitationsModels } from "./invitations.models";
 
 export namespace InvitationsApi {
   export const findAll = () => {
-    return AppRestClient.get({ resSchema: InvitationsModels.InvitationsFindAllResponseSchema }, `/invitations`);
+    return AppRestClient.get(
+      { resSchema: InvitationsModels.InvitationsFindAllResponseSchema },
+      `/invitations`,
+    );
   };
 
   export const getByToken = (token: string) => {

@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { CommonModels } from "@/data/common/common.models";
 
 export namespace CategoriesModels {
@@ -104,7 +103,9 @@ export namespace CategoriesModels {
     beltMax: CommonModels.BeltEnumSchema,
     tournamentId: z.string(),
   });
-  export type CreateCategoryWithTournamentDto = z.infer<typeof CreateCategoryWithTournamentDtoSchema>;
+  export type CreateCategoryWithTournamentDto = z.infer<
+    typeof CreateCategoryWithTournamentDtoSchema
+  >;
 
   /**
    * UpdateCategoryDtoSchema
@@ -138,6 +139,10 @@ export namespace CategoriesModels {
    * CategoriesFindAllResponseSchema
    * @type { array }
    */
-  export const CategoriesFindAllResponseSchema = z.array(CategoryResponseDtoSchema);
-  export type CategoriesFindAllResponse = z.infer<typeof CategoriesFindAllResponseSchema>;
+  export const CategoriesFindAllResponseSchema = z.array(
+    CategoryResponseDtoSchema,
+  );
+  export type CategoriesFindAllResponse = z.infer<
+    typeof CategoriesFindAllResponseSchema
+  >;
 }

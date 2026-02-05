@@ -54,17 +54,23 @@ export namespace AuthModels {
     email: SharedModels.EmailModel,
   });
 
-  export type ForgotPasswordRequest = z.infer<typeof ForgotPasswordRequestSchema>;
+  export type ForgotPasswordRequest = z.infer<
+    typeof ForgotPasswordRequestSchema
+  >;
 
-  export const ToForgotPasswordRequestDtoTransform = ForgotPasswordRequestSchema.transform((req) => ({
-    email: req.email,
-  }));
+  export const ToForgotPasswordRequestDtoTransform =
+    ForgotPasswordRequestSchema.transform((req) => ({
+      email: req.email,
+    }));
 
   export const ForgotPasswordResponseDtoSchema = z.object({});
 
-  export const ToForgotPasswordResponseTransform = ForgotPasswordResponseDtoSchema.transform(() => ({}));
+  export const ToForgotPasswordResponseTransform =
+    ForgotPasswordResponseDtoSchema.transform(() => ({}));
 
-  export type ForgotPasswordResponse = z.infer<typeof ToForgotPasswordResponseTransform>;
+  export type ForgotPasswordResponse = z.infer<
+    typeof ToForgotPasswordResponseTransform
+  >;
 
   export const ResetPasswordRequestSchema = z.object({
     email: SharedModels.OptionalEmailModel,
@@ -79,17 +85,21 @@ export namespace AuthModels {
   });
 
   export type RefreshRequest = z.infer<typeof RefreshRequestSchema>;
-  export const ToResetPasswordRequestDtoTransform = ResetPasswordRequestSchema.transform((req) => ({
-    email: req.email,
-    password: req.password,
-    code: req.code,
-  }));
+  export const ToResetPasswordRequestDtoTransform =
+    ResetPasswordRequestSchema.transform((req) => ({
+      email: req.email,
+      password: req.password,
+      code: req.code,
+    }));
 
   export const ResetPasswordResponseDtoSchema = z.object({});
 
-  export const ToResetPasswordResponseTransform = ResetPasswordResponseDtoSchema.transform(() => ({}));
+  export const ToResetPasswordResponseTransform =
+    ResetPasswordResponseDtoSchema.transform(() => ({}));
 
-  export type ResetPasswordResponse = z.infer<typeof ToResetPasswordResponseTransform>;
+  export type ResetPasswordResponse = z.infer<
+    typeof ToResetPasswordResponseTransform
+  >;
 
   export const SocialProviderSchema = z.union([
     z.literal("google"),
@@ -105,19 +115,24 @@ export namespace AuthModels {
     provider: SocialProviderSchema,
   });
 
-  export type SocialLoginProviderRequest = z.infer<typeof SocialLoginProviderRequestSchema>;
+  export type SocialLoginProviderRequest = z.infer<
+    typeof SocialLoginProviderRequestSchema
+  >;
 
   export const SocialCallbackRequestSchema = z.object({
     code: z.string(),
     redirectUri: z.string(),
   });
 
-  export type SocialCallbackRequest = z.infer<typeof SocialCallbackRequestSchema>;
+  export type SocialCallbackRequest = z.infer<
+    typeof SocialCallbackRequestSchema
+  >;
 
-  export const ToSocialCallbackRequestDtoTransform = SocialCallbackRequestSchema.transform((req) => ({
-    code: req.code,
-    redirectUri: req.redirectUri,
-  }));
+  export const ToSocialCallbackRequestDtoTransform =
+    SocialCallbackRequestSchema.transform((req) => ({
+      code: req.code,
+      redirectUri: req.redirectUri,
+    }));
 
   export const SocialCredentialsResponseDtoSchema = z.object({
     baseUrl: z.string(),
@@ -126,14 +141,17 @@ export namespace AuthModels {
     scopes: z.array(z.string()),
   });
 
-  export type SocialCredentialsResponse = z.infer<typeof SocialCredentialsResponseDtoSchema>;
+  export type SocialCredentialsResponse = z.infer<
+    typeof SocialCredentialsResponseDtoSchema
+  >;
 
-  export const ToSocialCredentialsResponseTransform = SocialCredentialsResponseDtoSchema.transform((res) => ({
-    baseUrl: res.baseUrl,
-    clientId: res.clientId,
-    responseType: res.responseType,
-    scopes: res.scopes,
-  }));
+  export const ToSocialCredentialsResponseTransform =
+    SocialCredentialsResponseDtoSchema.transform((res) => ({
+      baseUrl: res.baseUrl,
+      clientId: res.clientId,
+      responseType: res.responseType,
+      scopes: res.scopes,
+    }));
 
   export const SocialLoginCallbackRequestSchema = z.object({
     provider: SocialProviderSchema,
@@ -141,5 +159,7 @@ export namespace AuthModels {
     redirectUri: z.string().optional(),
   });
 
-  export type SocialLoginCallbackRequest = z.infer<typeof SocialLoginCallbackRequestSchema>;
+  export type SocialLoginCallbackRequest = z.infer<
+    typeof SocialLoginCallbackRequestSchema
+  >;
 }

@@ -4,6 +4,8 @@ import Pill from "@/components/ui/Pill";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { AuthContext } from "@/data/auth/auth.context";
 import { ClubsQueries } from "@/data/clubs/clubs.queries";
+import ClubMembersSection from "@/pages/clubs/ClubMembersSection";
+import ClubTournamentSection from "@/pages/clubs/ClubTournamentSection";
 import { faPencil } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconButton } from "@mui/material";
@@ -19,7 +21,9 @@ const MyClub = () => {
         { enabled: !!clubId },
     );
 
-    if (isLoading) {
+
+
+    if (isLoading || !club) {
         return <LoadingState />;
     }
 
@@ -66,16 +70,14 @@ const MyClub = () => {
                 </div>
 
             </div>
-            <div className="flex flex-col flex-1 p-4">
-                <p>members</p>
-                <p>list</p>
+            <div className="flex flex-col flex-1 px-6 py-4 gap-5">
+                <ClubMembersSection
+                    clubId={clubId}
+                />
 
-                <p>clubs achievemetns</p>
-                <p>list</p>
-
-                <p>clubs tournaments</p>
-                <p>list</p>
-
+                <ClubTournamentSection
+                    clubId={clubId}
+                />
             </div>
         </div>
     )

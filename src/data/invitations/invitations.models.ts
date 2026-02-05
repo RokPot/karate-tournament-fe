@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { CommonModels } from "@/data/common/common.models";
 
 export namespace InvitationsModels {
@@ -8,7 +7,12 @@ export namespace InvitationsModels {
    * @type { enum }
    * @description Invitation status,E,x,a,m,p,l,e,:, ,`,p,e,n,d,i,n,g,`
    */
-  export const InvitationStatusEnumSchema = z.enum(["pending", "accepted", "expired", "cancelled"]);
+  export const InvitationStatusEnumSchema = z.enum([
+    "pending",
+    "accepted",
+    "expired",
+    "cancelled",
+  ]);
   export type InvitationStatusEnum = z.infer<typeof InvitationStatusEnumSchema>;
   export const InvitationStatusEnum = InvitationStatusEnumSchema.enum;
 
@@ -22,7 +26,9 @@ export namespace InvitationsModels {
     user: CommonModels.UserResponseDtoSchema,
     club: CommonModels.ClubResponseDtoSchema,
   });
-  export type AcceptInvitationResponseDto = z.infer<typeof AcceptInvitationResponseDtoSchema>;
+  export type AcceptInvitationResponseDto = z.infer<
+    typeof AcceptInvitationResponseDtoSchema
+  >;
 
   /**
    * InvitationListItemDtoSchema
@@ -52,7 +58,9 @@ export namespace InvitationsModels {
     expiresAt: z.string().datetime({ offset: true }),
     acceptedAt: z.string().datetime({ offset: true }).nullish(),
   });
-  export type InvitationListItemDto = z.infer<typeof InvitationListItemDtoSchema>;
+  export type InvitationListItemDto = z.infer<
+    typeof InvitationListItemDtoSchema
+  >;
 
   /**
    * InvitationByTokenResponseDtoSchema
@@ -66,12 +74,18 @@ export namespace InvitationsModels {
     expiresAt: z.string().datetime({ offset: true }),
     status: InvitationStatusEnumSchema,
   });
-  export type InvitationByTokenResponseDto = z.infer<typeof InvitationByTokenResponseDtoSchema>;
+  export type InvitationByTokenResponseDto = z.infer<
+    typeof InvitationByTokenResponseDtoSchema
+  >;
 
   /**
    * InvitationsFindAllResponseSchema
    * @type { array }
    */
-  export const InvitationsFindAllResponseSchema = z.array(InvitationListItemDtoSchema);
-  export type InvitationsFindAllResponse = z.infer<typeof InvitationsFindAllResponseSchema>;
+  export const InvitationsFindAllResponseSchema = z.array(
+    InvitationListItemDtoSchema,
+  );
+  export type InvitationsFindAllResponse = z.infer<
+    typeof InvitationsFindAllResponseSchema
+  >;
 }

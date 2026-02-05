@@ -90,7 +90,7 @@ export const Navbar = () => {
           <Link
             key={link.href}
             href={link.href}
-            className="no-underline! hover:text-primary-400! flex flex-col items-center justify-center"
+            className="no-underline! hover:text-primary-400! flex flex-row items-center justify-center"
           >
             {link.icon && <FontAwesomeIcon icon={link.icon} />}
             {link.label}

@@ -46,8 +46,8 @@ interface TableProps<TData> extends PropsWithChildren {
   columns: ColumnDef<TData>[];
   pagination?: PaginationState;
   paginationOptions?: Pick<PaginationOptions, "onPaginationChange" | "rowCount" | "pageCount">;
-  sorting: SortingState;
-  onSortingChange: OnChangeFn<SortingState>;
+  sorting?: SortingState;
+  onSortingChange?: OnChangeFn<SortingState>;
   onRowClick?: (row: TData) => void;
   onPaginationChange?: OnChangeFn<PaginationState>;
   onRowSelectionChange?: OnChangeFn<RowSelectionState>;
@@ -65,7 +65,7 @@ export const Table = <TData,>({
   columns,
   pagination,
   paginationOptions,
-  sorting,
+  sorting = [],
   onSortingChange,
   children,
   manualSorting = true,

@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-import { QueryModule, InvalidateQueryOptions, invalidateQueries } from "@/data/invalidateQueries";
+import {
+  QueryModule,
+  InvalidateQueryOptions,
+  invalidateQueries,
+} from "@/data/invalidateQueries";
 import { AppQueryOptions, AppMutationOptions } from "@/types/react-query";
-
-import { RegistrationsApi } from "./registrations.api";
 import { RegistrationsModels } from "./registrations.models";
+import { RegistrationsApi } from "./registrations.api";
 
 export namespace RegistrationsQueries {
   export const moduleName = QueryModule.Registrations;
@@ -24,7 +26,10 @@ export namespace RegistrationsQueries {
    * @statusCodes [201, 400, 401, 404, 409]
    */
   export const useCreate = (
-    options?: AppMutationOptions<typeof RegistrationsApi.create, { data: RegistrationsModels.CreateRegistrationDto }> &
+    options?: AppMutationOptions<
+      typeof RegistrationsApi.create,
+      { data: RegistrationsModels.CreateRegistrationDto }
+    > &
       InvalidateQueryOptions,
   ) => {
     const queryClient = useQueryClient();

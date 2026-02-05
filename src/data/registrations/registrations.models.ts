@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { CommonModels } from "@/data/common/common.models";
 
 export namespace RegistrationsModels {
@@ -8,8 +7,14 @@ export namespace RegistrationsModels {
    * @type { enum }
    * @description Registration status,E,x,a,m,p,l,e,:, ,`,p,e,n,d,i,n,g,`
    */
-  export const RegistrationStatusEnumSchema = z.enum(["pending", "approved", "rejected"]);
-  export type RegistrationStatusEnum = z.infer<typeof RegistrationStatusEnumSchema>;
+  export const RegistrationStatusEnumSchema = z.enum([
+    "pending",
+    "approved",
+    "rejected",
+  ]);
+  export type RegistrationStatusEnum = z.infer<
+    typeof RegistrationStatusEnumSchema
+  >;
   export const RegistrationStatusEnum = RegistrationStatusEnumSchema.enum;
 
   /**
@@ -40,7 +45,9 @@ export namespace RegistrationsModels {
     createdAt: z.string().datetime({ offset: true }),
     updatedAt: z.string().datetime({ offset: true }),
   });
-  export type RegistrationResponseDto = z.infer<typeof RegistrationResponseDtoSchema>;
+  export type RegistrationResponseDto = z.infer<
+    typeof RegistrationResponseDtoSchema
+  >;
 
   /**
    * CreateRegistrationDtoSchema
@@ -58,7 +65,9 @@ export namespace RegistrationsModels {
     clubId: z.string(),
     finalWeight: z.number().gte(0).optional(),
   });
-  export type CreateRegistrationDto = z.infer<typeof CreateRegistrationDtoSchema>;
+  export type CreateRegistrationDto = z.infer<
+    typeof CreateRegistrationDtoSchema
+  >;
 
   /**
    * CreateRegistrationWithUserDtoSchema
@@ -88,5 +97,7 @@ export namespace RegistrationsModels {
     clubId: z.string().optional(),
     finalWeight: z.number().gte(0).optional(),
   });
-  export type CreateRegistrationWithUserDto = z.infer<typeof CreateRegistrationWithUserDtoSchema>;
+  export type CreateRegistrationWithUserDto = z.infer<
+    typeof CreateRegistrationWithUserDtoSchema
+  >;
 }

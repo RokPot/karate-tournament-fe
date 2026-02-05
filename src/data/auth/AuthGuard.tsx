@@ -10,7 +10,11 @@ export interface AuthGuardProps {
   redirectTo?: string;
 }
 
-export const AuthGuard = ({ type, redirectTo, children }: React.PropsWithChildren<AuthGuardProps>) => {
+export const AuthGuard = ({
+  type,
+  redirectTo,
+  children,
+}: React.PropsWithChildren<AuthGuardProps>) => {
   const { user, isInitializing } = AuthContext.useAuth();
   const router = useRouter();
 

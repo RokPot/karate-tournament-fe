@@ -1,8 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-import { QueryModule, InvalidateQueryOptions, invalidateQueries } from "@/data/invalidateQueries";
+import {
+  QueryModule,
+  InvalidateQueryOptions,
+  invalidateQueries,
+} from "@/data/invalidateQueries";
 import { AppQueryOptions, AppMutationOptions } from "@/types/react-query";
-
 import { InvitationsApi } from "./invitations.api";
 
 export namespace InvitationsQueries {
@@ -11,7 +13,8 @@ export namespace InvitationsQueries {
   export const keys = {
     all: [moduleName] as const,
     findAll: () => [...keys.all, "/invitations"] as const,
-    getByToken: (token: string) => [...keys.all, "/invitations/by-token/:token", token] as const,
+    getByToken: (token: string) =>
+      [...keys.all, "/invitations/by-token/:token", token] as const,
   };
 
   /**
@@ -22,7 +25,9 @@ export namespace InvitationsQueries {
    * @returns { UseQueryResult<InvitationsModels.InvitationsFindAllResponse> } List of invitations
    * @statusCodes [200, 401]
    */
-  export const useFindAll = <TData>(options?: AppQueryOptions<typeof InvitationsApi.findAll, TData>) => {
+  export const useFindAll = <TData>(
+    options?: AppQueryOptions<typeof InvitationsApi.findAll, TData>,
+  ) => {
     return useQuery({
       queryKey: keys.findAll(),
       queryFn: InvitationsApi.findAll,
@@ -60,7 +65,11 @@ export namespace InvitationsQueries {
    * @statusCodes [200, 201, 401, 404]
    */
   export const useAccept = (
-    options?: AppMutationOptions<typeof InvitationsApi.accept, { token: string }> & InvalidateQueryOptions,
+    options?: AppMutationOptions<
+      typeof InvitationsApi.accept,
+      { token: string }
+    > &
+      InvalidateQueryOptions,
   ) => {
     const queryClient = useQueryClient();
 

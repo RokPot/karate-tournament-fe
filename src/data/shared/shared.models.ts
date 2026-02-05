@@ -23,7 +23,10 @@ export namespace SharedModels {
     .email(i18n.t("auth.shared.email.invalid"))
     .min(1, i18n.t("auth.shared.email.required"));
 
-  export const OptionalEmailModel = z.string().email(i18n.t("auth.shared.email.invalid")).optional();
+  export const OptionalEmailModel = z
+    .string()
+    .email(i18n.t("auth.shared.email.invalid"))
+    .optional();
 
   export const PasswordModel = z
     .string()
