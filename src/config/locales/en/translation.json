@@ -58,7 +58,16 @@
     "back": "Back",
     "createNew": "Create New",
     "save": "Save",
-    "remove": "Remove"
+    "remove": "Remove",
+    "country": "Country",
+    "name": "Name",
+    "membersCount": "Members Count",
+    "address": "Address",
+    "birthday": "Birthday",
+    "categories": "Categories",
+    "registrationsCount": "Registrations Count",
+    "tournaments": "Tournaments",
+    "none": "None"
   },
   "belt": {
     "white": "White",
@@ -147,5 +156,63 @@
   "registrations": {
     "attendees": "Attendees",
     "noAttendees": "No attendees found"
+  },
+  "clubs": {
+    "title": "Clubs",
+    "createNew": "Create New Club",
+    "createTitle": "Create Club",
+    "createSuccess": "Club created successfully.",
+    "createError": "Failed to create club.",
+    "initialAdminEmail": "Initial club admin email (optional)",
+    "ownerFirstName": "Owner first name (optional)",
+    "ownerLastName": "Owner last name (optional)",
+    "inviteSuccessMessage": "Club created. Share this link with the club owner.",
+    "inviteLinkLabel": "Invite link",
+    "copyInviteLink": "Copy invite link",
+    "inviteLinkCopied": "Invite link copied to clipboard"
+  },
+  "tournaments": {
+    "addTournament": "Add Tournament",
+    "create": {
+      "title": "Create Tournament",
+      "success": "Tournament created successfully",
+      "error": "Failed to create tournament",
+      "startTime": "Start Time"
+    }
+  },
+  "invitations": {
+    "title": "Invitations",
+    "clubName": "Club",
+    "email": "Email",
+    "inviteeName": "Invitee",
+    "status": "Status",
+    "createdAt": "Created",
+    "expiresAt": "Expires",
+    "acceptedAt": "Accepted",
+    "statusPending": "Pending",
+    "statusAccepted": "Accepted",
+    "statusExpired": "Expired",
+    "statusCancelled": "Cancelled",
+    "noInvitations": "No invitations found",
+    "inviteHeading": "You're invited to join {{clubName}}",
+    "invalidOrExpired": "Invalid or expired invitation",
+    "signUpLogIn": "Sign up / Log in",
+    "expiresOn": "Invitation expires on {{date}}",
+    "noLongerValid": "This invitation is no longer valid",
+    "acceptSuccess": "You have joined the club.",
+    "acceptInvalid": "Invitation no longer valid"
+  },
+  "members": {
+    "addMember": "Add Member",
+    "title": "Members",
+    "create": {
+      "title": "Add member",
+      "success": "Member added successfully",
+      "error": "Failed to add member",
+      "role": "Role",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email"
+    }
   }
 }

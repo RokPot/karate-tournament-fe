@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-import { QueryModule, InvalidateQueryOptions, invalidateQueries } from "@/data/invalidateQueries";
+import {
+  QueryModule,
+  InvalidateQueryOptions,
+  invalidateQueries,
+} from "@/data/invalidateQueries";
 import { AppQueryOptions, AppMutationOptions } from "@/types/react-query";
-
-import { TournamentsApi } from "./tournaments.api";
 import { TournamentsModels } from "./tournaments.models";
+import { TournamentsApi } from "./tournaments.api";
 
 export namespace TournamentsQueries {
   export const moduleName = QueryModule.Tournaments;
@@ -21,11 +23,14 @@ export namespace TournamentsQueries {
    * @description Creates a new karate tournament
    * @param { TournamentsModels.CreateTournamentDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
-   * @returns { UseMutationResult<TournamentsModels.TournamentResponseDto> } Tournament created successfully
+   * @returns { UseMutationResult<CommonModels.TournamentResponseDto> } Tournament created successfully
    * @statusCodes [201, 400, 401]
    */
   export const useCreate = (
-    options?: AppMutationOptions<typeof TournamentsApi.create, { data: TournamentsModels.CreateTournamentDto }> &
+    options?: AppMutationOptions<
+      typeof TournamentsApi.create,
+      { data: TournamentsModels.CreateTournamentDto }
+    > &
       InvalidateQueryOptions,
   ) => {
     const queryClient = useQueryClient();
@@ -48,7 +53,9 @@ export namespace TournamentsQueries {
    * @returns { UseQueryResult<TournamentsModels.TournamentsFindAllResponse> } List of tournaments
    * @statusCodes [200, 401]
    */
-  export const useFindAll = <TData>(options?: AppQueryOptions<typeof TournamentsApi.findAll, TData>) => {
+  export const useFindAll = <TData>(
+    options?: AppQueryOptions<typeof TournamentsApi.findAll, TData>,
+  ) => {
     return useQuery({
       queryKey: keys.findAll(),
       queryFn: TournamentsApi.findAll,
@@ -62,7 +69,7 @@ export namespace TournamentsQueries {
    * @description Retrieves a specific tournament by its ID
    * @param { string } object.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { AppQueryOptions } options Query options
-   * @returns { UseQueryResult<TournamentsModels.TournamentResponseDto> } Tournament found
+   * @returns { UseQueryResult<CommonModels.TournamentResponseDto> } Tournament found
    * @statusCodes [200, 401, 404]
    */
   export const useFindOne = <TData>(
@@ -83,7 +90,7 @@ export namespace TournamentsQueries {
    * @param { string } mutation.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { TournamentsModels.UpdateTournamentDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
-   * @returns { UseMutationResult<TournamentsModels.TournamentResponseDto> } Tournament updated successfully
+   * @returns { UseMutationResult<CommonModels.TournamentResponseDto> } Tournament updated successfully
    * @statusCodes [200, 400, 401, 404]
    */
   export const useUpdate = (
@@ -115,7 +122,8 @@ export namespace TournamentsQueries {
    * @statusCodes [204, 401, 404]
    */
   export const useRemove = (
-    options?: AppMutationOptions<typeof TournamentsApi.remove, { id: string }> & InvalidateQueryOptions,
+    options?: AppMutationOptions<typeof TournamentsApi.remove, { id: string }> &
+      InvalidateQueryOptions,
   ) => {
     const queryClient = useQueryClient();
 
@@ -136,7 +144,7 @@ export namespace TournamentsQueries {
    * @param { string } mutation.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { TournamentsModels.AssignCategoriesDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
-   * @returns { UseMutationResult<TournamentsModels.TournamentResponseDto> } Categories assigned successfully
+   * @returns { UseMutationResult<CommonModels.TournamentResponseDto> } Categories assigned successfully
    * @statusCodes [200, 400, 401, 404]
    */
   export const useAssignCategories = (

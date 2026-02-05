@@ -2,6 +2,9 @@
   "prettier.enable": true,
   "prettier.configPath": "./.prettierrc.json",
   "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.codeActionsOnSave": {
     "source.fixAll": "always"
   },

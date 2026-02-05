@@ -1,5 +1,12 @@
 import { UseMutationResult, useQueryClient } from "@tanstack/react-query";
-import { createContext, use, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { CommonModels } from "@/data/common/common.models";
 import { UsersQueries } from "@/data/users/users.queries";
@@ -8,26 +15,42 @@ import { AppRestClient } from "@/util/rest/clients/app-rest-client";
 import { AuthorizationHeaderInterceptor } from "@/util/rest/interceptors/authorization-header.interceptor";
 import { TokenExpiredInterceptor } from "@/util/rest/interceptors/token-expired.interceptor";
 import { RoutingUtils } from "@/util/routing.utils";
-import { ApplicationException, GeneralErrorCodes } from "@/util/vendor/error-handling";
+import {
+  ApplicationException,
+  GeneralErrorCodes,
+} from "@/util/vendor/error-handling";
 
 import { AuthErrors } from "./auth.errors";
 import { AuthModels } from "./auth.models";
 
 export namespace AuthContext {
   export interface Type {
-    useLogin: AuthAction<AuthModels.LoginRequest | void, void, AuthErrors.LoginErrorCodes>;
+    useLogin: AuthAction<
+      AuthModels.LoginRequest | void,
+      void,
+      AuthErrors.LoginErrorCodes
+    >;
     useSocialLogin: AuthAction<AuthModels.SocialLoginCallbackRequest, void>;
     useRegister: AuthAction<
       AuthModels.RegisterRequest | void,
       AuthModels.RegisterResult | void,
       AuthErrors.RegisterErrorCodes
     >;
+    useLoginForInvite: AuthAction<{ token: string }, void>;
     useResendConfirm: AuthAction<AuthModels.ResendConfirmRequest>;
     useForgotPassword: AuthAction<AuthModels.ForgotPasswordRequest>;
-    useResetPassword: AuthAction<AuthModels.ResetPasswordRequest, void, AuthErrors.ResetPasswordErrorCodes>;
+    useResetPassword: AuthAction<
+      AuthModels.ResetPasswordRequest,
+      void,
+      AuthErrors.ResetPasswordErrorCodes
+    >;
     useConfirm: AuthAction<AuthModels.ConfirmRequest>;
     useLogout: AuthAction<void>;
-    useRefresh?: AuthAction<AuthModels.RefreshRequest | void, void, AuthErrors.LoginErrorCodes>;
+    useRefresh?: AuthAction<
+      AuthModels.RefreshRequest | void,
+      void,
+      AuthErrors.LoginErrorCodes
+    >;
     useSocialCredentials?: AuthAction<
       AuthModels.SocialLoginProviderRequest,
       AuthModels.SocialCredentialsResponse,
@@ -41,7 +64,11 @@ export namespace AuthContext {
 
   const Context = createContext<Type>({} as never);
 
-  type AuthAction<I, O = void, ECodes extends string = GeneralErrorCodes> = UseMutationResult<
+  type AuthAction<
+    I,
+    O = void,
+    ECodes extends string = GeneralErrorCodes,
+  > = UseMutationResult<
     O,
     ApplicationException<ECodes | GeneralErrorCodes> | null,
     I
@@ -51,6 +78,7 @@ export namespace AuthContext {
     useLogin: Type["useLogin"];
     useSocialLogin: Type["useSocialLogin"];
     useRegister: Type["useRegister"];
+    useLoginForInvite: Type["useLoginForInvite"];
     useLogout: Type["useLogout"];
     useResendConfirm: Type["useResendConfirm"];
     useForgotPassword: Type["useForgotPassword"];
@@ -68,6 +96,7 @@ export namespace AuthContext {
     useLogin,
     useSocialLogin,
     useRegister,
+    useLoginForInvite,
     useResendConfirm,
     useConfirm,
     useForgotPassword,
@@ -81,19 +110,31 @@ export namespace AuthContext {
     children,
     shouldPerformSync,
   }: React.PropsWithChildren<IProps>) => {
-    const [isLoggedIn, isLoggedInRef, setIsLoggedIn] = useStateAndRef<boolean | undefined>(undefined);
+    const [isLoggedIn, isLoggedInRef, setIsLoggedIn] = useStateAndRef<
+      boolean | undefined
+    >(undefined);
 
     // this is done because mutations are shared in the context;
     // and if we navigate away from the page and come back, we don't want to keep the old mutation state
     const resetAllAuthMutations = useCallback(() => {
       useLogin.reset();
       useRegister.reset();
+      useLoginForInvite.reset();
       useResendConfirm.reset();
       useConfirm.reset();
       useLogout.reset();
       useRefresh?.reset();
       useSocialCredentials?.reset();
-    }, [useLogin, useRegister, useResendConfirm, useConfirm, useLogout, useRefresh, useSocialCredentials]);
+    }, [
+      useLogin,
+      useRegister,
+      useLoginForInvite,
+      useResendConfirm,
+      useConfirm,
+      useLogout,
+      useRefresh,
+      useSocialCredentials,
+    ]);
 
     RoutingUtils.useOnPageChange(resetAllAuthMutations);
 
@@ -131,8 +172,14 @@ export namespace AuthContext {
     }, [performLogoutAsync, performRefreshAsync]);
 
     const applyAccessToken = useCallback(() => {
-      AppRestClient.attachInterceptor(AuthorizationHeaderInterceptor, getAuthHeader);
-      AppRestClient.attachInterceptor(TokenExpiredInterceptor, onAccessTokenExpired);
+      AppRestClient.attachInterceptor(
+        AuthorizationHeaderInterceptor,
+        getAuthHeader,
+      );
+      AppRestClient.attachInterceptor(
+        TokenExpiredInterceptor,
+        onAccessTokenExpired,
+      );
     }, [getAuthHeader, onAccessTokenExpired]);
 
     const unapplyAccessToken = useCallback(() => {
@@ -172,7 +219,14 @@ export namespace AuthContext {
         refetchProfile();
         setIsLoggedIn(true);
       }
-    }, [applyAccessToken, setIsLoggedIn, getAuthHeader, performLogoutAsync, refetchProfile, shouldPerformSync]);
+    }, [
+      applyAccessToken,
+      setIsLoggedIn,
+      getAuthHeader,
+      performLogoutAsync,
+      refetchProfile,
+      shouldPerformSync,
+    ]);
 
     useEffect(() => {
       if (isInitializing) {
@@ -196,7 +250,15 @@ export namespace AuthContext {
       return () => {
         unapplyAccessToken();
       };
-    }, [syncProfile, isLoggedInRef, unapplyAccessToken, authIsLoggedIn, queryClient, setIsLoggedIn, isInitializing]);
+    }, [
+      syncProfile,
+      isLoggedInRef,
+      unapplyAccessToken,
+      authIsLoggedIn,
+      queryClient,
+      setIsLoggedIn,
+      isInitializing,
+    ]);
 
     const value = useMemo(
       (): Type => ({
@@ -204,6 +266,7 @@ export namespace AuthContext {
         useLogin,
         useSocialLogin,
         useRegister,
+        useLoginForInvite,
         useResendConfirm,
         useForgotPassword,
         useResetPassword,
@@ -211,7 +274,8 @@ export namespace AuthContext {
         useLogout,
         useSocialCredentials,
         user,
-        isInitializing: isLoggedIn === undefined || isUserLoading /* || useSync.isPending */,
+        isInitializing:
+          isLoggedIn === undefined || isUserLoading /* || useSync.isPending */,
         shouldPerformSync,
       }),
       [
@@ -219,6 +283,7 @@ export namespace AuthContext {
         useLogin,
         useSocialLogin,
         useRegister,
+        useLoginForInvite,
         useResendConfirm,
         useForgotPassword,
         useResetPassword,

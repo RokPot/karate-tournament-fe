@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-import { QueryModule, InvalidateQueryOptions, invalidateQueries } from "@/data/invalidateQueries";
+import {
+  QueryModule,
+  InvalidateQueryOptions,
+  invalidateQueries,
+} from "@/data/invalidateQueries";
 import { AppQueryOptions, AppMutationOptions } from "@/types/react-query";
-
-import { TestApi } from "./test.api";
 import { TestModels } from "./test.models";
+import { TestApi } from "./test.api";
 
 export namespace TestQueries {
   export const moduleName = QueryModule.Test;
@@ -12,7 +14,8 @@ export namespace TestQueries {
   export const keys = {
     all: [moduleName] as const,
     get: () => [...keys.all, "/test"] as const,
-    echoPath: (message: string) => [...keys.all, "/test/echo/:message", message] as const,
+    echoPath: (message: string) =>
+      [...keys.all, "/test/echo/:message", message] as const,
   };
 
   /**
@@ -23,7 +26,9 @@ export namespace TestQueries {
    * @returns { UseQueryResult<TestModels.TestGetResponseDto> } Successful response
    * @statusCodes [200]
    */
-  export const useGet = <TData>(options?: AppQueryOptions<typeof TestApi.get, TData>) => {
+  export const useGet = <TData>(
+    options?: AppQueryOptions<typeof TestApi.get, TData>,
+  ) => {
     return useQuery({
       queryKey: keys.get(),
       queryFn: TestApi.get,
@@ -41,7 +46,11 @@ export namespace TestQueries {
    * @statusCodes [201, 400, 401]
    */
   export const usePost = (
-    options?: AppMutationOptions<typeof TestApi.post, { data: TestModels.TestRequestDto }> & InvalidateQueryOptions,
+    options?: AppMutationOptions<
+      typeof TestApi.post,
+      { data: TestModels.TestRequestDto }
+    > &
+      InvalidateQueryOptions,
   ) => {
     const queryClient = useQueryClient();
 

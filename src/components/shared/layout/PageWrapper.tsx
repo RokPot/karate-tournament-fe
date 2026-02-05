@@ -1,6 +1,7 @@
 import { cx } from "class-variance-authority";
 import { PropsWithChildren, useMemo } from "react";
 
+import { InviteAcceptHandler } from "@/components/invitations/InviteAcceptHandler";
 import { LoadingState } from "@/components/shared/layout/LoadingState";
 import Footer from "@/components/shared/layout/footer/Footer";
 
@@ -37,6 +38,7 @@ export const PageWrapper = ({ children }: PropsWithChildren) => {
           }}
           id="scroll-container"
         >
+          <InviteAcceptHandler />
           {children}
           {shouldShowFooter && <Footer />}
         </main>

@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-import { QueryModule, InvalidateQueryOptions, invalidateQueries } from "@/data/invalidateQueries";
+import {
+  QueryModule,
+  InvalidateQueryOptions,
+  invalidateQueries,
+} from "@/data/invalidateQueries";
 import { AppQueryOptions, AppMutationOptions } from "@/types/react-query";
-
-import { CategoriesApi } from "./categories.api";
 import { CategoriesModels } from "./categories.models";
+import { CategoriesApi } from "./categories.api";
 
 export namespace CategoriesQueries {
   export const moduleName = QueryModule.Categories;
@@ -25,7 +27,10 @@ export namespace CategoriesQueries {
    * @statusCodes [201, 400, 401]
    */
   export const useCreate = (
-    options?: AppMutationOptions<typeof CategoriesApi.create, { data: CategoriesModels.CreateCategoryDto }> &
+    options?: AppMutationOptions<
+      typeof CategoriesApi.create,
+      { data: CategoriesModels.CreateCategoryDto }
+    > &
       InvalidateQueryOptions,
   ) => {
     const queryClient = useQueryClient();
@@ -48,7 +53,9 @@ export namespace CategoriesQueries {
    * @returns { UseQueryResult<CategoriesModels.CategoriesFindAllResponse> } List of categories
    * @statusCodes [200, 401]
    */
-  export const useFindAll = <TData>(options?: AppQueryOptions<typeof CategoriesApi.findAll, TData>) => {
+  export const useFindAll = <TData>(
+    options?: AppQueryOptions<typeof CategoriesApi.findAll, TData>,
+  ) => {
     return useQuery({
       queryKey: keys.findAll(),
       queryFn: CategoriesApi.findAll,
@@ -143,7 +150,8 @@ export namespace CategoriesQueries {
    * @statusCodes [204, 401, 404]
    */
   export const useRemove = (
-    options?: AppMutationOptions<typeof CategoriesApi.remove, { id: string }> & InvalidateQueryOptions,
+    options?: AppMutationOptions<typeof CategoriesApi.remove, { id: string }> &
+      InvalidateQueryOptions,
   ) => {
     const queryClient = useQueryClient();
 

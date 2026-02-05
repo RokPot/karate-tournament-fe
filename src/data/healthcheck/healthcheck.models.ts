@@ -11,7 +11,13 @@ export namespace HealthcheckModels {
    * @property { string } buildTime
    */
   export const HttpHealthDtoSchema = z
-    .object({ uptime: z.string(), stage: z.string(), version: z.string(), release: z.string(), buildTime: z.string() })
+    .object({
+      uptime: z.string(),
+      stage: z.string(),
+      version: z.string(),
+      release: z.string(),
+      buildTime: z.string(),
+    })
     .partial();
   export type HttpHealthDto = z.infer<typeof HttpHealthDtoSchema>;
 }

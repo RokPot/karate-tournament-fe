@@ -4,6 +4,7 @@ export const enum QueryModule {
   Healthcheck = "HealthcheckQueries",
   Users = "UsersQueries",
   Clubs = "ClubsQueries",
+  Invitations = "InvitationsQueries",
   Registrations = "RegistrationsQueries",
   Tournaments = "TournamentsQueries",
   Categories = "CategoriesQueries",
@@ -21,17 +22,26 @@ export async function invalidateQueries(
   currentModule: QueryModule,
   options: InvalidateQueryOptions = {},
 ) {
-  const { invalidateCurrentModule, invalidateModules, invalidateKeys } = options;
+  const { invalidateCurrentModule, invalidateModules, invalidateKeys } =
+    options;
 
   if (invalidateCurrentModule) {
     await queryClient.invalidateQueries({ queryKey: [currentModule] });
   }
 
   if (invalidateModules) {
-    await Promise.all([...invalidateModules.map((module) => queryClient.invalidateQueries({ queryKey: [module] }))]);
+    await Promise.all([
+      ...invalidateModules.map((module) =>
+        queryClient.invalidateQueries({ queryKey: [module] }),
+      ),
+    ]);
   }
 
   if (invalidateKeys) {
-    await Promise.all([...invalidateKeys.map((queryKey) => queryClient.invalidateQueries({ queryKey }))]);
+    await Promise.all([
+      ...invalidateKeys.map((queryKey) =>
+        queryClient.invalidateQueries({ queryKey }),
+      ),
+    ]);
   }
 }

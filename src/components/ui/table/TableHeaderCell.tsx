@@ -36,7 +36,7 @@ const TableHeaderCell = ({ header, label, align = "start" }: IProps) => {
         size="body-paragraph-m"
         className={cx(
           "text-text-default-primary relative",
-          header?.column.getIsSorted() ? "font-body-prominent-2" : "font-body-default",
+          header?.column.getIsSorted() ? "font-body-prominent-2!" : "font-weight-500!",
         )}
         as="span"
       >

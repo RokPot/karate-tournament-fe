@@ -46,8 +46,8 @@ interface TableProps<TData> extends PropsWithChildren {
   columns: ColumnDef<TData>[];
   pagination?: PaginationState;
   paginationOptions?: Pick<PaginationOptions, "onPaginationChange" | "rowCount" | "pageCount">;
-  sorting: SortingState;
-  onSortingChange: OnChangeFn<SortingState>;
+  sorting?: SortingState;
+  onSortingChange?: OnChangeFn<SortingState>;
   onRowClick?: (row: TData) => void;
   onPaginationChange?: OnChangeFn<PaginationState>;
   onRowSelectionChange?: OnChangeFn<RowSelectionState>;
@@ -65,7 +65,7 @@ export const Table = <TData,>({
   columns,
   pagination,
   paginationOptions,
-  sorting,
+  sorting = [],
   onSortingChange,
   children,
   manualSorting = true,
@@ -73,10 +73,10 @@ export const Table = <TData,>({
   onPaginationChange,
   onRowSelectionChange,
   isLoading,
-  rowSelection,
   className,
   rowClassname,
   seeAllData,
+  rowSelection = {},
   tableLayout = "fixed",
 }: TableProps<TData>) => {
   const { t } = useTranslation();
@@ -97,7 +97,6 @@ export const Table = <TData,>({
     defaultColumn: {
       size: undefined,
     },
-
   });
 
   return (
@@ -134,7 +133,7 @@ export const Table = <TData,>({
                 <tr
                   key={row.id}
 
-                  className={clsx(rowClassname?.(row.original), tableClasses.tableRow, onRowClick && "cursor-pointer", row.getIsSelected() && "bg-primary-500 hover:bg-primary-500/70!")}
+                  className={clsx(rowClassname?.(row.original), tableClasses.tableRow, onRowClick && "cursor-pointer", row?.getIsSelected() && "bg-primary-500 hover:bg-primary-500/70!")}
                   onClick={() => { onRowClick?.(row.original); table.toggleAllRowsSelected(false); row.toggleSelected(); }}
                 >
                   {row.getVisibleCells().map((cell) => (

@@ -5,6 +5,11 @@ export const RouteConfig = {
   signup: "/sign-up/",
   bugReport: "/bug-report/",
   tournaments: "/tournaments/",
+  clubs: "/clubs/",
+  invitations: "/invitations/",
+  invite: "/invite/",
+  myClub: "/clubs/my-club/",
 };
 
 export const getTournamentDetailRoute = (id: string) => `/tournament/${id}/`;
+export const getInviteRoute = (token: string) => `/invite/${token}/`;

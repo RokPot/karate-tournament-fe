@@ -6,6 +6,8 @@ import { AppConfig } from "@/config/app.config";
 import { AuthContext } from "@/data/auth/auth.context";
 import { logger } from "@/util/logger";
 
+const PENDING_INVITE_TOKEN_KEY = "pending_invite_token";
+
 export const AuthAuth0Provider = ({ children }: React.PropsWithChildren) => {
   return (
     <Auth0Provider
@@ -24,7 +26,13 @@ export const AuthAuth0Provider = ({ children }: React.PropsWithChildren) => {
 };
 
 const Auth0 = ({ children }: React.PropsWithChildren) => {
-  const { loginWithRedirect, logout, getAccessTokenSilently, isLoading, isAuthenticated } = useAuth0();
+  const {
+    loginWithRedirect,
+    logout,
+    getAccessTokenSilently,
+    isLoading,
+    isAuthenticated,
+  } = useAuth0();
 
   async function handleOperation<T>(req: T | null) {
     if (!req) {
@@ -47,12 +55,35 @@ const Auth0 = ({ children }: React.PropsWithChildren) => {
     try {
       await loginWithRedirect({
         authorizationParams: {
-          redirect_uri: AppConfig.authAuth0.loginRedirectPath?.replace(/\/$/, ""),
+          redirect_uri: AppConfig.authAuth0.loginRedirectPath?.replace(
+            /\/$/,
+            "",
+          ),
           audience: AppConfig.authAuth0.audience?.replace(/\/$/, ""),
           screen_hint: "signup",
         },
       });
     } catch (e) {
+      logger.error(e);
+    }
+  }
+
+  /** Store token so InviteAcceptHandler can accept after Auth0 redirect. */
+  async function handleLoginForInvite(req: { token: string }) {
+    try {
+      localStorage.setItem(PENDING_INVITE_TOKEN_KEY, req.token);
+      await loginWithRedirect({
+        authorizationParams: {
+          redirect_uri: AppConfig.authAuth0.loginRedirectPath?.replace(
+            /\/$/,
+            "",
+          ),
+          audience: AppConfig.authAuth0.audience?.replace(/\/$/, ""),
+          screen_hint: "signup",
+        },
+      });
+    } catch (e) {
+      localStorage.removeItem(PENDING_INVITE_TOKEN_KEY);
       logger.error(e);
     }
   }
@@ -67,6 +98,10 @@ const Auth0 = ({ children }: React.PropsWithChildren) => {
 
   const useRegister: AuthContext.Type["useRegister"] = useMutation({
     mutationFn: handleRegister,
+  });
+
+  const useLoginForInvite: AuthContext.Type["useLoginForInvite"] = useMutation({
+    mutationFn: handleLoginForInvite,
   });
 
   const useForgotPassword: AuthContext.Type["useForgotPassword"] = useMutation({
@@ -103,6 +138,7 @@ const Auth0 = ({ children }: React.PropsWithChildren) => {
     <AuthContext.Provider
       useRegister={useRegister}
       useLogin={useLogin}
+      useLoginForInvite={useLoginForInvite}
       useSocialLogin={useSocialLogin}
       useForgotPassword={useForgotPassword}
       useResetPassword={useResetPassword}

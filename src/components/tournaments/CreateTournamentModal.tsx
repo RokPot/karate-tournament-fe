@@ -1,6 +1,7 @@
 import { Button, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 
 import { TournamentsModels } from "@/data/tournaments/tournaments.models";
 import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
@@ -8,24 +9,28 @@ import { useToast } from "@/components/ui/status/Toast/useToast";
 import { getTournamentDetailRoute } from "@/config/route.config";
 import { useRouter } from "next/router";
 import CustomDialog from "@/components/ui/overlays/CustomDialog";
+import { CommonModels } from "@/data/common/common.models";
 
 interface IProps {
   open: boolean;
-  onClose: () => void;
+  onClose: (newTournament?: CommonModels.TournamentResponseDto) => void;
+  clubId?: string;
 }
 
-export const CreateTournamentForm = ({ open, onClose }: IProps) => {
+export const CreateTournamentModal = ({ open, onClose, clubId }: IProps) => {
+  const { t } = useTranslation();
   const router = useRouter();
   const { successToast, errorToast } = useToast();
+
   const createMutation = TournamentsQueries.useCreate({
     invalidateCurrentModule: true,
     onSuccess: (data) => {
-      successToast({ text: "Tournament created successfully" });
-      onClose();
+      successToast({ text: t("tournaments.create.success") });
+      onClose(data);
       router.push(getTournamentDetailRoute(data.id));
     },
     onError: (error) => {
-      errorToast({ text: error?.message || "Failed to create tournament" });
+      errorToast({ text: error?.message || t("tournaments.create.error") });
     },
   });
 
@@ -47,6 +52,7 @@ export const CreateTournamentForm = ({ open, onClose }: IProps) => {
         : data.registrationDeadline,
       startDate: data.startDate ? new Date(data.startDate).toISOString()
         : data.startDate,
+      clubId,
     };
     createMutation.mutate({ data: formattedData });
   };
@@ -60,10 +66,10 @@ export const CreateTournamentForm = ({ open, onClose }: IProps) => {
   return (
     <CustomDialog open={open} onClose={handleClose} >
       <form onSubmit={handleSubmit(onSubmit)} >
-        <DialogTitle>Create Tournament</DialogTitle>
+        <DialogTitle>{t("tournaments.create.title")}</DialogTitle>
         <DialogContent className="flex flex-col gap-4 pt-2!">
           <TextField
-            label="Name"
+            label={t("shared.name")}
             {...register("name")}
             error={!!errors.name}
             helperText={errors.name?.message}
@@ -71,7 +77,7 @@ export const CreateTournamentForm = ({ open, onClose }: IProps) => {
             required
           />
           <TextField
-            label="Location"
+            label={t("shared.location")}
             {...register("location")}
             error={!!errors.location}
             helperText={errors.location?.message}
@@ -79,7 +85,7 @@ export const CreateTournamentForm = ({ open, onClose }: IProps) => {
             required
           />
           <TextField
-            label="Start Time"
+            label={t("tournaments.create.startTime")}
             type="datetime-local"
             {...register("startDate")}
             error={!!errors.startDate}
@@ -89,7 +95,7 @@ export const CreateTournamentForm = ({ open, onClose }: IProps) => {
             InputLabelProps={{ shrink: true }}
           />
           <TextField
-            label="Registration Deadline"
+            label={t("shared.registrationDeadline")}
             type="datetime-local"
             {...register("registrationDeadline")}
             error={!!errors.registrationDeadline}
@@ -101,10 +107,10 @@ export const CreateTournamentForm = ({ open, onClose }: IProps) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} disabled={createMutation.isPending}>
-            Cancel
+            {t("shared.cancel")}
           </Button>
           <Button type="submit" variant="contained" disabled={createMutation.isPending}>
-            {createMutation.isPending ? "Creating..." : "Create"}
+            {createMutation.isPending ? t("shared.creating") : t("shared.create")}
           </Button>
         </DialogActions>
       </form>
