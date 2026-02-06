@@ -7,8 +7,11 @@ import { Link } from "@/components/ui/text/Link/Link";
 export const ProfileMenu: React.FC = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-
-  const profileLinks = [
+  interface NavbarLinkData {
+    href: string;
+    label: string;
+  }
+  const AvatarElements: NavbarLinkData []= [
     { href: "/profile", label: "Profile" },
     { href: "/settings", label: "Settings" },
     { href: "/logout", label: "Logout" },
@@ -31,13 +34,12 @@ export const ProfileMenu: React.FC = () => {
         aria-expanded={open ? "true" : undefined}
         sx={{
           cursor: "pointer",
-          bgcolor: "#edc000",
+          bgcolor: "#FBBF24;",
           width: 40,
           height: 40,
         }}
       >
-        {/* Optional: initials or icon */}
-        U
+        8=D
       </Avatar>
 
       <Menu
@@ -48,10 +50,10 @@ export const ProfileMenu: React.FC = () => {
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        {profileLinks.map((link) => (
-          <MenuItem key={link.href} onClick={handleClose}>
-            <Link href={link.href} className="w-full">
-              {link.label}
+        {AvatarElements.map((el) => (
+          <MenuItem key={el.href} onClick={handleClose}>
+            <Link href={el.href} className="w-full">
+              {el.label}
             </Link>
           </MenuItem>
         ))}
