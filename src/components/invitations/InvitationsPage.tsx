@@ -1,19 +1,19 @@
 import { HeaderCell, TextCell } from "@/components/categories/CategoryList";
 import { ErrorState } from "@/components/shared/layout/ErrorState";
 import { LoadingState } from "@/components/shared/layout/LoadingState";
+import { useToast } from "@/components/ui/status/Toast/useToast";
 import { Table } from "@/components/ui/table/Table";
+import TableCell from "@/components/ui/table/TableCell";
 import { Typography } from "@/components/ui/text/Typography/Typography";
+import { getInviteRoute } from "@/config/route.config";
 import { InvitationsModels } from "@/data/invitations/invitations.models";
 import { InvitationsQueries } from "@/data/invitations/invitations.queries";
-import { useTranslation } from "react-i18next";
-import { useMemo } from "react";
-import { ColumnDef } from "@tanstack/react-table";
-import { useToast } from "@/components/ui/status/Toast/useToast";
-import { getInviteRoute } from "@/config/route.config";
-import TableCell from "@/components/ui/table/TableCell";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ColumnDef } from "@tanstack/react-table";
 import { cva } from "class-variance-authority";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 const STATUS_KEYS: Record<InvitationsModels.InvitationStatusEnum, string> = {
   pending: "invitations.statusPending",
@@ -121,7 +121,7 @@ export const InvitationsPage = () => {
 const statusIcon = cva("h-6 w-6 shrink-0 mr-2", {
   variants: {
     variant: {
-      neutral: "text-secondary-50",
+      neutral: "text-secondary-200",
       pending: "stroke-warning text-warning",
       accepted: "stroke-success text-success",
       expired: "stroke-danger text-danger",

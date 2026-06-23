@@ -20,6 +20,7 @@ import {
   GeneralErrorCodes,
 } from "@/util/vendor/error-handling";
 
+import { logger } from "@/util/logger";
 import { AuthErrors } from "./auth.errors";
 import { AuthModels } from "./auth.models";
 
@@ -211,9 +212,13 @@ export namespace AuthContext {
         //     performLogoutAsync();
         //   },
         // });
-        applyAccessToken();
-        refetchProfile();
-        setIsLoggedIn(true);
+        try {
+          applyAccessToken();
+          await refetchProfile();
+          setIsLoggedIn(true);
+        } catch (e) {
+          logger.error("Failed to sync user data", e);
+        }
       } else {
         applyAccessToken();
         refetchProfile();

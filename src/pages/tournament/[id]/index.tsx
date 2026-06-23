@@ -1,21 +1,23 @@
 import { Button, IconButton } from "@mui/material";
 import { useRouter } from "next/router";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 
+import AddOrCreateCategoryModal from "@/components/categories/AddOrCreateCategoryModal";
 import { CategoryList } from "@/components/categories/CategoryList";
+import RegistrationList from "@/components/registrations/RegistrationList";
 import { ErrorState } from "@/components/shared/layout/ErrorState";
 import { LoadingState } from "@/components/shared/layout/LoadingState";
-import { Typography } from "@/components/ui/text/Typography/Typography";
-import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
-import { CategoriesQueries } from "@/data/categories/categories.queries";
-import { useTranslation } from "react-i18next";
-import RegistrationList from "@/components/registrations/RegistrationList";
-import { CategoriesModels } from "@/data/categories/categories.models";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAdd, faPencil } from "@fortawesome/free-solid-svg-icons";
-import AddOrCreateCategoryModal from "@/components/categories/AddOrCreateCategoryModal";
 import Pill from "@/components/ui/Pill";
+import { Link } from "@/components/ui/text/Link/Link";
+import { Typography } from "@/components/ui/text/Typography/Typography";
+import { CategoriesQueries } from "@/data/categories/categories.queries";
+import { CommonModels } from "@/data/common/common.models";
+import { RegistrationsQueries } from "@/data/registrations/registrations.queries";
+import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
 import { useAuthRoles } from "@/hooks/useAuthRoles";
+import { faAdd, faPencil } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 const TournamentDetailPage = () => {
   const router = useRouter();
@@ -23,22 +25,28 @@ const TournamentDetailPage = () => {
   const tournamentId = id as string;
   const [createCategoryDialogOpen, setCreateCategoryDialogOpen] = useState(false);
   const { t } = useTranslation();
-  const [selectedCategory, setSelectedCategory] = useState<CategoriesModels.CategoryResponseDto | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<CommonModels.CategoryResponseDto | null>(null);
   const {
     data: tournament,
     isLoading: isTournamentLoading,
     error: tournamentError,
     refetch: refetchTournament,
-  } = TournamentsQueries.useFindOne({ id: tournamentId }, { enabled: !!tournamentId });
+  } = TournamentsQueries.useFindOne({ id: tournamentId, }, { enabled: !!tournamentId });
 
-  const { isClubOwner } = useAuthRoles();
+  const { isClubOwner, isAdmin } = useAuthRoles();
 
   const { data: allCategories } = CategoriesQueries.useFindAll();
 
+  const { data: registrations } = RegistrationsQueries.useFindByTournament({ tournamentId, categoryId: selectedCategory?.id }, { enabled: !!tournamentId });
   // Filter categories that belong to this tournament
   const tournamentCategories = useMemo(() => {
     if (!tournament || !allCategories) return [];
-    return allCategories.filter((category) => tournament.categoryIds.includes(category.id));
+
+    const categoriesById = new Map(allCategories.map((category) => [category.id, category]));
+    return tournament.categoryIds.flatMap((categoryId) => {
+      const category = categoriesById.get(categoryId);
+      return category ? [category] : [];
+    });
   }, [tournament, allCategories]);
 
 
@@ -53,18 +61,18 @@ const TournamentDetailPage = () => {
 
   return (
     <div className="flex flex-row flex-1">
-      <div className="flex flex-col gap-2 p-4 border-r border-secondary-200 min-w-[300px] max-w-[300px]">
+      <div className="flex flex-col gap-2 border-r border-primary-300 bg-primary-75 p-4 min-w-[300px] max-w-[300px]">
         <div className="flex flex-row items-center justify-between">
           <Typography size="h2" >
             {tournament.name}
           </Typography>
           {isClubOwner && <IconButton className="h-10 w-10">
-            <FontAwesomeIcon icon={faPencil} className="text-primary-200" size="xs" />
+            <FontAwesomeIcon icon={faPencil} className="text-tertiary-300" size="xs" />
           </IconButton>}
         </div>
         <div className="flex flex-row gap-1 flex-wrap">
           <Pill>
-            <Typography size="body-paragraph-s" className="text-text-inverted-secondary">
+            <Typography size="body-paragraph-s" className="text-secondary-200">
               {t("shared.location")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">
@@ -77,7 +85,7 @@ const TournamentDetailPage = () => {
             </Typography>
           </Pill>
           <Pill>
-            <Typography size="body-paragraph-s" className="text-text-inverted-secondary">
+            <Typography size="body-paragraph-s" className="text-secondary-200">
               {t("shared.registrationDeadline")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">
@@ -85,6 +93,12 @@ const TournamentDetailPage = () => {
             </Typography>
           </Pill>
         </div>
+
+        <Link href={`/tournament/${tournamentId}/registration`} >
+          <Button variant="contained" className="w-full">
+            {t("shared.registration")}
+          </Button>
+        </Link>
 
       </div>
       <div className="flex flex-col flex-1 p-4">
@@ -95,7 +109,7 @@ const TournamentDetailPage = () => {
         </div>
         <div className="mb-5 flex items-center justify-between">
           <Typography size="h3">{t("categories.title")} ({tournamentCategories.length})</Typography>
-          {isClubOwner && <Button variant="contained" onClick={() => setCreateCategoryDialogOpen(true)}>
+          {(isClubOwner || isAdmin) && <Button variant="contained" onClick={() => setCreateCategoryDialogOpen(true)} >
             <div className="flex flex-row items-center gap-0-5">
               <FontAwesomeIcon icon={faAdd} />
               {t("categories.addCategory")}
@@ -108,11 +122,11 @@ const TournamentDetailPage = () => {
         <div className="mb-5 flex items-center">
           <Typography size="h3" className="mr-2">{t("registrations.attendees")} {selectedCategory ? " -" : ""}</Typography>
           {
-            selectedCategory && <Typography size="h5" as="span" className="leading-none">{selectedCategory?.name} <span className="text-primary-500">({[].length})</span></Typography>
+            selectedCategory && <Typography size="h5" as="span" className="leading-none">{selectedCategory?.name} <span className="text-tertiary-300">({registrations?.length || 0})</span></Typography>
           }
         </div>
         <div className="max-w-[calc(100vw-300px)]">
-          <RegistrationList registrations={[]} />
+          <RegistrationList registrations={registrations || []} />
         </div>
 
       </div>

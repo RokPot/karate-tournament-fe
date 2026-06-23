@@ -1,5 +1,5 @@
 import { z } from "node_modules/zod/lib";
-import React, { createContext, useContext, ReactNode, useMemo } from "react";
+import React, { createContext, ReactNode, useContext, useEffect, useMemo } from "react";
 
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
@@ -28,7 +28,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }
 
     if (darkMode === null) {
-      document.body.classList.add("dark");
+      document.body.classList.remove("dark");
       return;
     }
 
@@ -45,11 +45,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     applyModeToApp(newIsDarkMode);
   };
 
-  // Enable switching when light mode is back
-  // useEffect(() => {
-  //   applyModeToApp(isDarkMode);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [isDarkMode, isInitialLoading]);
+  useEffect(() => {
+    applyModeToApp(isDarkMode);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDarkMode, isInitialLoading]);
 
   const value: ThemeContextType = useMemo(
     () => ({

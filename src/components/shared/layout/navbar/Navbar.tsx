@@ -1,11 +1,14 @@
-import Image from "next/image";
 import { Link } from "@/components/ui/text/Link/Link";
-import { useMemo, useState, useRef, useEffect } from "react";
-import logo from "src/assets/images/logo-4.png";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBuilding, faEnvelope, faHome, faTrophy, faUser } from '@fortawesome/free-solid-svg-icons';
+import { RouteConfig } from "@/config/route.config";
 import { useAuthRoles } from "@/hooks/useAuthRoles";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { faBuilding, faEnvelope, faHome, faTrophy, faUser } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button, Menu, MenuItem } from "@mui/material";
+import { cx } from "class-variance-authority";
+import Image from "next/image";
+import { useMemo, useState } from "react";
+import logo from "src/assets/images/logo-4.png";
 
 interface NavbarLinkData {
   href: string;
@@ -20,21 +23,26 @@ const homeLink: NavbarLinkData = {
 };
 
 const tournamentsLink: NavbarLinkData = {
-  href: "/tournaments",
+  href: RouteConfig.tournaments,
   label: "Tournaments",
   icon: faTrophy,
 };
 
 const clubsLink: NavbarLinkData = {
-  href: "/clubs",
+  href: RouteConfig.clubs,
   label: "Clubs",
   icon: faBuilding,
 };
 
 const invitationsLink: NavbarLinkData = {
-  href: "/invitations",
+  href: RouteConfig.invitations,
   label: "Invitations",
   icon: faEnvelope,
+};
+
+const categoriesLink: NavbarLinkData = {
+  href: RouteConfig.categories,
+  label: "Categories",
 };
 
 const profileLinks: NavbarLinkData[] = [
@@ -44,8 +52,16 @@ const profileLinks: NavbarLinkData[] = [
 ];
 
 export const Navbar = () => {
-  const [open, setOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const isProfileMenuOpen = Boolean(menuAnchorEl);
+
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = () => {
+    setMenuAnchorEl(null);
+  };
 
   const { isClubOwner, isAdmin } = useAuthRoles();
   const links = useMemo(() => {
@@ -54,45 +70,39 @@ export const Navbar = () => {
       userLinks.push(homeLink);
       userLinks.push(clubsLink);
       userLinks.push(invitationsLink);
+      userLinks.push(categoriesLink);
       userLinks.push(tournamentsLink);
       return userLinks;
     }
     if (isClubOwner) {
       userLinks.push(homeLink);
+      userLinks.push(categoriesLink);
       return userLinks;
     }
     return [];
   }, [isAdmin, isClubOwner]);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setOpen(false);
-      }
-    }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   return (
-    <header className="z-20 flex h-[70px] items-center  bg-secondary-400 shadow-1 dark:shadow-5 dm:py-1 dm:pl-4 t:px-4 t:py-[26px]">
+    <header
+      className={cx(
+        "z-20 flex h-[70px] items-center border-b border-primary-300 bg-primary-200 text-secondary-500 shadow-1 dark:border-secondary-300 dark:bg-secondary-400 dark:text-white dark:shadow-5",
+        "md:px-10 lg:px-20"
+      )}
+    >
 
-      <div className="flex items-center gap-2 jsutify-start">
+      <div className="flex items-center gap-2 justify-start">
         <Image src={logo} alt="Logo" width={60} height={60} />
       </div>
 
-      <div className="flex items-center justify-start gap-2 ml-5">
+      <div className="flex items-center justify-start gap-2 ml-auto">
         {links.map((link) => (
           <Link
             key={link.href}
             href={link.href}
-            className="no-underline! hover:text-primary-400! flex flex-row items-center justify-center"
+            className="flex flex-row items-center font-weight-500 justify-center no-underline! hover:text-tertiary-300! text-tertiary-200!"
           >
-            {link.icon && <FontAwesomeIcon icon={link.icon} />}
             {link.label}
           </Link>
         ))}
@@ -100,24 +110,43 @@ export const Navbar = () => {
 
 
 
-      <div className="relative ml-auto" ref={dropdownRef}>
-        <button type="button" onClick={() => setOpen(!open)}>
-          <FontAwesomeIcon size="lg" icon={faUser} style={{ color: "#edc000", }} />
-        </button>
+      <div>
+        <Button
+          type="button"
+          aria-controls={isProfileMenuOpen ? "profile-menu" : undefined}
+          aria-haspopup="true"
+          aria-expanded={isProfileMenuOpen ? "true" : undefined}
+          onClick={handleProfileMenuOpen}
+        >
+          <FontAwesomeIcon size="lg" icon={faUser} style={{ color: "#B8963E" }} />
+        </Button>
 
-        {open && (
-          <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-secondary-500 shadow-lg rounded-md  hover:text-primary-400!">
-            {profileLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="block px-4 py-2 hover:bg-secondary-300 no-underline!"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        )}
+        <Menu
+          id="profile-menu"
+          anchorEl={menuAnchorEl}
+          open={isProfileMenuOpen}
+          onClose={handleProfileMenuClose}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+          slotProps={{
+            paper: {
+              className:
+                "mt-2 w-40 rounded-md border border-primary-300 bg-primary-200 text-secondary-500 shadow-lg dark:border-secondary-300 dark:bg-secondary-500 dark:text-white",
+            },
+          }}
+        >
+          {profileLinks.map((link) => (
+            <MenuItem
+              key={link.href}
+              component={Link}
+              href={link.href}
+              onClick={handleProfileMenuClose}
+              className="no-underline! hover:bg-primary-75 dark:hover:bg-secondary-400 hover:text-tertiary-300!"
+            >
+              {link.label}
+            </MenuItem>
+          ))}
+        </Menu>
       </div>
 
     </header>

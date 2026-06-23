@@ -4,6 +4,7 @@ export const RouteConfig = {
   signin: "/sign-in/",
   signup: "/sign-up/",
   bugReport: "/bug-report/",
+  categories: "/categories/",
   tournaments: "/tournaments/",
   clubs: "/clubs/",
   invitations: "/invitations/",

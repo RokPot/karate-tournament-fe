@@ -20,10 +20,10 @@ const toastContainer = cva("m-8 w-auto p-0", {
   },
 });
 
-const toastWrapper = cva("max-w-toast bg-secondary-300 shadow-4 min-h-0 w-auto overflow-hidden rounded-sm border p-0", {
+const toastWrapper = cva("max-w-toast min-h-0 w-auto overflow-hidden rounded-sm border bg-primary-200 p-0 shadow-4", {
   variants: {
     variant: {
-      neutral: "border-secondary-75",
+      neutral: "border-primary-400",
       success: "border-success bg-success-75!",
       warning: "border-warning",
       error: "border-danger",
@@ -58,7 +58,7 @@ export const Toast = ({ variant, text, isLoading = false, actions = [], icon: Ic
           size="labels-s"
           className={clsx(
             "font-weight-500",
-            variant === "error" || variant === "neutral" ? "text-white" : "text-black",
+            variant === "error" ? "text-danger" : "text-secondary-500",
           )}
         >
           {text}

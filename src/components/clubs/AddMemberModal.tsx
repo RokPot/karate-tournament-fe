@@ -1,3 +1,4 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
   DialogActions,
@@ -10,16 +11,16 @@ import {
   TextField,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
+import { BeltLevelSelect } from "@/components/karate/BeltLevelSelect";
 import CustomDialog from "@/components/ui/overlays/CustomDialog";
 import { useToast } from "@/components/ui/status/Toast/useToast";
-import { CommonModels } from "@/data/common/common.models";
+import { Typography } from "@/components/ui/text/Typography/Typography";
 import { ClubsModels } from "@/data/clubs/clubs.models";
 import { ClubsQueries } from "@/data/clubs/clubs.queries";
-import { Typography } from "@/components/ui/text/Typography/Typography";
+import { CommonModels } from "@/data/common/common.models";
 
 interface IProps {
   open: boolean;
@@ -152,7 +153,7 @@ export const AddMemberModal = ({ open, onClose, clubId }: IProps) => {
                 const v = e.target.value;
                 setValue(
                   "gender",
-                  v as CommonModels.GenderEnum,
+                  v as CommonModels.ParticipantGenderEnum,
                 );
               }}
               label={t("shared.gender")}
@@ -160,7 +161,7 @@ export const AddMemberModal = ({ open, onClose, clubId }: IProps) => {
               <MenuItem value="">
                 <em>{t("shared.none")}</em>
               </MenuItem>
-              {Object.values(CommonModels.GenderEnum).map((g) => (
+              {Object.values(CommonModels.ParticipantGenderEnum).map((g) => (
                 <MenuItem key={g} value={g}>
                   {formatRoleLabel(g)}
                 </MenuItem>
@@ -176,9 +177,9 @@ export const AddMemberModal = ({ open, onClose, clubId }: IProps) => {
           <TextField
             label={t("shared.birthday")}
             type="date"
-            {...register("birthDate")}
-            error={!!errors.birthDate}
-            helperText={errors.birthDate?.message}
+            {...register("dateOfBirth")}
+            error={!!errors.dateOfBirth}
+            helperText={errors.dateOfBirth?.message}
             fullWidth
             InputLabelProps={{ shrink: true }}
           />
@@ -196,34 +197,18 @@ export const AddMemberModal = ({ open, onClose, clubId }: IProps) => {
             inputProps={{ min: 0, max: 300, step: 1 }}
           />
 
-          <FormControl fullWidth error={!!errors.beltLevel}>
-            <InputLabel>{t("shared.belt")}</InputLabel>
-            <Select
-              value={beltLevel ?? ""}
-              onChange={(e) => {
-                const v = e.target.value;
-                setValue(
-                  "beltLevel",
-                  (v as CommonModels.BeltEnum),
-                );
-              }}
-              label={t("shared.belt")}
-            >
-              <MenuItem value="">
-                <em>{t("shared.none")}</em>
-              </MenuItem>
-              {Object.values(CommonModels.BeltEnum).map((belt) => (
-                <MenuItem key={belt} value={belt}>
-                  {t(`belt.${belt}`) || formatRoleLabel(belt)}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.beltLevel && (
-              <Typography size="body-paragraph-xs" className="text-danger mt-1">
-                {errors.beltLevel.message}
-              </Typography>
-            )}
-          </FormControl>
+          <BeltLevelSelect
+            label={t("shared.belt")}
+            value={beltLevel}
+            onChange={(value) => {
+              if (value) {
+                setValue("beltLevel", value);
+              }
+            }}
+            error={!!errors.beltLevel}
+            helperText={errors.beltLevel?.message}
+            required
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} disabled={addMemberMutation.isPending}>

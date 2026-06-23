@@ -33,9 +33,9 @@ export interface SeeAllData {
 }
 
 export const tableClasses = {
-  table: "min-h-[90px] w-full max-w-[1500px] overflow-x-auto rounded-xs border border-secondary-200",
-  tableHeader: "border-b border-secondary-200 bg-secondary-200",
-  tableRow: "group border-b border-secondary-200  transition-colors duration-150 hover:bg-secondary-200",
+  table: "min-h-[90px] w-full max-w-[1500px] overflow-x-auto rounded-xs border border-primary-300 bg-primary-200",
+  tableHeader: "border-b border-primary-300 bg-primary-75",
+  tableRow: "group border-b border-primary-300 transition-colors duration-150 hover:bg-primary-100",
   tableCell: "min-w-11",
   tableNoData: "p-3 text-center",
   tableLoading: "flex w-full items-center justify-center",
@@ -132,9 +132,19 @@ export const Table = <TData,>({
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-
-                  className={clsx(rowClassname?.(row.original), tableClasses.tableRow, onRowClick && "cursor-pointer", row?.getIsSelected() && "bg-primary-500 hover:bg-primary-500/70!")}
-                  onClick={() => { onRowClick?.(row.original); table.toggleAllRowsSelected(false); row.toggleSelected(); }}
+                  className={clsx(
+                    rowClassname?.(row.original),
+                    tableClasses.tableRow,
+                    onRowClick && "cursor-pointer",
+                    row?.getIsSelected() && "bg-tertiary-75 hover:bg-tertiary-100!",
+                  )}
+                  onClick={() => {
+                    if (onRowClick) {
+                      onRowClick(row.original);
+                      table.toggleAllRowsSelected(false);
+                    }
+                    row.toggleSelected();
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td
@@ -160,7 +170,7 @@ export const Table = <TData,>({
             {!isLoading && table.getRowModel().rows.length === 0 && (
               <tr>
                 <td colSpan={columns.length} className={tableClasses.tableNoData}>
-                  <Typography size="body-paragraph-m" variant="default" className="text-white">
+                  <Typography size="body-paragraph-m" variant="default" className="text-secondary-300">
                     {t("table.noData")}
                   </Typography>
                 </td>

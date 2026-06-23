@@ -19,6 +19,13 @@ export namespace TournamentsApi {
     );
   };
 
+  export const findOnePublic = (id: string) => {
+    return AppRestClient.get(
+      { resSchema: TournamentsModels.TournamentPublicLiteResponseDtoSchema },
+      `/tournaments/public/${id}`,
+    );
+  };
+
   export const findOne = (id: string) => {
     return AppRestClient.get(
       { resSchema: CommonModels.TournamentResponseDtoSchema },

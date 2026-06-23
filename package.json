@@ -43,6 +43,7 @@
     "@fortawesome/free-regular-svg-icons": "^7.1.0",
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@fortawesome/react-fontawesome": "^3.1.1",
+    "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^3.10.0",
     "@internationalized/date": "^3.8.2",
     "@mui/material": "^7.3.6",
@@ -95,7 +96,6 @@
   },
   "devDependencies": {
     "@axe-core/react": "^4.10.1",
-    "@povio/openapi-codegen-cli": "^0.10.0",
     "@storybook/addon-a11y": "^8.5.3",
     "@storybook/addon-controls": "^8.5.3",
     "@storybook/addon-essentials": "^8.5.3",

@@ -66,7 +66,7 @@ const Dot = ({ active, duration, size, className }: DotProps) => {
   return (
     <div
       ref={dotRef}
-      className={cx("rounded-full bg-secondary-300", className)}
+      className={cx("rounded-full bg-tertiary-300", className)}
       style={{
         width: `${size}px`,
         height: `${size}px`,

@@ -5,10 +5,10 @@ import { Loader } from "@/components/ui/status/Loader/Loader";
 import { statusIcon, StatusParams, statusSeparator } from "@/components/ui/status/shared/status";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 
-const alert = cva("bg-secondary-300 min-h-0 overflow-hidden rounded-sm border p-0", {
+const alert = cva("min-h-0 overflow-hidden rounded-sm border bg-primary-200 p-0", {
   variants: {
     variant: {
-      neutral: "border-secondary-75",
+      neutral: "border-primary-400",
       success: "border-success",
       warning: "border-warning",
       error: "border-danger",

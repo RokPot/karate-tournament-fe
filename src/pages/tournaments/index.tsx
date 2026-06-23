@@ -1,21 +1,62 @@
-import { Button, Card, CardContent } from "@mui/material";
+import { Button } from "@mui/material";
+import { ColumnDef } from "@tanstack/react-table";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import { CreateTournamentModal } from "@/components/tournaments/CreateTournamentModal";
+import { HeaderCell, TextCell } from "@/components/categories/CategoryList";
 import { ErrorState } from "@/components/shared/layout/ErrorState";
 import { LoadingState } from "@/components/shared/layout/LoadingState";
+import { CreateTournamentModal } from "@/components/tournaments/CreateTournamentModal";
+import { Table } from "@/components/ui/table/Table";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { getTournamentDetailRoute, RouteConfig } from "@/config/route.config";
 import { AuthGuard } from "@/data/auth/AuthGuard";
+import { CommonModels } from "@/data/common/common.models";
 import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
 import { useAuthRoles } from "@/hooks/useAuthRoles";
+import { DateUtils } from "@/util/date.utils";
 
 const TournamentsPage = () => {
     const router = useRouter();
+    const { t } = useTranslation();
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const { data: tournaments, isLoading, error, refetch } = TournamentsQueries.useFindAll();
-    const { isClubOwner } = useAuthRoles();
+    const { isClubOwner, isAdmin } = useAuthRoles();
+
+    const columns: ColumnDef<CommonModels.TournamentResponseDto>[] = useMemo(
+        () => [
+            {
+                header: ({ header }) => HeaderCell(header, t("shared.name")),
+                accessorKey: "name",
+                cell: ({ row }) => TextCell(row.original.name),
+            },
+            {
+                header: ({ header }) => HeaderCell(header, t("shared.location")),
+                accessorKey: "location",
+                cell: ({ row }) => TextCell(row.original.location || "—"),
+            },
+            {
+                header: ({ header }) => HeaderCell(header, t("shared.registrationDeadline")),
+                accessorKey: "registrationDeadline",
+                cell: ({ row }) =>
+                    TextCell(DateUtils.parseAndFormatDateTimeToLocaleShort(row.original.registrationDeadline)),
+            },
+            {
+                header: ({ header }) => HeaderCell(header, t("shared.startDate")),
+                accessorKey: "startDate",
+                cell: ({ row }) =>
+                    TextCell(DateUtils.parseAndFormatDateTimeToLocaleShort(row.original.startDate)),
+            },
+            {
+                header: ({ header }) => HeaderCell(header, t("shared.categories")),
+                accessorKey: "categoryIds",
+                cell: ({ row }) => TextCell(String(row.original.categoryIds.length)),
+            },
+        ],
+        [t],
+    );
+
     if (isLoading) {
         return <LoadingState />;
     }
@@ -30,9 +71,11 @@ const TournamentsPage = () => {
         <div className="w-full max-w-7xl mx-auto p-6">
             <div className="mb-6 flex items-center justify-between">
                 <Typography size="h2">Tournaments</Typography>
-                {isClubOwner && <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>
-                    Create Tournament
-                </Button>}
+                {(isClubOwner || isAdmin) && (
+                    <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>
+                        Create Tournament
+                    </Button>
+                )}
             </div>
 
             {!hasTournaments ? (
@@ -43,35 +86,13 @@ const TournamentsPage = () => {
                     </Button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {tournaments.map((tournament) => (
-                        <Card
-                            key={tournament.id}
-                            className="cursor-pointer transition-shadow hover:shadow-lg"
-                            onClick={() => router.push(getTournamentDetailRoute(tournament.id))}
-                        >
-                            <CardContent>
-                                <Typography size="h5" className="mb-2">
-                                    {tournament.name}
-                                </Typography>
-                                <Typography size="body-paragraph-m" className="mb-1 text-gray-600">
-                                    Location: {tournament.location}
-                                </Typography>
-                                <Typography size="body-paragraph-m" className="mb-1 text-gray-600">
-                                    Date: {new Date(tournament.startDate).toLocaleDateString()}
-                                </Typography>
-                                <Typography size="body-paragraph-m" className="mb-1 text-gray-600">
-                                    Start Time: {new Date(tournament.startDate).toLocaleTimeString()}
-                                </Typography>
-                                <Typography size="body-paragraph-s" className="text-gray-500">
-                                    Categories: {tournament.categoryIds.length}
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
+                <Table
+                    data={tournaments}
+                    columns={columns}
+                    tableLayout="auto"
+                    onRowClick={(row) => router.push(getTournamentDetailRoute(row.id))}
+                />
             )}
-
 
             <CreateTournamentModal
                 open={createDialogOpen}
@@ -84,7 +105,7 @@ const TournamentsPage = () => {
             />
         </div>
     );
-};
+}
 
 export default function Component() {
     return (

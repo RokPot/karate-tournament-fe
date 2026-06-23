@@ -1,4 +1,91 @@
 {
   "appName": "KarateApp",
-  "appDescription": "KarateApp App"
+  "appDescription": "KarateApp App",
+  "shared": {
+    "edit": "Uredi",
+    "duplicate": "Podvoji",
+    "delete": "Izbriši",
+    "updatedAt": "Posodobljeno"
+  },
+  "categories": {
+    "title": "Kategorije",
+    "noCategories": "Ni najdenih kategorij",
+    "addCategoryModal": {
+      "sortByName": "Razvrsti po imenu"
+    },
+    "actions": {
+      "duplicateSuccess": "Kategorije so bile uspešno podvojene",
+      "duplicateError": "Podvajanje kategorij ni uspelo",
+      "deleteSuccess": "Kategorije so bile uspešno izbrisane",
+      "deleteError": "Brisanje kategorij ni uspelo"
+    },
+    "edit": {
+      "title": "Uredi kategorijo",
+      "success": "Kategorija je bila uspešno posodobljena",
+      "error": "Posodobitev kategorije ni uspela",
+      "saving": "Shranjevanje..."
+    }
+  },
+  "registrations": {
+    "public": {
+      "pageTitle": "Prijava na turnir",
+      "showCategories": "Prikaži kategorije",
+      "tournamentCategoriesTitle": "Kategorije turnirja",
+      "steps": {
+        "participants": "Udeleženci",
+        "categories": "Kategorije",
+        "coach": "Podatki trenerja"
+      },
+      "participantFirstName": "Ime",
+      "participantLastName": "Priimek",
+      "addParticipant": "Dodaj udeleženca",
+      "editParticipant": "Uredi udeleženca",
+      "updateParticipant": "Posodobi udeleženca",
+      "noParticipants": "Še ni dodanih udeležencev",
+      "noCategories": "Za ta turnir ni razpoložljivih kategorij",
+      "categoriesLoading": "Nalaganje primernih kategorij…",
+      "categoriesHint": "Izberite udeležence za vsako kategorijo",
+      "noEligibleParticipantsForCategory": "Za to kategorijo ni ustreznih udeležencev",
+      "selectedRegistrations": {
+        "title": "Izbrane prijave",
+        "hint": "Ti udeleženci in kategorije bodo oddani ob zaključku.",
+        "selectedForParticipant": "Izbrane kategorije"
+      },
+      "coachSectionTitle": "Vaši podatki",
+      "coachEmail": "E-pošta",
+      "coachFirstName": "Ime",
+      "coachLastName": "Priimek",
+      "clubName": "Ime kluba",
+      "clubNameOptional": "Neobvezno",
+      "next": "Naprej",
+      "back": "Nazaj",
+      "submit": "Oddaj prijavo",
+      "submitting": "Oddajanje…",
+      "submitSuccess": "Prijava je bila uspešno oddana",
+      "submitPartial": "Prijava je bila oddana z napakami — preglejte rezultate spodaj",
+      "submitError": "Oddaja prijave ni uspela",
+      "validation": {
+        "noParticipants": "Dodajte vsaj enega udeleženca",
+        "noCategoryAssigned": "Vsak udeleženec mora biti v vsaj eni kategoriji",
+        "assignAtLeastOne": "Za nadaljevanje izberite vsaj enega udeleženca v kategoriji",
+        "assignRemaining": "Izberite kategorijo za še {{count}} udeleženca/e",
+        "noEligibleCategories": "{{count}} udeleženec/cev nima ustreznih kategorij — odstranite jih ali se vrnite",
+        "coachRequired": "Za oddajo izpolnite e-pošto in ime trenerja"
+      },
+      "noEligibleCategoriesHint": "{{count}} udeleženec/cev nima ustreznih kategorij in ne bo prijavljen/a.",
+      "assignmentStatus": {
+        "needsCategory": "Še potrebuje kategorijo",
+        "noEligible": "Ni ustreznih kategorij (bo preskočeno)"
+      },
+      "results": {
+        "title": "Rezultati prijave",
+        "success": "Uspešno",
+        "failed": "Neuspešno",
+        "participant": "Udeleženec",
+        "category": "Kategorija",
+        "error": "Napaka",
+        "startOver": "Prijavi več udeležencev"
+      }
+    }
+  }
 }

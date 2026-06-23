@@ -33,18 +33,18 @@ const MyClub = () => {
 
     return (
         <div className="flex flex-row flex-1">
-            <div className="flex flex-col gap-2 p-4 border-r border-secondary-200 min-w-[300px] max-w-[300px]">
+            <div className="flex flex-col gap-2 border-r border-primary-300 bg-primary-75 p-4 min-w-[300px] max-w-[300px]">
                 <div className="flex flex-row items-center justify-between">
                     <Typography size="h2" >
                         {club?.name}
                     </Typography>
                     <IconButton className="h-10 w-10">
-                        <FontAwesomeIcon icon={faPencil} className="text-primary-200" size="xs" />
+                        <FontAwesomeIcon icon={faPencil} className="text-tertiary-300" size="xs" />
                     </IconButton>
                 </div>
                 <div className="flex flex-row gap-1 flex-wrap">
                     <Pill>
-                        <Typography size="body-paragraph-s" className="text-text-inverted-secondary">
+                        <Typography size="body-paragraph-s" className="text-secondary-200">
                             {t("shared.location")}:
                         </Typography>
                         <Typography size="body-paragraph-s" className="font-weight-500">
@@ -52,7 +52,7 @@ const MyClub = () => {
                         </Typography>
                     </Pill>
                     <Pill>
-                        <Typography size="body-paragraph-s" className="text-text-inverted-secondary">
+                        <Typography size="body-paragraph-s" className="text-secondary-200">
                             {t("shared.country")}:
                         </Typography>
                         <Typography size="body-paragraph-s" className="font-weight-500">
@@ -60,7 +60,7 @@ const MyClub = () => {
                         </Typography>
                     </Pill>
                     <Pill>
-                        <Typography size="body-paragraph-s" className="text-text-inverted-secondary">
+                        <Typography size="body-paragraph-s" className="text-secondary-200">
                             {t("shared.registrationDeadline")}:
                         </Typography>
                         <Typography size="body-paragraph-s" className="font-weight-500">

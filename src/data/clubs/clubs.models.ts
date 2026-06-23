@@ -43,17 +43,17 @@ export namespace ClubsModels {
    * @property { string } lastName Last name. Min Length: `2`. Max Length: `100`. Example: `Doe`
    * @property { string } email Email (for display and future Auth0 linking). Max Length: `255`. Example: `member@example.com`
    * @property { string } gender Gender. Example: `male`
-   * @property { string } birthDate Birth date. Example: `1990-01-01`
+   * @property { string } dateOfBirth Date of birth. Example: `7.7.2000`
    * @property { number } weight Weight in kg. Maximum: `999.99`. Example: `75.5`
-   * @property { string } beltLevel Belt level. Example: `black`
+   * @property { string } beltLevel Belt level. Example: `1-dan`
    */
   export const AddMemberDtoSchema = z.object({
     role: RoleEnumSchema,
     firstName: z.string().min(2).max(100),
     lastName: z.string().min(2).max(100),
     email: z.string().max(255).email().optional(),
-    gender: CommonModels.GenderEnumSchema,
-    birthDate: z.string(),
+    gender: CommonModels.ParticipantGenderEnumSchema,
+    dateOfBirth: z.string(),
     weight: z.number().gte(0).lte(999.99).optional(),
     beltLevel: CommonModels.BeltEnumSchema,
   });
@@ -83,6 +83,14 @@ export namespace ClubsModels {
     CommonModels.ClubResponseDtoSchema,
   );
   export type ClubsFindAllResponse = z.infer<typeof ClubsFindAllResponseSchema>;
+
+  /**
+   * GetMembersRoleParamSchema
+   * @type { string }
+   */
+  export const GetMembersRoleParamSchema =
+    CommonModels.UserEnumSchema.optional();
+  export type GetMembersRoleParam = z.infer<typeof GetMembersRoleParamSchema>;
 
   /**
    * GetMembersResponseSchema

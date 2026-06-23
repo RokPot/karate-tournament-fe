@@ -14,6 +14,8 @@ export namespace TournamentsQueries {
   export const keys = {
     all: [moduleName] as const,
     findAll: () => [...keys.all, "/tournaments"] as const,
+    findOnePublic: (id: string) =>
+      [...keys.all, "/tournaments/public/:id", id] as const,
     findOne: (id: string) => [...keys.all, "/tournaments/:id", id] as const,
   };
 
@@ -59,6 +61,26 @@ export namespace TournamentsQueries {
     return useQuery({
       queryKey: keys.findAll(),
       queryFn: TournamentsApi.findAll,
+      ...options,
+    });
+  };
+
+  /**
+   * Query `useFindOnePublic`
+   * @summary Get tournament (public lite)
+   * @description Returns tournament name, dates, location, and full category details. No authentication required.
+   * @param { string } object.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { AppQueryOptions } options Query options
+   * @returns { UseQueryResult<TournamentsModels.TournamentPublicLiteResponseDto> } Tournament found
+   * @statusCodes [200, 404]
+   */
+  export const useFindOnePublic = <TData>(
+    { id }: { id: string },
+    options?: AppQueryOptions<typeof TournamentsApi.findOnePublic, TData>,
+  ) => {
+    return useQuery({
+      queryKey: keys.findOnePublic(id),
+      queryFn: () => TournamentsApi.findOnePublic(id),
       ...options,
     });
   };
@@ -140,7 +162,7 @@ export namespace TournamentsQueries {
   /**
    * Mutation `useAssignCategories`
    * @summary Assign categories to tournament
-   * @description Sets the tournament&#x27;s categories to the given list. Any previously assigned categories not in the list are unassigned.
+   * @description Sets the tournament&#x27;s categories to the given list. Any previously assigned categories not in the list are unassigned, and the array order becomes the tournament-specific display order.
    * @param { string } mutation.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { TournamentsModels.AssignCategoriesDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options

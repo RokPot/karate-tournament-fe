@@ -10,7 +10,7 @@ interface IProps {
 const CustomDialog = ({ open, onClose, children, maxWidth = "sm" }: IProps) => {
     return (
         <Dialog open={open} onClose={onClose} maxWidth={maxWidth} fullWidth classes={{
-            paper: "!bg-secondary-500",
+            paper: "!bg-primary-200 !text-secondary-500 dark:!bg-secondary-500 dark:!text-white",
         }}>
             {children}
         </Dialog>

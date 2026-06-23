@@ -1,8 +1,7 @@
 @layer theme, base, mui, components, utilities;
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@config '../../tailwind.config.ts';
-
+@config "../../tailwind.config.ts";
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
@@ -13,48 +12,65 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
-
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: #101010;
-    ;
+    border-color: #ebeae6;
     /* @apply border-neutral-300; */
   }
 
-  /* Scrollbar – dark theme (in base so it isn’t overridden by utilities layer) */
+  /* Scrollbar defaults for light mode */
   ::-webkit-scrollbar {
     width: 0.375rem;
     height: 0.375rem;
   }
 
   ::-webkit-scrollbar-track {
-    background-color: #2d2d2d;
+    background-color: #f2f1ed;
   }
 
   ::-webkit-scrollbar-thumb {
     border-radius: 9999px;
-    background-color: #707070;
+    background-color: #c4c2bb;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: #aaaaaa;
+    background-color: #a9a79f;
   }
 
   ::-webkit-scrollbar-corner {
-    background-color: #2d2d2d;
+    background-color: #f2f1ed;
   }
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: #707070 #2d2d2d;
+    scrollbar-color: #c4c2bb #f2f1ed;
+  }
+
+  body.dark ::-webkit-scrollbar-track {
+    background-color: #1c1c1e;
+  }
+
+  body.dark ::-webkit-scrollbar-thumb {
+    background-color: #6b7280;
+  }
+
+  body.dark ::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+  }
+
+  body.dark ::-webkit-scrollbar-corner {
+    background-color: #1c1c1e;
+  }
+
+  body.dark * {
+    scrollbar-color: #6b7280 #1c1c1e;
   }
 }
 
 @utility no-scrollbar {
-
   /* Hide scrollbar for Chrome, Safari and Opera */
   &::-webkit-scrollbar {
     display: none;
@@ -68,7 +84,6 @@
 }
 
 @layer utilities {
-
   body,
   html {
     height: 100%;
@@ -81,11 +96,29 @@
     --sal: env(safe-area-inset-left);
     --sar: env(safe-area-inset-right);
 
-    --yellow-gradient: linear-gradient(0deg, #ffd001 0%, #fffc9d 100%);
-    --yellow-gradient-box: linear-gradient(0deg, #ffd001 0%, #fff808 100%);
-    --skeleton-gradient: linear-gradient(138deg,
-        #232323 14.32%,
-        #656565 126.83%);
+    --gold-gradient: linear-gradient(180deg, #e5c97a 0%, #b8963e 100%);
+    --gold-gradient-subtle: linear-gradient(180deg, #fbf6eb 0%, #f3e6c8 100%);
+    --yellow-gradient: var(--gold-gradient);
+    --yellow-gradient-box: var(--gold-gradient-subtle);
+    --skeleton-gradient: linear-gradient(138deg, #f2f1ed 14.32%, #ebeae6 126.83%);
+
+    --text-default-primary: 10 10 11;
+    --text-default-secondary: 107 114 128;
+    --text-inverted-secondary: 255 255 255;
+    --elevation-surface-1: 255 255 255;
+    --elevation-surface-2: 248 247 244;
+    --elevation-surface-4: 10 10 11;
+    --elevation-outline-1: 235 234 230;
+  }
+
+  body.dark {
+    --text-default-primary: 255 255 255;
+    --text-default-secondary: 209 209 209;
+    --text-inverted-secondary: 28 28 30;
+    --elevation-surface-1: 63 63 70;
+    --elevation-surface-2: 28 28 30;
+    --elevation-surface-4: 255 255 255;
+    --elevation-outline-1: 107 114 128;
   }
 
   input:-webkit-autofill,

@@ -37,7 +37,9 @@ const ClubMembersSection = ({ clubId }: IProps) => {
                 header: ({ header }) => HeaderCell(header, t("shared.belt")),
                 accessorKey: "belt",
                 cell: ({ row }) => {
-                    return TextCell(row.original.beltLevel || "—");
+                    return TextCell(
+                        row.original.beltLevel ? t(`belt.${row.original.beltLevel}`) : "—",
+                    );
                 },
             },
             {
@@ -49,9 +51,9 @@ const ClubMembersSection = ({ clubId }: IProps) => {
             },
             {
                 header: ({ header }) => HeaderCell(header, t("shared.birthday")),
-                accessorKey: "birthDate",
+                accessorKey: "dateOfBirth",
                 cell: ({ row }) => {
-                    return TextCell(DateUtils.parseAndFormatDateToLocaleShort(row.original.birthDate));
+                    return TextCell(DateUtils.parseAndFormatDateToLocaleShort(row.original.dateOfBirth));
                 },
             },
         ]

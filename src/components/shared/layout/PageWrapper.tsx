@@ -25,15 +25,14 @@ export const PageWrapper = ({ children }: PropsWithChildren) => {
         height: "100dvh",
         position: "relative",
       }}
-      className={cx("flex", "flex-col")}
+      className={cx("flex flex-col min-h-0 flex-1")}
     >
       <Navbar />
-      <div className={cx("flex", "h-full")}>
+      <div className={cx("flex h-full max-h-full overflow-y-auto")}>
         <main
           className="flex flex-1 flex-col"
           style={{
-            overflowY: "auto",
-            overflowX: "hidden",
+
             flexBasis: "0",
           }}
           id="scroll-container"

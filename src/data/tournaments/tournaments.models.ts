@@ -3,6 +3,28 @@ import { CommonModels } from "@/data/common/common.models";
 
 export namespace TournamentsModels {
   /**
+   * TournamentPublicLiteResponseDtoSchema
+   * @type { object }
+   * @property { string } id Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } name Tournament name. Example: `European Karate Championship 2024`
+   * @property { string } startDate Tournament start date and time. Example: `2024-06-15T09:00:00.000Z`
+   * @property { string } location Tournament location. Example: `Paris, France`
+   * @property { string } registrationDeadline Registration deadline. Example: `2024-06-01T23:59:59.000Z`
+   * @property { CommonModels.CategoryResponseDto[] } categories Categories assigned to this tournament
+   */
+  export const TournamentPublicLiteResponseDtoSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    startDate: z.string().datetime({ offset: true }),
+    location: z.string(),
+    registrationDeadline: z.string().datetime({ offset: true }),
+    categories: z.array(CommonModels.CategoryResponseDtoSchema),
+  });
+  export type TournamentPublicLiteResponseDto = z.infer<
+    typeof TournamentPublicLiteResponseDtoSchema
+  >;
+
+  /**
    * CreateTournamentDtoSchema
    * @type { object }
    * @property { string } name Tournament name. Max Length: `255`. Example: `European Karate Championship 2024`
@@ -23,7 +45,7 @@ export namespace TournamentsModels {
   /**
    * AssignCategoriesDtoSchema
    * @type { object }
-   * @property { string[] } categoryIds Category IDs to assign to the tournament. Any previously assigned categories not in this list are unassigned.. Example: `123e4567-e89b-12d3-a456-426614174000,223e4567-e89b-12d3-a456-426614174001`
+   * @property { string[] } categoryIds Category IDs to assign to the tournament. Any previously assigned categories not in this list are unassigned. Array order becomes display order.. Example: `123e4567-e89b-12d3-a456-426614174000,223e4567-e89b-12d3-a456-426614174001`
    */
   export const AssignCategoriesDtoSchema = z.object({
     categoryIds: z.array(z.string().uuid()),

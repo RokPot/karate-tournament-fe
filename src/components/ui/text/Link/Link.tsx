@@ -15,8 +15,8 @@ export const Link = (props: LinkProps) => {
       {...props}
       className={clsx(
         uiOutlineClass,
-        "text-primary-300 underline focus-visible:outline-secondary-200",
-        "active:text-secondary-100 hover:text-secondary-200 focus-visible:text-secondary-200",
+        "text-tertiary-200 underline focus-visible:outline-primary-300",
+        "active:text-tertiary-400 hover:text-tertiary-300 focus-visible:text-tertiary-300",
         props.className,
       )}
     />

@@ -2,6 +2,7 @@
   "appName": "KarateApp",
   "appDescription": "KarateApp App",
   "shared": {
+    "registration": "Registration",
     "languages": {
       "slovenian": "Slovenian",
       "english": "English"
@@ -44,6 +45,8 @@
     "create": "Create",
     "creating": "Creating...",
     "edit": "Edit",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
     "location": "Location",
     "startDate": "Start Date",
     "registrationDeadline": "Registration Deadline",
@@ -53,8 +56,6 @@
     "discipline": "Discipline",
     "gender": "Gender",
     "kata": "Kata",
-    "kumite": "Kumite",
-    "yako-soku": "Yako-soku",
     "back": "Back",
     "createNew": "Create New",
     "save": "Save",
@@ -67,27 +68,44 @@
     "categories": "Categories",
     "registrationsCount": "Registrations Count",
     "tournaments": "Tournaments",
-    "none": "None"
+    "none": "None",
+    "subDiscipline": "Sub-discipline",
+    "updatedAt": "Updated At"
   },
   "belt": {
-    "white": "White",
-    "yellow": "Yellow",
-    "orange": "Orange",
-    "green": "Green",
-    "blue": "Blue",
-    "purple": "Purple",
-    "brown": "Brown",
-    "black": "Black",
-    "black_dan_1": "Black Dan 1",
-    "black_dan_2": "Black Dan 2",
-    "black_dan_3": "Black Dan 3",
-    "black_dan_4": "Black Dan 4",
-    "black_dan_5": "Black Dan 5",
-    "black_dan_6": "Black Dan 6",
-    "black_dan_7": "Black Dan 7",
-    "black_dan_8": "Black Dan 8",
-    "black_dan_9": "Black Dan 9",
-    "black_dan_10": "Black Dan 10"
+    "10-kyu": "10. Kyu",
+    "9-kyu": "9. Kyu",
+    "8-kyu": "8. Kyu",
+    "7-kyu": "7. Kyu",
+    "6-kyu": "6. Kyu",
+    "5-kyu": "5. Kyu",
+    "4-kyu": "4. Kyu",
+    "3-kyu": "3. Kyu",
+    "2-kyu": "2. Kyu",
+    "1-kyu": "1. Kyu",
+    "1-dan": "1. Dan",
+    "2-dan": "2. Dan",
+    "3-dan": "3. Dan",
+    "4-dan": "4. Dan",
+    "5-dan": "5. Dan",
+    "6-dan": "6. Dan",
+    "7-dan": "7. Dan",
+    "8-dan": "8. Dan",
+    "9-dan": "9. Dan",
+    "10-dan": "10. Dan"
+  },
+  "discipline": {
+    "kata": "Kata",
+    "kata-team": "Kata (team)",
+    "yako-soku-kumite": "Yako-soku kumite",
+    "yiju-kumite": "Yiju kumite",
+    "kumite-team": "Kumite (team)"
+  },
+  "subDiscipline": {
+    "gohon-ippon-kumite": "Gohon ippon kumite",
+    "sanbon-ippon-kumite": "Sanbon ippon kumite",
+    "kihon-ippon-kumite": "Kihon ippon kumite",
+    "dyu-ippon-kumite": "Dyu ippon kumite"
   },
   "ui": {
     "dropdown": {
@@ -134,6 +152,18 @@
     "title": "Categories",
     "noCategories": "No categories found",
     "addCategory": "Add Category",
+    "actions": {
+      "duplicateSuccess": "Categories duplicated successfully",
+      "duplicateError": "Failed to duplicate categories",
+      "deleteSuccess": "Categories deleted successfully",
+      "deleteError": "Failed to delete categories"
+    },
+    "edit": {
+      "title": "Edit Category",
+      "success": "Category updated successfully",
+      "error": "Failed to update category",
+      "saving": "Saving..."
+    },
     "create": {
       "success": "Category created successfully",
       "error": "Failed to create category",
@@ -145,17 +175,97 @@
       "weightMax": "Weight Max (kg)",
       "beltMin": "Belt Min",
       "beltMax": "Belt Max",
+      "subDiscipline": "Sub-discipline",
+      "noRestriction": "No restriction",
       "male": "Male",
-      "female": "Female"
+      "female": "Female",
+      "other": "Other",
+      "teamSize": "Team size",
+      "teamReservesSize": "Reserve slots",
+      "teamReservesShort": "res.",
+      "validation": {
+        "genderRequired": "Gender is required",
+        "ageMinRequired": "Minimum age is required",
+        "ageMaxRequired": "Maximum age is required",
+        "weightMinRequired": "Minimum weight is required",
+        "weightMaxRequired": "Maximum weight is required",
+        "beltMinRequired": "Minimum belt is required",
+        "beltMaxRequired": "Maximum belt is required",
+        "teamSizeRequired": "Team size is required",
+        "teamReservesSizeRequired": "Reserve slots is required",
+        "subDisciplineRequired": "Sub-discipline is required"
+      }
     },
     "addCategoryModal": {
+      "sortByName": "Sort by name",
       "success": "Categories added successfully",
       "error": "Failed to add categories"
     }
   },
   "registrations": {
     "attendees": "Attendees",
-    "noAttendees": "No attendees found"
+    "noAttendees": "No attendees found",
+    "public": {
+      "pageTitle": "Tournament registration",
+      "showCategories": "Show categories",
+      "tournamentCategoriesTitle": "Tournament categories",
+      "steps": {
+        "participants": "Participants",
+        "categories": "Categories",
+        "coach": "Coach details"
+      },
+      "participantFirstName": "First name",
+      "participantLastName": "Last name",
+      "birthYear": "Birth year",
+      "addParticipant": "Add participant",
+      "editParticipant": "Edit participant",
+      "updateParticipant": "Update participant",
+      "noParticipants": "No participants added yet",
+      "noCategories": "No categories available for this tournament",
+      "categoriesLoading": "Loading suitable categories…",
+      "categoriesHint": "Select participants for each category",
+      "noEligibleParticipantsForCategory": "No eligible participants for this category",
+      "selectedRegistrations": {
+        "title": "Selected registrations",
+        "hint": "These participants and categories will be submitted when you finish.",
+        "selectedForParticipant": "Selected categories"
+      },
+      "coachSectionTitle": "Your details",
+      "coachEmail": "Email",
+      "coachFirstName": "First name",
+      "coachLastName": "Last name",
+      "clubName": "Club name",
+      "clubNameOptional": "Optional",
+      "next": "Next",
+      "back": "Back",
+      "submit": "Submit registration",
+      "submitting": "Submitting…",
+      "submitSuccess": "Registration submitted successfully",
+      "submitPartial": "Registration submitted with some errors — review results below",
+      "submitError": "Failed to submit registration",
+      "validation": {
+        "noParticipants": "Add at least one participant to continue",
+        "noCategoryAssigned": "Assign each participant to at least one category",
+        "assignAtLeastOne": "Select at least one participant for a category to continue",
+        "assignRemaining": "Select a category for {{count}} more participant(s)",
+        "noEligibleCategories": "No eligible categories for {{count}} participant(s) — remove them or go back",
+        "coachRequired": "Fill in coach email and name to submit"
+      },
+      "noEligibleCategoriesHint": "{{count}} participant(s) have no eligible categories and will not be registered.",
+      "assignmentStatus": {
+        "needsCategory": "Still needs a category",
+        "noEligible": "No eligible categories (will be skipped)"
+      },
+      "results": {
+        "title": "Registration results",
+        "success": "Success",
+        "failed": "Failed",
+        "participant": "Participant",
+        "category": "Category",
+        "error": "Error",
+        "startOver": "Register more participants"
+      }
+    }
   },
   "clubs": {
     "title": "Clubs",

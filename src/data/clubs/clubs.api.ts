@@ -27,10 +27,18 @@ export namespace ClubsApi {
     );
   };
 
-  export const getMembers = (id: string) => {
+  export const getMembers = (
+    id: string,
+    role?: ClubsModels.GetMembersRoleParam,
+  ) => {
     return AppRestClient.get(
       { resSchema: ClubsModels.GetMembersResponseSchema },
       `/clubs/${id}/members`,
+      {
+        params: {
+          role,
+        },
+      },
     );
   };
 

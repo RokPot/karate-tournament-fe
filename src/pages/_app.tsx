@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { AppProps } from "next/app";
 import { useReportWebVitals } from "next/web-vitals";
-import { useMemo, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ErrorBoundaryTrigger } from "@/components/shared/error/ErrorBoundaryTrigger";
@@ -32,7 +32,7 @@ export function App(props: AppProps) {
   const { isDarkMode } = useThemeStore();
   const [queryClient] = useState(() => new QueryClient(QueryConfig));
 
-  const muiTheme = useMemo(() => createUnifiedTheme(isDarkMode ?? true), [isDarkMode]);
+  const muiTheme = useMemo(() => createUnifiedTheme(isDarkMode ?? false), [isDarkMode]);
 
   useEffect(() => {
     i18n.on("languageChanged", (lng) => {

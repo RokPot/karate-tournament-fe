@@ -118,6 +118,7 @@ export class RestClient {
 
       return requestInfo.resSchema.parse(res) as Res;
     } catch (e) {
+      alert(JSON.stringify(e));
       const errorHandler = requestInfo.errorHandler ?? SharedErrorHandler;
       errorHandler.rethrowError(e);
       throw e;

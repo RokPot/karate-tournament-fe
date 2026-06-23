@@ -1,36 +1,55 @@
-import { Button, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem, FormControl, InputLabel, Checkbox, FormControlLabel, FormGroup, FormLabel } from "@mui/material";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Button,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+} from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
+import {
+  clearHiddenCategoryFields,
+  getCategoryFormProfile,
+  mapCategoryToFormValues,
+  toCreateCategoryPayload,
+  toUpdateCategoryPayload,
+  validateCategoryForm,
+} from "@/components/categories/category-form-profiles";
+import { CategoryFieldsByDiscipline } from "@/components/categories/form-fields/CategoryFieldsByDiscipline";
+import { CategoryGenderRadio } from "@/components/categories/form-fields/CategoryGenderRadio";
+import { DisciplineSelect } from "@/components/karate/DisciplineSelect";
+import CustomDialog from "@/components/ui/overlays/CustomDialog";
+import { useToast } from "@/components/ui/status/Toast/useToast";
 import { CategoriesModels } from "@/data/categories/categories.models";
 import { CategoriesQueries } from "@/data/categories/categories.queries";
 import { CommonModels } from "@/data/common/common.models";
-import { useToast } from "@/components/ui/status/Toast/useToast";
 import { QueryModule } from "@/data/invalidateQueries";
-import { useQueryClient } from "@tanstack/react-query";
-import { Typography } from "@/components/ui/text/Typography/Typography";
-import CustomDialog from "@/components/ui/overlays/CustomDialog";
-import { useTranslation } from "react-i18next";
 
 interface IProps {
   open: boolean;
-  onClose: (category?: CategoriesModels.CategoryResponseDto) => void;
-
+  mode?: "create" | "edit";
+  initialCategory?: CommonModels.CategoryResponseDto | null;
+  onClose: (category?: CommonModels.CategoryResponseDto) => void;
 }
 
-export const CreateCategoryForm = ({ open, onClose }: IProps) => {
+export const CreateCategoryForm = ({
+  open,
+  mode = "create",
+  initialCategory,
+  onClose,
+}: IProps) => {
   const { successToast, errorToast } = useToast();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
-
   const createCategoryMutation = CategoriesQueries.useCreate({
     invalidateCurrentModule: true,
     onSuccess: async (data) => {
-
       successToast({ text: t("categories.create.success") });
       await queryClient.invalidateQueries({ queryKey: [QueryModule.Categories] });
-
       reset();
       onClose(data);
     },
@@ -38,8 +57,18 @@ export const CreateCategoryForm = ({ open, onClose }: IProps) => {
       errorToast({ text: error?.message || t("categories.create.error") });
     },
   });
-
-  const [genderSelection, setGenderSelection] = useState<CategoriesModels.CategoryEnum[]>([]);
+  const updateCategoryMutation = CategoriesQueries.useUpdate({
+    invalidateCurrentModule: true,
+    onSuccess: async (data) => {
+      successToast({ text: t("categories.edit.success") });
+      await queryClient.invalidateQueries({ queryKey: [QueryModule.Categories] });
+      reset();
+      onClose(data);
+    },
+    onError: (error) => {
+      errorToast({ text: error?.message || t("categories.edit.error") });
+    },
+  });
 
   const {
     register,
@@ -48,37 +77,78 @@ export const CreateCategoryForm = ({ open, onClose }: IProps) => {
     reset,
     setValue,
     watch,
+    control,
+    setError,
   } = useForm<CategoriesModels.CreateCategoryDto>({
     resolver: zodResolver(CategoriesModels.CreateCategoryDtoSchema),
-    defaultValues: {
-      gender: [],
-    },
+    defaultValues: {},
   });
 
   const discipline = watch("discipline");
-  const beltMin = watch("beltMin");
-  const beltMax = watch("beltMax");
+  const profile = getCategoryFormProfile(discipline);
+  const isEditMode = mode === "edit" && !!initialCategory;
+  const isSubmitting =
+    createCategoryMutation.isPending || updateCategoryMutation.isPending;
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    reset(
+      isEditMode && initialCategory
+        ? mapCategoryToFormValues(initialCategory)
+        : {},
+    );
+  }, [initialCategory, isEditMode, open, reset]);
+
+  useEffect(() => {
+    if (discipline) {
+      clearHiddenCategoryFields(discipline, setValue);
+    }
+  }, [discipline, setValue]);
 
   const onSubmit = (data: CategoriesModels.CreateCategoryDto) => {
-    createCategoryMutation.mutate({ data: { ...data, gender: genderSelection } });
+    const profileErrors = validateCategoryForm(data);
+    if (profileErrors.length > 0) {
+      for (const error of profileErrors) {
+        setError(error.path, { message: error.message });
+      }
+      return;
+    }
+
+    if (isEditMode && initialCategory) {
+      updateCategoryMutation.mutate({
+        id: initialCategory.id,
+        data: toUpdateCategoryPayload(data),
+      });
+      return;
+    }
+
+    createCategoryMutation.mutate({ data: toCreateCategoryPayload(data) });
   };
 
   const handleClose = () => {
     reset();
-    setGenderSelection([]);
     onClose();
   };
 
-  const handleGenderChange = (gender: CategoriesModels.CategoryEnum) => {
-    setGenderSelection((prev) =>
-      prev.includes(gender) ? prev.filter((g) => g !== gender) : [...prev, gender]
-    );
-  };
+  const submitLabel = useMemo(() => {
+    if (isEditMode) {
+      return isSubmitting ? t("categories.edit.saving") : t("shared.save");
+    }
+    if (createCategoryMutation.isPending) {
+      return t("shared.creating");
+    }
+    return t("shared.create");
+  }, [isEditMode, isSubmitting, createCategoryMutation.isPending, t]);
 
   return (
     <CustomDialog open={open} onClose={handleClose} maxWidth="md">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogTitle>{t("categories.create.title")}</DialogTitle>
+        <DialogTitle>
+          {isEditMode ? t("categories.edit.title") : t("categories.create.title")}
+        </DialogTitle>
         <DialogContent className="flex flex-col gap-4 pt-4!">
           <TextField
             label={t("categories.create.name")}
@@ -89,145 +159,37 @@ export const CreateCategoryForm = ({ open, onClose }: IProps) => {
             required
           />
 
-          <FormControl fullWidth required error={!!errors.discipline}>
-            <InputLabel>{t("shared.discipline")}</InputLabel>
-            <Select
-              value={discipline || ""}
-              onChange={(e) => setValue("discipline", e.target.value as CategoriesModels.DisciplineEnum)}
-              label={t("shared.discipline")}
-            >
-              <MenuItem value="kata">{t("shared.kata")}</MenuItem>
-              <MenuItem value="kumite">{t("shared.kumite")}</MenuItem>
-              <MenuItem value="yako-soku">{t("shared.yako-soku")}</MenuItem>
-            </Select>
-            {errors.discipline && (
-              <Typography size="body-paragraph-xs" className="text-danger mt-1">
-                {errors.discipline.message}
-              </Typography>
-            )}
-          </FormControl>
+          <DisciplineSelect
+            label={t("shared.discipline")}
+            value={discipline}
+            onChange={(value) => setValue("discipline", value)}
+            error={!!errors.discipline}
+            helperText={errors.discipline?.message}
+            required
+          />
 
-          <FormControl fullWidth required error={!!errors.gender} component="fieldset">
-            <FormLabel component="legend" required>
-              {t("shared.gender")}
-            </FormLabel>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={genderSelection.includes("male")}
-                    onChange={() => handleGenderChange("male")}
-                  />
-                }
-                label={t("categories.create.male")}
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={genderSelection.includes("female")}
-                    onChange={() => handleGenderChange("female")}
-                  />
-                }
-                label={t("categories.create.female")}
-              />
-            </FormGroup>
-            {errors.gender && (
-              <Typography size="body-paragraph-xs" className="text-danger mt-1">
-                {errors.gender.message}
-              </Typography>
-            )}
-          </FormControl>
+          <CategoryGenderRadio control={control} errors={errors} />
 
-          <div className="grid grid-cols-2 gap-4">
-            <TextField
-              label={t("categories.create.ageMin")}
-              type="number"
-              {...register("ageMin", { valueAsNumber: true })}
-              error={!!errors.ageMin}
-              helperText={errors.ageMin?.message}
-              fullWidth
+          {profile && (
+            <CategoryFieldsByDiscipline
+              profile={profile}
+              register={register}
+              errors={errors}
+              setValue={setValue}
+              watch={watch}
             />
-            <TextField
-              label={t("categories.create.ageMax")}
-              type="number"
-              {...register("ageMax", { valueAsNumber: true })}
-              error={!!errors.ageMax}
-              helperText={errors.ageMax?.message}
-              fullWidth
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <TextField
-              label={t("categories.create.weightMin")}
-              type="number"
-              {...register("weightMin", { valueAsNumber: true })}
-              error={!!errors.weightMin}
-              helperText={errors.weightMin?.message}
-              fullWidth
-            />
-            <TextField
-              label={t("categories.create.weightMax")}
-              type="number"
-              {...register("weightMax", { valueAsNumber: true })}
-              error={!!errors.weightMax}
-              helperText={errors.weightMax?.message}
-              fullWidth
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <FormControl fullWidth required error={!!errors.beltMin}>
-              <InputLabel>{t("categories.create.beltMin")}</InputLabel>
-              <Select
-                value={beltMin || ""}
-                onChange={(e) => setValue("beltMin", e.target.value as CommonModels.BeltEnum)}
-                label={t("categories.create.beltMin")}
-              >
-                {Object.values(CommonModels.BeltEnum).map((belt) => (
-                  <MenuItem key={belt} value={belt}>
-                    {belt.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.beltMin && (
-                <Typography size="body-paragraph-xs" className="text-danger mt-1">
-                  {errors.beltMin.message}
-                </Typography>
-              )}
-            </FormControl>
-
-            <FormControl fullWidth required error={!!errors.beltMax}>
-              <InputLabel>{t("categories.create.beltMax")}</InputLabel>
-              <Select
-                value={beltMax || ""}
-                onChange={(e) => setValue("beltMax", e.target.value as CommonModels.BeltEnum)}
-                label={t("categories.create.beltMax")}
-              >
-                {Object.values(CommonModels.BeltEnum).map((belt) => (
-                  <MenuItem key={belt} value={belt}>
-                    {belt.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.beltMax && (
-                <Typography size="body-paragraph-xs" className="text-danger mt-1">
-                  {errors.beltMax.message}
-                </Typography>
-              )}
-            </FormControl>
-          </div>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} disabled={createCategoryMutation.isPending}>
+          <Button onClick={handleClose} disabled={isSubmitting}>
             {t("shared.cancel")}
           </Button>
           <Button
             type="submit"
             variant="contained"
-            disabled={createCategoryMutation.isPending || genderSelection.length === 0}
+            disabled={isSubmitting || !profile}
           >
-            {createCategoryMutation.isPending ? t("shared.creating") : t("shared.create")}
+            {submitLabel}
           </Button>
         </DialogActions>
       </form>

@@ -14,8 +14,8 @@ export namespace ClubsQueries {
   export const keys = {
     all: [moduleName] as const,
     findAll: () => [...keys.all, "/clubs"] as const,
-    getMembers: (id: string) =>
-      [...keys.all, "/clubs/:id/members", id] as const,
+    getMembers: (id: string, role?: ClubsModels.GetMembersRoleParam) =>
+      [...keys.all, "/clubs/:id/members", id, role] as const,
     getTournaments: (id: string) =>
       [...keys.all, "/clubs/:id/tournaments", id] as const,
     findOne: (id: string) => [...keys.all, "/clubs/:id", id] as const,
@@ -99,19 +99,20 @@ export namespace ClubsQueries {
   /**
    * Query `useGetMembers`
    * @summary Get club members
-   * @description Retrieves users (members) of the club
+   * @description Retrieves users (members) of the club. Optionally filter by role (query param).
    * @param { string } object.id Path parameter. Club ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { ClubsModels.GetMembersRoleParam } object.role Query parameter. Filter by member role
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<ClubsModels.GetMembersResponse> } List of club members
    * @statusCodes [200, 401, 404]
    */
   export const useGetMembers = <TData>(
-    { id }: { id: string },
+    { id, role }: { id: string; role?: ClubsModels.GetMembersRoleParam },
     options?: AppQueryOptions<typeof ClubsApi.getMembers, TData>,
   ) => {
     return useQuery({
-      queryKey: keys.getMembers(id),
-      queryFn: () => ClubsApi.getMembers(id),
+      queryKey: keys.getMembers(id, role),
+      queryFn: () => ClubsApi.getMembers(id, role),
       ...options,
     });
   };

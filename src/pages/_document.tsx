@@ -16,7 +16,7 @@ export default function Document() {
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
-      <body className={clsx("dark bg-secondary-300 text-white", globalFontClass)}>
+      <body className={clsx("bg-primary-50 text-secondary-500", globalFontClass)}>
         <Main />
         <NextScript />
       </body>
