@@ -23,7 +23,10 @@ const InvitePage = () => {
 
   const handleSignUpLogIn = () => {
     if (tokenStr) {
-      useLoginForInvite.mutate({ token: tokenStr });
+      useLoginForInvite.mutate({
+        token: tokenStr,
+        email: data?.email ?? undefined,
+      });
     }
   };
 
@@ -84,6 +87,8 @@ const InvitePage = () => {
   }
 
   // status === "pending"
+  const inviteeName = [data.firstName, data.lastName].filter(Boolean).join(" ");
+
   return (
     <ThinPageWrapper>
       <Card className="p-4">
@@ -91,6 +96,16 @@ const InvitePage = () => {
           <Typography size="h2" variant="prominent-1" as="h2">
             {t("invitations.inviteHeading", { clubName: data.clubName })}
           </Typography>
+          {inviteeName && (
+            <Typography size="body-paragraph-m">
+              {t("invitations.invitedAs", { name: inviteeName })}
+            </Typography>
+          )}
+          {data.email && (
+            <Typography size="body-paragraph-m">
+              {t("invitations.invitedEmail", { email: data.email })}
+            </Typography>
+          )}
           {data.expiresAt && (
             <Typography size="body-paragraph-m">
               {t("invitations.expiresOn", { date: formatExpiresAt(data.expiresAt) })}
@@ -101,7 +116,7 @@ const InvitePage = () => {
             onClick={handleSignUpLogIn}
             disabled={useLoginForInvite.isPending}
           >
-            {useLoginForInvite.isPending ? "..." : t("invitations.signUpLogIn")}
+            {useLoginForInvite.isPending ? "..." : t("invitations.signUpToJoin")}
           </Button>
           <Button onClick={() => router.push(RouteConfig.home)}>
             {t("shared.notFound.homeBtn")}

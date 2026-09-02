@@ -4,9 +4,12 @@ import { useCallback } from "react";
 
 import { AppConfig } from "@/config/app.config";
 import { AuthContext } from "@/data/auth/auth.context";
+import {
+  clearPendingInviteToken,
+  markPendingProfileSetup,
+  setPendingInviteToken,
+} from "@/data/auth/auth-onboarding";
 import { logger } from "@/util/logger";
-
-const PENDING_INVITE_TOKEN_KEY = "pending_invite_token";
 
 export const AuthAuth0Provider = ({ children }: React.PropsWithChildren) => {
   return (
@@ -69,9 +72,10 @@ const Auth0 = ({ children }: React.PropsWithChildren) => {
   }
 
   /** Store token so InviteAcceptHandler can accept after Auth0 redirect. */
-  async function handleLoginForInvite(req: { token: string }) {
+  async function handleLoginForInvite(req: { token: string; email?: string }) {
     try {
-      localStorage.setItem(PENDING_INVITE_TOKEN_KEY, req.token);
+      setPendingInviteToken(req.token);
+      markPendingProfileSetup();
       await loginWithRedirect({
         authorizationParams: {
           redirect_uri: AppConfig.authAuth0.loginRedirectPath?.replace(
@@ -80,10 +84,11 @@ const Auth0 = ({ children }: React.PropsWithChildren) => {
           ),
           audience: AppConfig.authAuth0.audience?.replace(/\/$/, ""),
           screen_hint: "signup",
+          ...(req.email ? { login_hint: req.email } : {}),
         },
       });
     } catch (e) {
-      localStorage.removeItem(PENDING_INVITE_TOKEN_KEY);
+      clearPendingInviteToken();
       logger.error(e);
     }
   }

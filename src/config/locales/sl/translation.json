@@ -216,6 +216,31 @@
       "notificationsHint": "Nastavitve obvestil bodo kmalu na voljo.",
       "tournamentReminders": "Opomniki za turnirje",
       "invitationEmails": "E-pošta z vabili"
+    },
+    "complete": {
+      "title": "Dopolnite profil",
+      "subtitle": "Potrdite svoje podatke, da nastavimo račun. Neobvezna polja lahko izpolnite pozneje.",
+      "firstName": "Ime",
+      "lastName": "Priimek",
+      "email": "E-pošta",
+      "optionalHint": "Spol, rojstni dan, teža in pas so neobvezni.",
+      "save": "Shrani profil",
+      "saving": "Shranjevanje...",
+      "success": "Profil je shranjen",
+      "error": "Profila ni bilo mogoče shraniti",
+      "edit": "Uredi"
     }
+  },
+  "invitations": {
+    "signUpToJoin": "Ustvari račun",
+    "invitedAs": "Povabljeni kot {{name}}",
+    "invitedEmail": "To vabilo je bilo poslano na {{email}}",
+    "inviteHeading": "Povabljeni ste v {{clubName}}",
+    "signUpLogIn": "Registracija / prijava",
+    "expiresOn": "Vabilo poteče {{date}}",
+    "invalidOrExpired": "Neveljavno ali pretečeno vabilo",
+    "noLongerValid": "To vabilo ni več veljavno",
+    "acceptSuccess": "Pridružili ste se klubu.",
+    "acceptInvalid": "Vabilo ni več veljavno"
   }
 }

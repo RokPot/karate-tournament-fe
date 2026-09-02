@@ -338,6 +338,9 @@
     "inviteHeading": "You're invited to join {{clubName}}",
     "invalidOrExpired": "Invalid or expired invitation",
     "signUpLogIn": "Sign up / Log in",
+    "signUpToJoin": "Create your account",
+    "invitedAs": "Invited as {{name}}",
+    "invitedEmail": "This invitation was sent to {{email}}",
     "expiresOn": "Invitation expires on {{date}}",
     "noLongerValid": "This invitation is no longer valid",
     "acceptSuccess": "You have joined the club.",
@@ -451,6 +454,19 @@
       "notificationsHint": "Notification preferences will be available soon.",
       "tournamentReminders": "Tournament reminders",
       "invitationEmails": "Invitation emails"
+    },
+    "complete": {
+      "title": "Complete your profile",
+      "subtitle": "Confirm your details so we can set up your account. Optional fields can be filled in later.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "optionalHint": "Gender, birthday, weight, and belt are optional.",
+      "save": "Save profile",
+      "saving": "Saving...",
+      "success": "Profile saved",
+      "error": "Failed to save profile",
+      "edit": "Edit"
     }
   }
 }

@@ -37,7 +37,7 @@ export namespace AuthContext {
       AuthModels.RegisterResult | void,
       AuthErrors.RegisterErrorCodes
     >;
-    useLoginForInvite: AuthAction<{ token: string }, void>;
+    useLoginForInvite: AuthAction<{ token: string; email?: string }, void>;
     useResendConfirm: AuthAction<AuthModels.ResendConfirmRequest>;
     useForgotPassword: AuthAction<AuthModels.ForgotPasswordRequest>;
     useResetPassword: AuthAction<
@@ -61,6 +61,8 @@ export namespace AuthContext {
     user: CommonModels.UserResponseDto | undefined;
     isInitializing: boolean;
     shouldPerformSync: boolean;
+    profileSyncError: unknown | null;
+    retryProfileSync: () => void;
   }
 
   const Context = createContext<Type>({} as never);
@@ -139,17 +141,18 @@ export namespace AuthContext {
 
     RoutingUtils.useOnPageChange(resetAllAuthMutations);
 
+    const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
+    const [isSyncingProfile, setIsSyncingProfile] = useState(false);
+    const [profileSyncError, setProfileSyncError] = useState<unknown | null>(
+      null,
+    );
+    const [profileQueryEnabled, setProfileQueryEnabled] = useState(false);
+
     const {
       data: user,
       isLoading: isUserLoading,
       refetch: refetchProfile,
-    } = UsersQueries.useGetProfile({ enabled: false });
-
-    const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
-
-    // todo rokpot setup sync if its needed
-    // const useSync = UsersQueries.useSync();
-    // const performSync = useSync.mutate;
+    } = UsersQueries.useGetProfile({ enabled: profileQueryEnabled });
 
     const performLogoutAsync = useLogout.mutateAsync;
     const performRefreshAsync = useRefresh?.mutateAsync;
@@ -192,37 +195,45 @@ export namespace AuthContext {
       const header = await getAuthHeader();
       if (!header) {
         await performLogoutAsync();
+        setIsLoggedIn(false);
+        setProfileSyncError(null);
         return;
       }
 
-      if (shouldPerformSync) {
-        // todo rokpot setup sync if its needed
-        // performSync(header, {
-        //   onSuccess: () => {
-        //     applyAccessToken();
-        //     refetchProfile();
-        //     setIsLoggedIn(true);
-        //   },
-        //   onError: (e) => {
-        //     logger.error("Failed to sync user data", e);
-        //     if (e?.code === "CANCELED_ERROR") {
-        //       logger.debug("User cancelled sync");
-        //       return;
-        //     }
-        //     performLogoutAsync();
-        //   },
-        // });
-        try {
-          applyAccessToken();
-          await refetchProfile();
-          setIsLoggedIn(true);
-        } catch (e) {
-          logger.error("Failed to sync user data", e);
+      applyAccessToken();
+      setIsSyncingProfile(true);
+      setProfileSyncError(null);
+
+      const maxAttempts = shouldPerformSync ? 4 : 1;
+      const delayMs = 800;
+
+      try {
+        let lastError: unknown = null;
+
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+          try {
+            const result = await refetchProfile();
+            if (result.data) {
+              setProfileQueryEnabled(true);
+              setIsLoggedIn(true);
+              setProfileSyncError(null);
+              return;
+            }
+            lastError = result.error;
+          } catch (e) {
+            lastError = e;
+          }
+
+          if (attempt < maxAttempts - 1) {
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+          }
         }
-      } else {
-        applyAccessToken();
-        refetchProfile();
-        setIsLoggedIn(true);
+
+        logger.error("Failed to sync user data", lastError);
+        setProfileSyncError(lastError);
+        setIsLoggedIn(false);
+      } finally {
+        setIsSyncingProfile(false);
       }
     }, [
       applyAccessToken,
@@ -243,9 +254,10 @@ export namespace AuthContext {
 
         const wasLoggedOut = isLoggedInRef.current;
         setIsLoggedIn(false);
+        setProfileSyncError(null);
+        setProfileQueryEnabled(false);
 
         if (wasLoggedOut) {
-          // handle logout
           queryClient.clear();
         }
       } else {
@@ -280,8 +292,10 @@ export namespace AuthContext {
         useSocialCredentials,
         user,
         isInitializing:
-          isLoggedIn === undefined || isUserLoading /* || useSync.isPending */,
+          isLoggedIn === undefined || isUserLoading || isSyncingProfile,
         shouldPerformSync,
+        profileSyncError,
+        retryProfileSync: syncProfile,
       }),
       [
         isUserLoading,
@@ -298,6 +312,9 @@ export namespace AuthContext {
         isLoggedIn,
         user,
         shouldPerformSync,
+        isSyncingProfile,
+        profileSyncError,
+        syncProfile,
       ],
     );
 

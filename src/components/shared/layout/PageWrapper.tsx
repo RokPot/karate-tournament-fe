@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { PropsWithChildren, useMemo } from "react";
 
 import { InviteAcceptHandler } from "@/components/invitations/InviteAcceptHandler";
+import { CompleteProfilePrompt } from "@/components/profile/CompleteProfilePrompt";
 import { LoadingState } from "@/components/shared/layout/LoadingState";
 import Footer from "@/components/shared/layout/footer/Footer";
 
@@ -40,8 +41,10 @@ export const PageWrapper = ({ children }: PropsWithChildren) => {
           }}
           id="scroll-container"
         >
-          <InviteAcceptHandler />
-          {children}
+          <InviteAcceptHandler>
+            <CompleteProfilePrompt />
+            {children}
+          </InviteAcceptHandler>
           {shouldShowFooter && <Footer />}
         </main>
       </div>

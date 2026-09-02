@@ -38,7 +38,7 @@ export namespace InvitationsQueries {
   /**
    * Query `useGetByToken`
    * @summary Get invitation by token
-   * @description Returns invitation details (club name, expiry) for the given token. Public. Used by frontend to show &quot;You&#x27;re invited to join X&quot; before redirecting to Auth0.
+   * @description Returns invitation details for the given token, including invitee identity. Public. Expired, cancelled, and accepted invites still return 200 with status.
    * @param { string } object.token Path parameter. Invitation token. Example: `abc123-uuid`
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<InvitationsModels.InvitationByTokenResponseDto> } Invitation details
@@ -58,7 +58,7 @@ export namespace InvitationsQueries {
   /**
    * Mutation `useAccept`
    * @summary Accept invitation
-   * @description Accepts the invitation: links the authenticated user to the club and assigns club owner role. Requires Auth0 JWT.
+   * @description Accepts the invitation: copies empty profile fields from the invite, links the authenticated user to the club, and assigns the invitation role. Requires Auth0 JWT.
    * @param { string } mutation.token Path parameter. Invitation token. Example: `abc123-uuid`
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<InvitationsModels.AcceptInvitationResponseDto> } Invitation accepted

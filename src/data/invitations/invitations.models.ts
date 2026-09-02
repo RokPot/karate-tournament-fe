@@ -68,11 +68,17 @@ export namespace InvitationsModels {
    * @property { string } clubName Club name the user is invited to join. Example: `Tokyo Karate Club`
    * @property { string } expiresAt Invitation expiry timestamp. Example: `2024-02-08T12:00:00.000Z`
    * @property { string } status Invitation status. Example: `pending`
+   * @property { string } email Invitee email. Example: `owner@example.com`
+   * @property { string } firstName Invitee first name. Example: `Jane`
+   * @property { string } lastName Invitee last name. Example: `Doe`
    */
   export const InvitationByTokenResponseDtoSchema = z.object({
     clubName: z.string(),
     expiresAt: z.string().datetime({ offset: true }),
     status: InvitationStatusEnumSchema,
+    email: z.string(),
+    firstName: z.string().nullish(),
+    lastName: z.string().nullish(),
   });
   export type InvitationByTokenResponseDto = z.infer<
     typeof InvitationByTokenResponseDtoSchema

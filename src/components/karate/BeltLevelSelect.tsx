@@ -17,6 +17,7 @@ interface BeltLevelSelectProps {
   error?: boolean;
   helperText?: string;
   allowEmpty?: boolean;
+  emptyLabel?: string;
   required?: boolean;
   fullWidth?: boolean;
 }
@@ -28,6 +29,7 @@ export function BeltLevelSelect({
   error,
   helperText,
   allowEmpty = false,
+  emptyLabel,
   required = false,
   fullWidth = true,
 }: BeltLevelSelectProps) {
@@ -48,7 +50,7 @@ export function BeltLevelSelect({
       >
         {allowEmpty && (
           <MenuItem value="">
-            <em>{t("categories.create.noRestriction")}</em>
+            <em>{emptyLabel ?? t("categories.create.noRestriction")}</em>
           </MenuItem>
         )}
         {Object.values(CommonModels.BeltEnum).map((belt) => (

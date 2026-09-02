@@ -3,8 +3,11 @@ import { Typography } from "@/components/ui/text/Typography/Typography";
 import { CommonModels } from "@/data/common/common.models";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { DateUtils } from "@/util/date.utils";
+import { Button } from "@mui/material";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { CompleteProfileModal } from "./CompleteProfileModal";
 import { ProfileField } from "./ProfileField";
 
 const roleLabelKey = (role: CommonModels.UserEnum) => {
@@ -38,6 +41,7 @@ const genderLabelKey = (gender: CommonModels.ParticipantGenderEnum) => {
 export const ProfileOverview = () => {
   const { t } = useTranslation();
   const user = useAuthUser();
+  const [isEditing, setIsEditing] = useState(false);
 
   const displayName = [user?.firstName, user?.lastName]
     .filter(Boolean)
@@ -46,7 +50,14 @@ export const ProfileOverview = () => {
 
   return (
     <div className="flex max-w-xl flex-col gap-5">
-      <Typography size="h2">{t("profile.overview.title")}</Typography>
+      <div className="flex flex-row items-center justify-between gap-4">
+        <Typography size="h2">{t("profile.overview.title")}</Typography>
+        {user && (
+          <Button variant="outlined" onClick={() => setIsEditing(true)}>
+            {t("profile.complete.edit")}
+          </Button>
+        )}
+      </div>
       <div className="flex flex-col gap-4">
         <ProfileField label={t("profile.overview.name")}>
           <Typography size="body-paragraph-m">
@@ -108,6 +119,13 @@ export const ProfileOverview = () => {
           </Typography>
         </ProfileField>
       </div>
+      {user && (
+        <CompleteProfileModal
+          open={isEditing}
+          user={user}
+          onClose={() => setIsEditing(false)}
+        />
+      )}
     </div>
   );
 };

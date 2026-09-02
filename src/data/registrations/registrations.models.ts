@@ -40,7 +40,7 @@ export namespace RegistrationsModels {
    * @property { string } dateOfBirth Date of birth. Example: `2018-02-02T00:00:00.000Z`
    * @property { string } gender Gender (required when matching categories with a gender restriction). Example: `male`
    * @property { string } beltLevel Belt level. Example: `10-kyu`
-   * @property { BulkParticipantRegistrationDto[] } registrations Registrations for this participant (individual categories). Team-category membership is sent in `teams` instead. Example omitted when the participant is only on teams.
+   * @property { BulkParticipantRegistrationDto[] } registrations Registrations for this participant. Min Items: `1`
    */
   export const BulkParticipantDtoSchema = z.object({
     firstName: z.string().max(100),
@@ -49,7 +49,7 @@ export namespace RegistrationsModels {
     dateOfBirth: z.string().datetime({ offset: true }),
     gender: CommonModels.ParticipantGenderEnumSchema.optional(),
     beltLevel: CommonModels.BeltEnumSchema.optional(),
-    registrations: z.array(BulkParticipantRegistrationDtoSchema),
+    registrations: z.array(BulkParticipantRegistrationDtoSchema).min(1),
   });
   export type BulkParticipantDto = z.infer<typeof BulkParticipantDtoSchema>;
 
@@ -62,20 +62,7 @@ export namespace RegistrationsModels {
    * @property { string } clubName Club name (free text). If a matching club exists in the system, it is linked; otherwise registrations proceed without a club.. Min Length: `1`. Max Length: `255`. Example: `Dragon Karate Club`
    * @property { string } tournamentId Tournament ID for all registrations in this request. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { BulkParticipantDto[] } participants Participants to register. Min Items: `1`
-   * @property { BulkTeamDto[] } teams Team rosters for kata-team / kumite-team categories
    */
-  export const BulkTeamMemberDtoSchema = z.object({
-    participantIndex: z.number().int().gte(0),
-  });
-  export type BulkTeamMemberDto = z.infer<typeof BulkTeamMemberDtoSchema>;
-
-  export const BulkTeamDtoSchema = z.object({
-    categoryId: z.string(),
-    starters: z.array(BulkTeamMemberDtoSchema).min(1),
-    reserves: z.array(BulkTeamMemberDtoSchema),
-  });
-  export type BulkTeamDto = z.infer<typeof BulkTeamDtoSchema>;
-
   export const BulkPublicRegistrationDtoSchema = z.object({
     email: z.string().email(),
     firstName: z.string().max(100),
@@ -83,7 +70,6 @@ export namespace RegistrationsModels {
     clubName: z.string().min(1).max(255).optional(),
     tournamentId: z.string(),
     participants: z.array(BulkParticipantDtoSchema).min(1),
-    teams: z.array(BulkTeamDtoSchema).optional(),
   });
   export type BulkPublicRegistrationDto = z.infer<
     typeof BulkPublicRegistrationDtoSchema
@@ -212,8 +198,6 @@ export namespace RegistrationsModels {
     finalWeight: z.number().nullish(),
     user: CommonModels.UserResponseDtoSchema.nullish(),
     club: CommonModels.ClubResponseDtoSchema.nullish(),
-    teamId: z.string().nullish(),
-    teamRole: z.enum(["starter", "reserve"]).nullish(),
     createdAt: z.string().datetime({ offset: true }),
     updatedAt: z.string().datetime({ offset: true }),
   });

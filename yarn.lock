@@ -4014,6 +4014,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@povio/openapi-codegen-cli@npm:^0.10.0":
+  version: 0.10.8
+  resolution: "@povio/openapi-codegen-cli@npm:0.10.8"
+  bin:
+    openapi-codegen: dist/sh.js
+  checksum: 10/3d95598d71d7fe7a5569065438e54eb2af5923ceb757d107a339566d187d02d216d5190957f3f2a1474c1d59936f4a83495c70b4719e3e720a36114cdd699043
+  languageName: node
+  linkType: hard
+
 "@react-aria/i18n@npm:^3.12.11":
   version: 3.12.11
   resolution: "@react-aria/i18n@npm:3.12.11"
@@ -13218,6 +13227,7 @@ __metadata:
     "@mui/material": "npm:^7.3.6"
     "@next/bundle-analyzer": "npm:^15.1.6"
     "@playwright/test": "npm:^1.50.0"
+    "@povio/openapi-codegen-cli": "npm:^0.10.0"
     "@react-aria/i18n": "npm:^3.12.11"
     "@react-stately/calendar": "npm:^3.8.3"
     "@react-stately/datepicker": "npm:^3.15.0"

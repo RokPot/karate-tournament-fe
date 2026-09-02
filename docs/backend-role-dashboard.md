@@ -31,8 +31,8 @@ These endpoints exist in the generated FE client. Confirm they are allowed for t
 Existing invitation flows to keep:
 
 - `POST /clubs` with `ownerEmail` → creates invitation, returns `inviteUrl` on `ClubResponseDto`
-- `GET /invitations/by-token/:token` — **public**
-- `POST /invitations/:token/accept` — authenticated; links user to club
+- `GET /invitations/by-token/:token` — **public** (must also return invitee identity — see [§10](#10-first-login-user-provisioning-and-invitation-profile-data))
+- `POST /invitations/:token/accept` — authenticated; links user to club **and** copies invitation name/email onto the user (see [§10](#10-first-login-user-provisioning-and-invitation-profile-data))
 
 ---
 
@@ -349,12 +349,13 @@ Empty lists are `200` with `[]`, not `404`.
 
 ## 8. Suggested implementation order
 
-1. **Invitations list auth + club filter** — unblocks club staff dashboard (currently errors if `GET /invitations` is admin-only).
-2. **`GET /registrations/me` + `GET /tournaments/registered`** — unblocks free-member dashboard.
-3. **Category `clubId` + filtered `GET /categories` + create rules** — unblocks club category catalogs (largest model change).
-4. **`POST /clubs/:id/invitations` + accept-by-role** — club staff can invite without creating a new club.
-5. Tighten `GET /tournaments` / registrations-by-tournament for club staff vs admin.
-6. **Team registrations on `POST /registrations/public/bulk`** — see [§9](#9-team-registrations-kata-team--kumite-team).
+1. **First-login user upsert + invitation profile copy** — see [§10](#10-first-login-user-provisioning-and-invitation-profile-data). Without this, new users spin forever after Auth0 and must refresh; invitee name/email never appear on the profile.
+2. **Invitations list auth + club filter** — unblocks club staff dashboard (currently errors if `GET /invitations` is admin-only).
+3. **`GET /registrations/me` + `GET /tournaments/registered`** — unblocks free-member dashboard.
+4. **Category `clubId` + filtered `GET /categories` + create rules** — unblocks club category catalogs (largest model change).
+5. **`POST /clubs/:id/invitations` + accept-by-role** — club staff can invite without creating a new club.
+6. Tighten `GET /tournaments` / registrations-by-tournament for club staff vs admin.
+7. **Team registrations on `POST /registrations/public/bulk`** — see [§9](#9-team-registrations-kata-team--kumite-team).
 
 After each endpoint is available, the frontend will add query params / new hooks and drop the fallbacks.
 
@@ -427,3 +428,68 @@ Example: `[A B C]`, `[A D E]`, `[D B F]` are all allowed (shared members are fin
 Keep per-registration `results` (partial success). When a row belongs to a team, include `teamId` / `teamRole` on the created `registration` object.
 
 Bulk result items may stay indexed by `participantIndex`; add `teamIndex` if useful.
+
+---
+
+## 10. First login, user provisioning, and invitation profile data
+
+The frontend signs users up through Auth0, then immediately calls `GET /users/me` and (for invite links) `POST /invitations/:token/accept`. After that it opens a complete-profile modal that **prefills name and email from the API**. Two backend gaps currently break this:
+
+1. The first `GET /users/me` after Auth0 signup often `404`/`401` because the app user does not exist yet. The client then spins until a **manual refresh**.
+2. Invitation `firstName` / `lastName` / `email` (set when the club/invite was created) never appear on the new user, so the modal is empty.
+
+### Required: upsert the user on first authenticated request (no refresh)
+
+The first authenticated `GET /users/me` **must create the user from the Auth0 JWT** if none exists (lazy upsert). A dedicated `POST /users/sync` that the frontend would call first is also acceptable, as long as the **first** profile fetch after the Auth0 callback returns `200`.
+
+On create:
+
+- Persist `auth0Id` from the JWT `sub`.
+- Persist **`email` from the JWT** and return it on `GET /users/me`. The complete-profile modal prefills this field; it must not be null after first login.
+- Copy `given_name` / `family_name` from JWT claims onto `firstName` / `lastName` when present and those user fields are empty.
+
+Status codes:
+
+| Status | When |
+| --- | --- |
+| `200` | User found **or just created**. Body is `UserResponseDto` including `email`. |
+| `401` | Missing/invalid JWT only — **not** “user not in our DB yet”. |
+
+Do **not** return `404` for a valid JWT whose user has not been inserted. That is what forces a refresh today.
+
+`PUT /users/me` (`UpdateUserDto`) stays the save path for the complete-profile modal (`firstName`, `lastName`, `email`, optional `gender`, `dateOfBirth`, `weight`, `beltLevel`).
+
+### Required: copy invitation identity onto the user on accept
+
+```
+POST /invitations/:token/accept
+```
+
+After linking club + role, copy invitation fields onto the authenticated user **only when the user field is empty**:
+
+| Invitation field | User field |
+| --- | --- |
+| `firstName` | `firstName` |
+| `lastName` | `lastName` |
+| `email` | `email` |
+
+Do not overwrite values the user (or Auth0 upsert) already set. The accept response already includes `user: UserResponseDto` — that object **must** contain the copied fields. A following `GET /users/me` must return the same.
+
+### Required: public by-token preview includes invitee identity
+
+```
+GET /invitations/by-token/:token
+```
+
+**Public.** The token in the URL is the secret. Extend `InvitationByTokenResponseDto`:
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `clubName` | `string` | Unchanged |
+| `expiresAt` | ISO-8601 datetime | Unchanged |
+| `status` | `pending` \| `accepted` \| `expired` \| `cancelled` | Unchanged |
+| `email` | `string` | Invitee email (used as Auth0 `login_hint` and shown on the invite page) |
+| `firstName` | `string \| null` | Invitee first name from create-invite |
+| `lastName` | `string \| null` | Invitee last name from create-invite |
+
+`404` if the token is unknown. Expired/cancelled/accepted invites still return `200` with `status` so the frontend can show “no longer valid”.

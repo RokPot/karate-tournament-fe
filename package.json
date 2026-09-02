@@ -98,6 +98,7 @@
   },
   "devDependencies": {
     "@axe-core/react": "^4.10.1",
+    "@povio/openapi-codegen-cli": "^0.10.0",
     "@storybook/addon-a11y": "^8.5.3",
     "@storybook/addon-controls": "^8.5.3",
     "@storybook/addon-essentials": "^8.5.3",
