@@ -1,4 +1,5 @@
 import { cx } from "class-variance-authority";
+import { useRouter } from "next/router";
 import { PropsWithChildren, useMemo } from "react";
 
 import { InviteAcceptHandler } from "@/components/invitations/InviteAcceptHandler";
@@ -8,12 +9,14 @@ import Footer from "@/components/shared/layout/footer/Footer";
 import { Navbar } from "./navbar/Navbar";
 
 export const PageWrapper = ({ children }: PropsWithChildren) => {
+  const router = useRouter();
+  const isLandingPage = router.pathname === "/";
   const isLoggedIn = true;
   const isCheckingAuth = false;
 
   const shouldShowFooter = useMemo(() => {
-    return isLoggedIn;
-  }, [isLoggedIn]);
+    return isLoggedIn && !isLandingPage;
+  }, [isLoggedIn, isLandingPage]);
 
   if (isCheckingAuth) {
     return <LoadingState />;
@@ -27,10 +30,10 @@ export const PageWrapper = ({ children }: PropsWithChildren) => {
       }}
       className={cx("flex flex-col min-h-0 flex-1")}
     >
-      <Navbar />
-      <div className={cx("flex h-full max-h-full overflow-y-auto")}>
+      {!isLandingPage && <Navbar />}
+      <div className={cx("flex h-full max-h-full min-h-0")}>
         <main
-          className="flex flex-1 flex-col"
+          className="flex min-h-0 flex-1 flex-col overflow-y-auto"
           style={{
 
             flexBasis: "0",

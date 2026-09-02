@@ -3,6 +3,13 @@ import { RegistrationsModels } from "@/data/registrations/registrations.models";
 
 export type WizardStep = "participants" | "categories" | "coach" | "results";
 
+export interface DraftTeam {
+  clientId: string;
+  categoryId: string;
+  starterIds: string[];
+  reserveIds: string[];
+}
+
 export interface DraftParticipant {
   clientId: string;
   firstName: string;

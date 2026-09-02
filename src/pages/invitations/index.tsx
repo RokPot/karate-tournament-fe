@@ -12,7 +12,7 @@ export default function InvitationsRoute() {
 
   useEffect(() => {
     if (isAdmin === false) {
-      router.replace(RouteConfig.home);
+      router.replace(RouteConfig.dashboard);
     }
   }, [isAdmin, router]);
 

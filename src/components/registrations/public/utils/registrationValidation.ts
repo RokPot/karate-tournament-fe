@@ -1,6 +1,13 @@
 import { DateUtils } from "@/util/date.utils";
+import { CommonModels } from "@/data/common/common.models";
 
 import type { CoachDetails, DraftParticipant, WizardStep } from "../types";
+
+export interface CategoryGroupedRegistrations {
+  categoryId: string;
+  categoryName: string;
+  participants: DraftParticipant[];
+}
 
 export function isParticipantComplete(
   participant: Pick<
@@ -14,6 +21,7 @@ export function isParticipantComplete(
     !!participant.gender &&
     !!participant.dateOfBirth &&
     participant.weight >= 0 &&
+    Number.isFinite(participant.weight) &&
     !!participant.beltLevel
   );
 }
@@ -62,6 +70,50 @@ export function getParticipantsWithSelections(
   return participants.filter(
     (participant) => participant.categoryIds.length > 0,
   );
+}
+
+export function getRegistrationsGroupedByCategory(
+  participants: DraftParticipant[],
+  tournamentCategories: CommonModels.CategoryResponseDto[],
+): CategoryGroupedRegistrations[] {
+  const groups: CategoryGroupedRegistrations[] = [];
+  const seenCategoryIds = new Set<string>();
+
+  for (const category of tournamentCategories) {
+    seenCategoryIds.add(category.id);
+    const assigned = participants.filter((participant) =>
+      participant.categoryIds.includes(category.id),
+    );
+    if (assigned.length === 0) {
+      continue;
+    }
+    groups.push({
+      categoryId: category.id,
+      categoryName: category.name,
+      participants: assigned,
+    });
+  }
+
+  const leftoverIds = new Set<string>();
+  for (const participant of participants) {
+    for (const categoryId of participant.categoryIds) {
+      if (!seenCategoryIds.has(categoryId)) {
+        leftoverIds.add(categoryId);
+      }
+    }
+  }
+
+  for (const categoryId of leftoverIds) {
+    groups.push({
+      categoryId,
+      categoryName: categoryId,
+      participants: participants.filter((participant) =>
+        participant.categoryIds.includes(categoryId),
+      ),
+    });
+  }
+
+  return groups;
 }
 
 export function formatParticipantDateOfBirthLabel(dateOfBirth: string): string {

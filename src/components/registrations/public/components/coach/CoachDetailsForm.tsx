@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import { Typography } from "@/components/ui/text/Typography/Typography";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 import { COACH_FORM_DEFAULTS } from "../../constants";
 import type { CoachDetails } from "../../types";
@@ -32,6 +33,7 @@ export const CoachDetailsForm = forwardRef<
   CoachDetailsFormProps
 >(function CoachDetailsForm({ disabled = false }, ref) {
   const { t } = useTranslation();
+  const authUser = useAuthUser();
 
   const {
     register,
@@ -39,7 +41,12 @@ export const CoachDetailsForm = forwardRef<
     formState: { errors },
   } = useForm<CoachDetailsFormValues>({
     resolver: zodResolver(CoachDetailsSchema),
-    defaultValues: COACH_FORM_DEFAULTS,
+    defaultValues: {
+      email: authUser?.email ?? COACH_FORM_DEFAULTS.email,
+      firstName: authUser?.firstName ?? COACH_FORM_DEFAULTS.firstName,
+      lastName: authUser?.lastName ?? COACH_FORM_DEFAULTS.lastName,
+      clubName: authUser?.club?.name ?? COACH_FORM_DEFAULTS.clubName,
+    },
   });
 
   useImperativeHandle(ref, () => ({

@@ -17,11 +17,6 @@ export function useSuitableParticipantsByCategory({
   participants,
   enabled = true,
 }: UseSuitableParticipantsByCategoryParams) {
-  const publicProfiles = useMemo(
-    () => mapParticipantsToPublicProfiles(participants),
-    [participants],
-  );
-
   const canFetch =
     enabled &&
     !!tournamentId &&
@@ -40,14 +35,24 @@ export function useSuitableParticipantsByCategory({
     mutate({
       data: {
         tournamentId,
-        participants: publicProfiles,
+        participants: mapParticipantsToPublicProfiles(participants),
       },
     });
-  }, [canFetch, tournamentId, publicProfiles, mutate, reset]);
+    // Fetch once when entering the categories step, not when local assignments change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canFetch, tournamentId, mutate, reset]);
+
+  const categoryItems = useMemo(
+    () =>
+      canFetch
+        ? (items ?? []).filter((item) => item.participants.length > 0)
+        : [],
+    [canFetch, items],
+  );
 
   return {
-    categoryItems: canFetch ? (items ?? []) : [],
-    isLoading: canFetch && isPending,
+    categoryItems,
+    isLoading: canFetch && isPending && !items,
     isError,
   };
 }

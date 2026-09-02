@@ -7,9 +7,13 @@ import { ParticipantList } from "./ParticipantList";
 
 interface ParticipantsStepProps {
   draft: UseDraftParticipantsReturn;
+  clubMembersLoadedCount?: number;
 }
 
-export function ParticipantsStep({ draft }: ParticipantsStepProps) {
+export function ParticipantsStep({
+  draft,
+  clubMembersLoadedCount = 0,
+}: ParticipantsStepProps) {
   const { t } = useTranslation();
   const {
     participants,
@@ -34,6 +38,13 @@ export function ParticipantsStep({ draft }: ParticipantsStepProps) {
       <Typography size="h3">
         {t("registrations.public.steps.participants")}
       </Typography>
+      {clubMembersLoadedCount > 0 && (
+        <Typography size="body-paragraph-s" className="text-secondary-200">
+          {t("registrations.public.clubMembersLoaded", {
+            count: clubMembersLoadedCount,
+          })}
+        </Typography>
+      )}
       <ParticipantForm
         editingParticipant={editingParticipant}
         onSubmit={handleSubmit}

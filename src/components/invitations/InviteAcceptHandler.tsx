@@ -24,7 +24,7 @@ export const InviteAcceptHandler = () => {
     },
     onError: () => {
       errorToast({ text: t("invitations.acceptInvalid") });
-      router.replace(RouteConfig.home);
+      router.replace(RouteConfig.dashboard);
     },
   });
 

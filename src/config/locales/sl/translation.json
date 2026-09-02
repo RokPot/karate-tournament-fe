@@ -42,10 +42,37 @@
       "editParticipant": "Uredi udeleženca",
       "updateParticipant": "Posodobi udeleženca",
       "noParticipants": "Še ni dodanih udeležencev",
+      "clubMembersLoaded": "Naloženih je {{count}} članov iz vašega kluba. Pred nadaljevanjem jih uredite ali odstranite.",
       "noCategories": "Za ta turnir ni razpoložljivih kategorij",
       "categoriesLoading": "Nalaganje primernih kategorij…",
       "categoriesHint": "Izberite udeležence za vsako kategorijo",
       "noEligibleParticipantsForCategory": "Za to kategorijo ni ustreznih udeležencev",
+      "stepper": {
+        "progress": "{{current}} od {{total}}",
+        "viewRegistrations": "Prikaži prijave",
+        "confirm": "Potrdi",
+        "continue": "Nadaljuj",
+        "overviewTitle": "Pregled prijav",
+        "emptyCategory": "Še nihče ni izbran"
+      },
+      "teams": {
+        "formedTeams": "Ekipe",
+        "currentTeam": "Nova ekipa",
+        "eligible": "Ustrezni udeleženci",
+        "addTeam": "Dodaj ekipo",
+        "starters": "Člani",
+        "reserves": "Rezerve",
+        "starterRole": "član",
+        "reserveRole": "rezerva",
+        "optional": "neobvezno",
+        "teamN": "Ekipa {{n}}",
+        "available": "Na voljo",
+        "reusable": "Že v ekipi",
+        "blocked": "Ni mogoče dodati",
+        "duplicateTeam": "Ekipa s temi udeleženci že obstaja",
+        "anyGender": "Kateri koli spol",
+        "rosterHint": "{{teamSize}} članov, do {{reserves}} rezerv"
+      },
       "selectedRegistrations": {
         "title": "Izbrane prijave",
         "hint": "Ti udeleženci in kategorije bodo oddani ob zaključku.",
@@ -86,6 +113,109 @@
         "error": "Napaka",
         "startOver": "Prijavi več udeležencev"
       }
+    }
+  },
+  "landing": {
+    "head": {
+      "title": "Upravljanje turnirjev za karate klube",
+      "description": "Organizirajte turnirje, kategorije in prijave na enem mestu."
+    },
+    "header": {
+      "features": "Funkcije",
+      "signIn": "Prijava",
+      "getStarted": "Začni"
+    },
+    "hero": {
+      "title": "Vodite karate turnirje samozavestno",
+      "subtitle": "Ustvarite dogodke, uredite kategorije in upravljajte prijave klubov v enem sodobnem okolju.",
+      "cta": "Začni",
+      "imageLabel": "Slika hero"
+    },
+    "features": {
+      "title": "Vse, kar potrebujete za izvedbo turnirja",
+      "subtitle": "Zasnovano za klube, organizatorje in trenerje.",
+      "imageLabel": "Slika funkcije",
+      "tournaments": {
+        "title": "Turnirji",
+        "description": "Nastavite dogodke, datume in lokacije ter ohranite usklajenost klubov skozi turnir."
+      },
+      "categories": {
+        "title": "Kategorije",
+        "description": "Razvrstite tekmovalce po starosti, pasu, teži in disciplini v preglednem seznamu."
+      },
+      "registrations": {
+        "title": "Prijave",
+        "description": "Klubom omogočite hitro prijavo udeležencev in pregled prijavljenih na enem mestu."
+      }
+    },
+    "cta": {
+      "title": "Pripravljeni na naslednji turnir?",
+      "subtitle": "Prijavite se in začnite ustvarjati kategorije, vabiti klube in spremljati prijave.",
+      "primary": "Začni",
+      "secondary": "Prijava",
+      "imageLabel": "Slika CTA"
+    }
+  },
+  "dashboard": {
+    "noClub": "Klub ni dodeljen"
+  },
+  "tournaments": {
+    "noTournaments": "Ni najdenih turnirjev"
+  },
+  "profile": {
+    "title": "Profil",
+    "signOut": "Odjava",
+    "nav": {
+      "overview": "Pregled",
+      "club": "Klub",
+      "account": "Račun",
+      "preferences": "Nastavitve"
+    },
+    "overview": {
+      "title": "Osebni podatki",
+      "name": "Ime",
+      "email": "E-pošta",
+      "roles": "Vloge",
+      "memberSince": "Član od",
+      "weightUnit": "{{weight}} kg"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "club_owner": "Lastnik kluba",
+      "club_member": "Član kluba",
+      "club_coach": "Trener",
+      "free_member": "Samostojni član",
+      "judge": "Sodnik"
+    },
+    "gender": {
+      "male": "Moški",
+      "female": "Ženska",
+      "other": "Drugo"
+    },
+    "club": {
+      "title": "Klub",
+      "viewClub": "Odpri moj klub"
+    },
+    "account": {
+      "title": "Račun",
+      "email": "E-pošta",
+      "password": "Geslo",
+      "changePassword": "Spremeni geslo",
+      "passwordManagedByAuth0": "Geslo upravlja ponudnik prijave.",
+      "sessions": "Seje",
+      "sessionsPlaceholder": "Upravljanje sej bo na voljo kmalu.",
+      "currentSession": "Ta naprava"
+    },
+    "preferences": {
+      "title": "Nastavitve",
+      "language": "Jezik",
+      "theme": "Tema",
+      "themeLight": "Svetla",
+      "themeDark": "Temna",
+      "notifications": "Obvestila",
+      "notificationsHint": "Nastavitve obvestil bodo kmalu na voljo.",
+      "tournamentReminders": "Opomniki za turnirje",
+      "invitationEmails": "E-pošta z vabili"
     }
   }
 }

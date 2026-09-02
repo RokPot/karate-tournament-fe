@@ -221,10 +221,37 @@
       "editParticipant": "Edit participant",
       "updateParticipant": "Update participant",
       "noParticipants": "No participants added yet",
+      "clubMembersLoaded": "Loaded {{count}} member(s) from your club. Edit or remove anyone before continuing.",
       "noCategories": "No categories available for this tournament",
       "categoriesLoading": "Loading suitable categories…",
       "categoriesHint": "Select participants for each category",
       "noEligibleParticipantsForCategory": "No eligible participants for this category",
+      "stepper": {
+        "progress": "{{current}} of {{total}}",
+        "viewRegistrations": "View registrations",
+        "confirm": "Confirm",
+        "continue": "Continue",
+        "overviewTitle": "Review registrations",
+        "emptyCategory": "No one selected yet"
+      },
+      "teams": {
+        "formedTeams": "Teams",
+        "currentTeam": "New team",
+        "eligible": "Eligible participants",
+        "addTeam": "Add team",
+        "starters": "Starters",
+        "reserves": "Reserves",
+        "starterRole": "starter",
+        "reserveRole": "reserve",
+        "optional": "optional",
+        "teamN": "Team {{n}}",
+        "available": "Available",
+        "reusable": "Already on a team",
+        "blocked": "Cannot add",
+        "duplicateTeam": "A team with these participants already exists",
+        "anyGender": "Any gender",
+        "rosterHint": "{{teamSize}} starters, up to {{reserves}} reserves"
+      },
       "selectedRegistrations": {
         "title": "Selected registrations",
         "hint": "These participants and categories will be submitted when you finish.",
@@ -281,8 +308,12 @@
     "copyInviteLink": "Copy invite link",
     "inviteLinkCopied": "Invite link copied to clipboard"
   },
+  "dashboard": {
+    "noClub": "No club assigned"
+  },
   "tournaments": {
     "addTournament": "Add Tournament",
+    "noTournaments": "No tournaments found",
     "create": {
       "title": "Create Tournament",
       "success": "Tournament created successfully",
@@ -312,6 +343,47 @@
     "acceptSuccess": "You have joined the club.",
     "acceptInvalid": "Invitation no longer valid"
   },
+  "landing": {
+    "head": {
+      "title": "Tournament management for karate clubs",
+      "description": "Organize tournaments, categories, and registrations in one place."
+    },
+    "header": {
+      "features": "Features",
+      "signIn": "Sign in",
+      "getStarted": "Get started"
+    },
+    "hero": {
+      "title": "Run karate tournaments with confidence",
+      "subtitle": "Create events, organize categories, and manage club registrations from one modern workspace.",
+      "cta": "Get started",
+      "imageLabel": "Hero image"
+    },
+    "features": {
+      "title": "Everything you need to host a tournament",
+      "subtitle": "Built for clubs, organizers, and coaches.",
+      "imageLabel": "Feature image",
+      "tournaments": {
+        "title": "Tournaments",
+        "description": "Set up events, dates, and locations, then keep every club aligned as the tournament unfolds."
+      },
+      "categories": {
+        "title": "Categories",
+        "description": "Group athletes by age, belt, weight, and discipline with a clear, ordered category list."
+      },
+      "registrations": {
+        "title": "Registrations",
+        "description": "Let clubs register participants quickly and review attendees in one place."
+      }
+    },
+    "cta": {
+      "title": "Ready to organize your next tournament?",
+      "subtitle": "Sign in to start building categories, inviting clubs, and tracking registrations.",
+      "primary": "Get started",
+      "secondary": "Sign in",
+      "imageLabel": "CTA image"
+    }
+  },
   "members": {
     "addMember": "Add Member",
     "title": "Members",
@@ -323,6 +395,62 @@
       "firstName": "First name",
       "lastName": "Last name",
       "email": "Email"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "signOut": "Logout",
+    "nav": {
+      "overview": "Overview",
+      "club": "Club",
+      "account": "Account",
+      "preferences": "Preferences"
+    },
+    "overview": {
+      "title": "Personal info",
+      "name": "Name",
+      "email": "Email",
+      "roles": "Roles",
+      "memberSince": "Member since",
+      "weightUnit": "{{weight}} kg"
+    },
+    "roles": {
+      "admin": "Admin",
+      "club_owner": "Club owner",
+      "club_member": "Club member",
+      "club_coach": "Club coach",
+      "free_member": "Free member",
+      "judge": "Judge"
+    },
+    "gender": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    },
+    "club": {
+      "title": "Club",
+      "viewClub": "View my club"
+    },
+    "account": {
+      "title": "Account",
+      "email": "Email",
+      "password": "Password",
+      "changePassword": "Change password",
+      "passwordManagedByAuth0": "Password is managed through your login provider.",
+      "sessions": "Sessions",
+      "sessionsPlaceholder": "Session management is coming soon.",
+      "currentSession": "This device"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "language": "Language",
+      "theme": "Theme",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "notifications": "Notifications",
+      "notificationsHint": "Notification preferences will be available soon.",
+      "tournamentReminders": "Tournament reminders",
+      "invitationEmails": "Invitation emails"
     }
   }
 }

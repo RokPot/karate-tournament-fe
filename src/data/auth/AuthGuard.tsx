@@ -34,7 +34,7 @@ export const AuthGuard = ({
   }
 
   if (type === "public-only" && user) {
-    router.replace(redirectTo || RouteConfig.home);
+    router.replace(redirectTo || RouteConfig.dashboard);
     return null;
   }
 

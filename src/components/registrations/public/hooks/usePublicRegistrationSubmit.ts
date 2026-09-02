@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useToast } from "@/components/ui/status/Toast/useToast";
+import { CommonModels } from "@/data/common/common.models";
 import { RegistrationsQueries } from "@/data/registrations/registrations.queries";
 
 import { mapToBulkDto } from "../utils/mapToBulkDto";
@@ -9,6 +10,7 @@ import type {
   BulkRegistrationResponse,
   CoachDetails,
   DraftParticipant,
+  DraftTeam,
 } from "../types";
 
 interface UsePublicRegistrationSubmitOptions {
@@ -42,8 +44,19 @@ export function usePublicRegistrationSubmit(
   });
 
   const submit = useCallback(
-    (coach: CoachDetails, participants: DraftParticipant[]) => {
-      const payload = mapToBulkDto(tournamentId, coach, participants);
+    (
+      coach: CoachDetails,
+      participants: DraftParticipant[],
+      teams: DraftTeam[] = [],
+      tournamentCategories: CommonModels.CategoryResponseDto[] = [],
+    ) => {
+      const payload = mapToBulkDto(
+        tournamentId,
+        coach,
+        participants,
+        teams,
+        tournamentCategories,
+      );
       mutation.mutate({ data: payload });
     },
     [mutation, tournamentId],

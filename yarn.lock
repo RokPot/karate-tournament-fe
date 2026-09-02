@@ -10867,6 +10867,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"framer-motion@npm:^13.1.1":
+  version: 13.1.1
+  resolution: "framer-motion@npm:13.1.1"
+  dependencies:
+    motion-dom: "npm:^13.1.1"
+    motion-utils: "npm:^13.0.0"
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    react: "*"
+    react-dom: "*"
+  peerDependenciesMeta:
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 10/78904da047762834e69810660d1aa73c99f07d69097c80e07b3c8b5bbd6f1dbf488e243fe5a482705baf1608903096d494a3be7322ee4af0e979766ce3aae11f
+  languageName: node
+  linkType: hard
+
 "fs-extra@npm:^10.0.0":
   version: 10.1.0
   resolution: "fs-extra@npm:10.1.0"
@@ -13265,11 +13284,13 @@ __metadata:
     jose: "npm:^5.9.6"
     js-yaml: "npm:^4.1.1"
     leaked-handles: "npm:^5.2.0"
+    lenis: "npm:^1.3.26"
     lint-staged: "npm:^15.4.3"
     lodash-es: "npm:^4.17.21"
     loglevel: "npm:^1.9.2"
     loglevel-plugin-prefix: "npm:^0.8.4"
     luxon: "npm:^3.5.0"
+    motion: "npm:^13.1.1"
     msw: "npm:^2.7.0"
     next: "npm:15.1.9"
     next-seo: "npm:^6.6.0"
@@ -13348,6 +13369,24 @@ __metadata:
     weakmap-shim: "npm:^1.1.0"
     xtend: "npm:^4.0.0"
   checksum: 10/4f967865beaf042f0d7447aac5c98f612a1be3370fe9c2a71c4bcc6cf511edb4f6c9fb8bce54228b0e5a1bff72f48cbde327411c9c7e3324d8cec91a4fcff3e7
+  languageName: node
+  linkType: hard
+
+"lenis@npm:^1.3.26":
+  version: 1.3.26
+  resolution: "lenis@npm:1.3.26"
+  peerDependencies:
+    "@nuxt/kit": ">=3.0.0"
+    react: ">=17.0.0"
+    vue: ">=3.0.0"
+  peerDependenciesMeta:
+    "@nuxt/kit":
+      optional: true
+    react:
+      optional: true
+    vue:
+      optional: true
+  checksum: 10/d2a31ed98e1e8d0bf07a6aa7d235be21002f7d5af228c690399ae56fa1f53add88454f69461c42708a5813580c6705ffa2431045cdd699226a3c3bf611c7fdf1
   languageName: node
   linkType: hard
 
@@ -14604,6 +14643,40 @@ __metadata:
   bin:
     mkdirp: dist/cjs/src/bin.js
   checksum: 10/4672fadb94dca8d2eafeb6fff53f2c5ea74e885565ef23251791709064f216105167c2387088c61ef068901bd0776648999785e341d74728164fa551b1c65996
+  languageName: node
+  linkType: hard
+
+"motion-dom@npm:^13.1.1":
+  version: 13.1.1
+  resolution: "motion-dom@npm:13.1.1"
+  dependencies:
+    motion-utils: "npm:^13.0.0"
+  checksum: 10/88f0d90946b292f94e0f964fb97540de64c0d648f3801295955da420608a529546be63214456dcb16420bc3e3fc8cb23e140a86f451933ac34fc0bf4e09397d3
+  languageName: node
+  linkType: hard
+
+"motion-utils@npm:^13.0.0":
+  version: 13.0.0
+  resolution: "motion-utils@npm:13.0.0"
+  checksum: 10/ee6296263ed6fd16a46eced143446e9335facdf72d1922ecdcfb945fb498d3723e9c94f3036fed4cc3cda7fca59de9b2971c11496fdfb8511cefb70eb2ec2da3
+  languageName: node
+  linkType: hard
+
+"motion@npm:^13.1.1":
+  version: 13.1.1
+  resolution: "motion@npm:13.1.1"
+  dependencies:
+    framer-motion: "npm:^13.1.1"
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    react: "*"
+    react-dom: "*"
+  peerDependenciesMeta:
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 10/5bf9082926cea1bd65da6830d46bcd730b3ffc556181d2b28804ad7798c9ccf3c4b63a8dea6cf2e828726dff3bf222b5e7998094da2591d7d6ac9a160cf594e0
   languageName: node
   linkType: hard
 

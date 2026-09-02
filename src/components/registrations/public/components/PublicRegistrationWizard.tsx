@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { useCategoryAssignments } from "../hooks/useCategoryAssignments";
 import { useDraftParticipants } from "../hooks/useDraftParticipants";
+import { useDraftTeams } from "../hooks/useDraftTeams";
+import { useSeedClubParticipants } from "../hooks/useSeedClubParticipants";
 import { useSuitableParticipantsByCategory } from "../hooks/useSuitableParticipantsByCategory";
 import { usePublicRegistrationSubmit } from "../hooks/usePublicRegistrationSubmit";
 import { useRegistrationWizard } from "../hooks/useRegistrationWizard";
@@ -27,6 +29,8 @@ export function PublicRegistrationWizard({
   const coachFormRef = useRef<CoachDetailsFormHandle>(null);
 
   const draft = useDraftParticipants();
+  const { seededCount, resetSeed } = useSeedClubParticipants(draft);
+  const teamsDraft = useDraftTeams(draft);
   const wizard = useRegistrationWizard({
     participants: draft.participants,
   });
@@ -53,11 +57,18 @@ export function PublicRegistrationWizard({
     if (!coach) {
       return;
     }
-    submitState.submit(coach, draft.participants);
+    submitState.submit(
+      coach,
+      draft.participants,
+      teamsDraft.teams,
+      categories,
+    );
   };
 
   const handleStartOver = () => {
     draft.setParticipants([]);
+    resetSeed();
+    teamsDraft.resetTeams();
     submitState.resetResults();
     wizard.resetToStart();
   };
@@ -75,13 +86,18 @@ export function PublicRegistrationWizard({
 
   return (
     <div className="flex flex-1 flex-col md:px-10 lg:px-20">
-      {wizard.step === "participants" && <ParticipantsStep draft={draft} />}
+      {wizard.step === "participants" && (
+        <ParticipantsStep draft={draft} clubMembersLoadedCount={seededCount} />
+      )}
       {wizard.step === "categories" && (
         <CategoryAssignmentStep
           draft={draft}
           suitable={suitable}
           assignments={assignments}
+          teamsDraft={teamsDraft}
           tournamentCategories={categories}
+          onWizardBack={wizard.goBack}
+          onWizardNext={handleNext}
         />
       )}
       {wizard.step === "coach" && (
@@ -89,11 +105,12 @@ export function PublicRegistrationWizard({
           formRef={coachFormRef}
           participants={draft.participants}
           tournamentCategories={categories}
+          teams={teamsDraft.teams}
           disabled={submitState.isSubmitting}
         />
       )}
 
-      {!wizard.isResultsStep && (
+      {wizard.step !== "categories" && (
         <>
           {wizard.step !== "coach" &&
             !canAdvanceFromStep(wizard.step, draft.participants) && (
@@ -101,22 +118,20 @@ export function PublicRegistrationWizard({
                 size="body-paragraph-s"
                 className="px-6 text-secondary-200"
               >
-                {wizard.step === "participants"
-                  ? t("registrations.public.validation.noParticipants")
-                  : t("registrations.public.validation.assignAtLeastOne")}
+                {t("registrations.public.validation.noParticipants")}
               </Typography>
             )}
+          <WizardStepNav
+            isFirstStep={wizard.isFirstStep}
+            isLastFormStep={wizard.isLastFormStep}
+            canGoNext={wizard.canGoNext}
+            isSubmitting={submitState.isSubmitting}
+            onBack={wizard.goBack}
+            onNext={handleNext}
+            onSubmit={handleSubmit}
+          />
         </>
       )}
-      <WizardStepNav
-        isFirstStep={wizard.isFirstStep}
-        isLastFormStep={wizard.isLastFormStep}
-        canGoNext={wizard.canGoNext}
-        isSubmitting={submitState.isSubmitting}
-        onBack={wizard.goBack}
-        onNext={handleNext}
-        onSubmit={handleSubmit}
-      />
     </div>
   );
 }

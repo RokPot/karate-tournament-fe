@@ -1,28 +1,32 @@
-import { Button } from "@mui/material";
-import { useRouter } from "next/router";
-
-import { RouteConfig } from "@/config/route.config";
+import { AdminDashboard } from "@/components/home/AdminDashboard";
+import { ClubProfileDashboard } from "@/components/home/ClubProfileDashboard";
+import { ClubStaffDashboard } from "@/components/home/ClubStaffDashboard";
+import { TournamentsDashboard } from "@/components/home/TournamentsDashboard";
 import { useAuthRoles } from "@/hooks/useAuthRoles";
-import { useEffect } from "react";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 const HomePage = () => {
-    const router = useRouter();
-    const { isAdmin, isClubOwner } = useAuthRoles();
+  const authUser = useAuthUser();
+  const { isAdmin, isClubOwner, isClubCoach, isClubCompetitor, isJudge, isFreeCompetitor } = useAuthRoles();
+  const clubId = authUser?.clubId ?? "";
 
-    useEffect(() => {
-        if (isClubOwner) {
-            router.push(RouteConfig.myClub);
-        }
-    }, [isAdmin, isClubOwner])
+  if (isAdmin) {
+    return <AdminDashboard />;
+  }
 
-    return (
-        <div className="flex flex-col items-center justify-center gap-4 p-10">
-            <h1 className="text-2xl font-bold">Welcome to Karate Tournament Manager</h1>
-            <Button variant="contained" onClick={() => router.push(RouteConfig.tournaments)}>
-                View Tournaments
-            </Button>
-        </div>
-    );
+  if (isClubOwner || isClubCoach) {
+    return <ClubStaffDashboard clubId={clubId} />;
+  }
+
+  if (isClubCompetitor) {
+    return <ClubProfileDashboard clubId={clubId} />;
+  }
+
+  if (isJudge || isFreeCompetitor) {
+    return <TournamentsDashboard />;
+  }
+
+  return <TournamentsDashboard />;
 };
 
 export default HomePage;
