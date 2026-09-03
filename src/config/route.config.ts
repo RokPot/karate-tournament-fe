@@ -18,5 +18,7 @@ export const RouteConfig = {
 };
 
 export const getTournamentDetailRoute = (id: string) => `/tournament/${id}/`;
+export const getTournamentRegistrationRoute = (id: string) =>
+  `/tournament/${id}/registration/`;
 export const getClubDetailRoute = (id: string) => `/clubs/${id}/`;
 export const getInviteRoute = (token: string) => `/invite/${token}/`;

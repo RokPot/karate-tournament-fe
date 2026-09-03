@@ -323,6 +323,20 @@ export namespace RegistrationsModels {
   >;
 
   /**
+   * TournamentRegistrationCountItemDtoSchema
+   * @type { object }
+   * @property { string } categoryId Assigned category ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { number } registrationCount Number of registrations in this category (including zero)
+   */
+  export const TournamentRegistrationCountItemDtoSchema = z.object({
+    categoryId: z.string(),
+    registrationCount: z.number(),
+  });
+  export type TournamentRegistrationCountItemDto = z.infer<
+    typeof TournamentRegistrationCountItemDtoSchema
+  >;
+
+  /**
    * GetPublicSuitableCategoriesBeltLevelParamSchema
    * @type { string }
    * @description E,x,a,m,p,l,e,:, ,`,7,-,k,y,u,`
@@ -375,6 +389,17 @@ export namespace RegistrationsModels {
   );
   export type GetSuitableParticipantsByCategoryResponse = z.infer<
     typeof GetSuitableParticipantsByCategoryResponseSchema
+  >;
+
+  /**
+   * FindCountsByTournamentResponseSchema
+   * @type { array }
+   */
+  export const FindCountsByTournamentResponseSchema = z.array(
+    TournamentRegistrationCountItemDtoSchema,
+  );
+  export type FindCountsByTournamentResponse = z.infer<
+    typeof FindCountsByTournamentResponseSchema
   >;
 
   /**

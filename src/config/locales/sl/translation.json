@@ -97,7 +97,9 @@
         "blocked": "Ni mogoče dodati",
         "duplicateTeam": "Ekipa s temi udeleženci že obstaja",
         "anyGender": "Kateri koli spol",
-        "rosterHint": "{{teamSize}} članov, do {{reserves}} rezerv"
+        "rosterHint": "Kliknite udeleženca na desni, da zapolnite mesto. Vsaka ekipa potrebuje {{teamSize}} članov.",
+        "rosterHintWithReserves": "Kliknite udeleženca na desni, da zapolnite mesto. Vsaka ekipa potrebuje {{teamSize}} članov in lahko vključuje do {{reserves}} rezerv.",
+        "emptySlot": "Prazno mesto"
       },
       "selectedRegistrations": {
         "title": "Izbrane prijave",
@@ -224,7 +226,13 @@
     "registration": {
       "locked": "Prijava se odpre, ko je turnir odobren.",
       "closedTitle": "Prijava ni odprta",
-      "closedBody": "Ta turnir še ni na voljo za prijavo."
+      "closedBody": "Ta turnir še ni na voljo za prijavo.",
+      "finishedTitle": "Turnir se je zaključil",
+      "finishedBody": "Prijava ni več na voljo, ker se je turnir zaključil.",
+      "deadlineClosedTitle": "Prijava je zaprta",
+      "deadlineClosedBody": "Prijava ni več na voljo, ker je rok za prijavo potekel.",
+      "copyLink": "Kopiraj povezavo za prijavo",
+      "copyLinkSuccess": "Povezava za prijavo je kopirana"
     }
   },
   "profile": {

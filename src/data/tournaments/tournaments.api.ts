@@ -12,7 +12,9 @@ export namespace TournamentsApi {
     );
   };
 
-  export const findAll = (status?: TournamentsModels.FindAllStatusParam) => {
+  export const findAll = (
+    status?: TournamentsModels.TournamentsFindAllStatusParam,
+  ) => {
     return AppRestClient.get(
       { resSchema: TournamentsModels.TournamentsFindAllResponseSchema },
       `/tournaments`,
@@ -35,6 +37,35 @@ export namespace TournamentsApi {
     return AppRestClient.get(
       { resSchema: TournamentsModels.TournamentPublicLiteResponseDtoSchema },
       `/tournaments/public/${id}`,
+    );
+  };
+
+  export const approve = (id: string) => {
+    return AppRestClient.post(
+      { resSchema: CommonModels.TournamentResponseDtoSchema },
+      `/tournaments/${id}/approve`,
+    );
+  };
+
+  export const decline = (
+    id: string,
+    data: TournamentsModels.DeclineTournamentDto,
+  ) => {
+    return AppRestClient.post(
+      { resSchema: CommonModels.TournamentResponseDtoSchema },
+      `/tournaments/${id}/decline`,
+      data,
+    );
+  };
+
+  export const resubmit = (
+    id: string,
+    data: TournamentsModels.ResubmitTournamentDto,
+  ) => {
+    return AppRestClient.post(
+      { resSchema: CommonModels.TournamentResponseDtoSchema },
+      `/tournaments/${id}/resubmit`,
+      data,
     );
   };
 
@@ -67,35 +98,6 @@ export namespace TournamentsApi {
     return AppRestClient.put(
       { resSchema: CommonModels.TournamentResponseDtoSchema },
       `/tournaments/${id}/categories`,
-      data,
-    );
-  };
-
-  export const approve = (id: string) => {
-    return AppRestClient.post(
-      { resSchema: CommonModels.TournamentResponseDtoSchema },
-      `/tournaments/${id}/approve`,
-    );
-  };
-
-  export const decline = (
-    id: string,
-    data?: TournamentsModels.DeclineTournamentDto,
-  ) => {
-    return AppRestClient.post(
-      { resSchema: CommonModels.TournamentResponseDtoSchema },
-      `/tournaments/${id}/decline`,
-      data,
-    );
-  };
-
-  export const resubmit = (
-    id: string,
-    data?: TournamentsModels.ResubmitTournamentDto,
-  ) => {
-    return AppRestClient.post(
-      { resSchema: CommonModels.TournamentResponseDtoSchema },
-      `/tournaments/${id}/resubmit`,
       data,
     );
   };

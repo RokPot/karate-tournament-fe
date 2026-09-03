@@ -271,7 +271,9 @@
         "blocked": "Cannot add",
         "duplicateTeam": "A team with these participants already exists",
         "anyGender": "Any gender",
-        "rosterHint": "{{teamSize}} starters, up to {{reserves}} reserves"
+        "rosterHint": "Click a participant on the right to fill a slot. Each team needs {{teamSize}} starters.",
+        "rosterHintWithReserves": "Click a participant on the right to fill a slot. Each team needs {{teamSize}} starters and can include up to {{reserves}} reserves.",
+        "emptySlot": "Empty slot"
       },
       "selectedRegistrations": {
         "title": "Selected registrations",
@@ -371,7 +373,13 @@
     "registration": {
       "locked": "Registration opens after the tournament is approved.",
       "closedTitle": "Registration is not open",
-      "closedBody": "This tournament is not available for registration yet."
+      "closedBody": "This tournament is not available for registration yet.",
+      "finishedTitle": "This tournament has finished",
+      "finishedBody": "Registration is no longer available because this tournament has finished.",
+      "deadlineClosedTitle": "Registration is closed",
+      "deadlineClosedBody": "Registration is no longer available because the deadline has run out.",
+      "copyLink": "Copy registration link",
+      "copyLinkSuccess": "Registration link copied to clipboard"
     }
   },
   "invitations": {

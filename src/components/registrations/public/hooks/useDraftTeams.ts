@@ -48,6 +48,20 @@ export function useDraftTeams(draft: UseDraftParticipantsReturn) {
       };
       seenCategoryIdsRef.current.add(categoryId);
       setTeams((prev) => [...prev, team]);
+      return team.clientId;
+    },
+    [],
+  );
+
+  const updateTeam = useCallback(
+    (teamId: string, starterIds: string[], reserveIds: string[]) => {
+      setTeams((prev) =>
+        prev.map((team) =>
+          team.clientId === teamId
+            ? { ...team, starterIds, reserveIds }
+            : team,
+        ),
+      );
     },
     [],
   );
@@ -126,6 +140,7 @@ export function useDraftTeams(draft: UseDraftParticipantsReturn) {
   return {
     teams,
     addTeam,
+    updateTeam,
     removeTeam,
     resetTeams,
     getTeamsForCategory,

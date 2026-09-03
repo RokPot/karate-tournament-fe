@@ -110,18 +110,11 @@ export const useCategoryFormatters = () => {
     [t],
   );
 
-  const getCategoryRegistrationCount = useCallback(
-    (category: CommonModels.CategoryResponseDto) =>
-      category.registrationCount ?? 0,
-    [],
-  );
-
   return {
     emptyLabel: t("categories.format.empty"),
     formatAgeRange,
     formatWeightRange,
     formatBeltRange,
     formatTeamSize,
-    getCategoryRegistrationCount,
   };
 };

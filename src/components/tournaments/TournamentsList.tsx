@@ -11,10 +11,11 @@ import { CreateTournamentModal } from "@/components/tournaments/CreateTournament
 import { DeclineTournamentDialog } from "@/components/tournaments/DeclineTournamentDialog";
 import { TournamentStatusCell } from "@/components/tournaments/TournamentStatusCell";
 import { useTournamentReview } from "@/components/tournaments/useTournamentReview";
-import TableCell from "@/components/ui/table/TableCell";
 import { Table } from "@/components/ui/table/Table";
+import TableCell from "@/components/ui/table/TableCell";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { getTournamentDetailRoute } from "@/config/route.config";
+import { ClubsQueries } from "@/data/clubs/clubs.queries";
 import { CommonModels } from "@/data/common/common.models";
 import { TournamentsModels } from "@/data/tournaments/tournaments.models";
 import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
@@ -23,8 +24,9 @@ import { DateUtils } from "@/util/date.utils";
 interface TournamentsListProps {
   showCreateButton?: boolean;
   titleSize?: "h2" | "h3";
-  source?: "all" | "registered";
-  status?: TournamentsModels.FindAllStatusParam;
+  source?: "all" | "registered" | "club";
+  clubId?: string;
+  status?: TournamentsModels.TournamentsFindAllStatusParam;
   showApprovalActions?: boolean;
   showClubColumn?: boolean;
   showStatusColumn?: boolean;
@@ -34,6 +36,7 @@ export const TournamentsList = ({
   showCreateButton = false,
   titleSize = "h2",
   source = "all",
+  clubId,
   status,
   showApprovalActions = false,
   showClubColumn = false,
@@ -55,8 +58,17 @@ export const TournamentsList = ({
   const registeredQuery = TournamentsQueries.useFindRegistered({
     enabled: source === "registered",
   });
-  const { data: tournaments, isLoading, error, refetch } =
-    source === "registered" ? registeredQuery : allQuery;
+  const clubQuery = ClubsQueries.useGetTournaments(
+    { id: clubId ?? "" },
+    { enabled: source === "club" && !!clubId },
+  );
+  let activeQuery = allQuery;
+  if (source === "registered") {
+    activeQuery = registeredQuery;
+  } else if (source === "club") {
+    activeQuery = clubQuery;
+  }
+  const { data: tournaments, isLoading, error, refetch } = activeQuery;
 
   const columns: ColumnDef<CommonModels.TournamentResponseDto>[] = useMemo(
     () => {
@@ -104,7 +116,7 @@ export const TournamentsList = ({
         cols.push({
           header: ({ header }) => HeaderCell(header, t("tournaments.status.label")),
           accessorKey: "status",
-          cell: ({ row }) => <TournamentStatusCell status={row.original.status} />,
+          cell: ({ row }) => TournamentStatusCellComponent({ status: row.original.status }),
         });
       }
 
@@ -112,32 +124,7 @@ export const TournamentsList = ({
         cols.push({
           id: "actions",
           header: ({ header }) => HeaderCell(header, ""),
-          cell: ({ row }) => (
-            <TableCell align="end" className="gap-2">
-              <div
-                className="flex flex-row items-center gap-2"
-                onClick={(event) => event.stopPropagation()}
-              >
-                <Button
-                  size="small"
-                  variant="contained"
-                  disabled={isReviewPending}
-                  onClick={() => approve.mutate({ id: row.original.id })}
-                >
-                  {t("tournaments.review.approve")}
-                </Button>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  color="error"
-                  disabled={isReviewPending}
-                  onClick={() => setDeclineTournamentId(row.original.id)}
-                >
-                  {t("tournaments.review.decline")}
-                </Button>
-              </div>
-            </TableCell>
-          ),
+          cell: ({ row }) => TournamentActionsCell({ onApprove: () => approve.mutate({ id: row.original.id }), onDecline: () => setDeclineTournamentId(row.original.id), isReviewPending }),
         });
       }
 
@@ -210,7 +197,7 @@ export const TournamentsList = ({
           decline.mutate(
             {
               id: declineTournamentId,
-              data: reason ? { reason } : undefined,
+              data: reason ? { reason } : {},
             },
             { onSuccess: () => setDeclineTournamentId(null) },
           );
@@ -219,3 +206,38 @@ export const TournamentsList = ({
     </div>
   );
 };
+
+const TournamentStatusCellComponent = ({ status }: { status: CommonModels.TournamentsFindAllStatusEnum }) => {
+  return <TournamentStatusCell status={status} />
+}
+
+const TournamentActionsCell = (
+  { onApprove, onDecline, isReviewPending }:
+    { onApprove: () => void, onDecline: () => void, isReviewPending: boolean }
+) => {
+  const { t } = useTranslation();
+  return <TableCell align="end" className="gap-2">
+    <div
+      className="flex flex-row items-center gap-2"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <Button
+        size="small"
+        variant="contained"
+        disabled={isReviewPending}
+        onClick={onApprove}
+      >
+        {t("tournaments.review.approve")}
+      </Button>
+      <Button
+        size="small"
+        variant="outlined"
+        color="error"
+        disabled={isReviewPending}
+        onClick={onDecline}
+      >
+        {t("tournaments.review.decline")}
+      </Button>
+    </div>
+  </TableCell>
+}

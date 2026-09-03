@@ -176,6 +176,9 @@ export function CategoryAssignmentStep({
                         reserveIds,
                       )
                     }
+                    onUpdateTeam={(teamId, starterIds, reserveIds) =>
+                      teamsDraft.updateTeam(teamId, starterIds, reserveIds)
+                    }
                     onRemoveTeam={teamsDraft.removeTeam}
                   />
                 ) : (

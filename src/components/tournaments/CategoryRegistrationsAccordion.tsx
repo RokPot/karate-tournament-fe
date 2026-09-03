@@ -1,8 +1,10 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { CategoryRegistrationsAccordionItem } from "@/components/tournaments/CategoryRegistrationsAccordionItem";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { CommonModels } from "@/data/common/common.models";
+import { RegistrationsQueries } from "@/data/registrations/registrations.queries";
 
 interface IProps {
   categories: CommonModels.CategoryResponseDto[];
@@ -14,6 +16,16 @@ export const CategoryRegistrationsAccordion = ({
   tournamentId,
 }: IProps) => {
   const { t } = useTranslation();
+  const { data: counts } = RegistrationsQueries.useFindCountsByTournament(
+    { tournamentId },
+    { enabled: !!tournamentId },
+  );
+
+  const countsByCategoryId = useMemo(() => {
+    return new Map(
+      (counts ?? []).map((item) => [item.categoryId, item.registrationCount]),
+    );
+  }, [counts]);
 
   if (categories.length === 0) {
     return (
@@ -32,6 +44,7 @@ export const CategoryRegistrationsAccordion = ({
           key={category.id}
           category={category}
           tournamentId={tournamentId}
+          registrationCount={countsByCategoryId.get(category.id) ?? 0}
         />
       ))}
     </div>

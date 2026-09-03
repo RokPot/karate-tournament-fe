@@ -83,6 +83,18 @@ export namespace RegistrationsApi {
     );
   };
 
+  export const findCountsByTournament = (tournamentId: string) => {
+    return AppRestClient.get(
+      { resSchema: RegistrationsModels.FindCountsByTournamentResponseSchema },
+      `/registrations/by-tournament/counts`,
+      {
+        params: {
+          tournamentId,
+        },
+      },
+    );
+  };
+
   export const findByTournament = (
     tournamentId: string,
     categoryId?: string,

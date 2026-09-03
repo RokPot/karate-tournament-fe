@@ -7,11 +7,13 @@ import { RouteConfig } from "@/config/route.config";
 import { AuthGuard } from "@/data/auth/AuthGuard";
 import { TournamentsModels } from "@/data/tournaments/tournaments.models";
 import { useAuthRoles } from "@/hooks/useAuthRoles";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 const TournamentsPage = () => {
   const { t } = useTranslation();
+  const authUser = useAuthUser();
   const { isClubOwner, isClubCoach, isAdmin } = useAuthRoles();
-  const [tab, setTab] = useState<Extract<TournamentsModels.FindAllStatusParam, "approved" | "pending">>("approved");
+  const [tab, setTab] = useState<Extract<TournamentsModels.TournamentsFindAllStatusParam, "approved" | "pending">>("approved");
   const canCreate = isAdmin || isClubOwner || isClubCoach;
 
   if (isAdmin) {
@@ -31,6 +33,19 @@ const TournamentsPage = () => {
           status={tab}
           showApprovalActions={tab === "pending"}
           showClubColumn={tab === "pending"}
+        />
+      </div>
+    );
+  }
+
+  if (isClubOwner || isClubCoach) {
+    return (
+      <div className="mx-auto w-full max-w-7xl p-6">
+        <TournamentsList
+          showCreateButton={canCreate}
+          titleSize="h2"
+          source="club"
+          clubId={authUser?.clubId ?? undefined}
         />
       </div>
     );

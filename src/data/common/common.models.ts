@@ -62,6 +62,22 @@ export namespace CommonModels {
   export const ParticipantGenderEnum = ParticipantGenderEnumSchema.enum;
 
   /**
+   * TournamentsFindAllStatusEnumSchema
+   * @type { enum }
+   * @description Tournament review status,E,x,a,m,p,l,e,:, ,`,a,p,p,r,o,v,e,d,`
+   */
+  export const TournamentsFindAllStatusEnumSchema = z.enum([
+    "pending",
+    "approved",
+    "declined",
+  ]);
+  export type TournamentsFindAllStatusEnum = z.infer<
+    typeof TournamentsFindAllStatusEnumSchema
+  >;
+  export const TournamentsFindAllStatusEnum =
+    TournamentsFindAllStatusEnumSchema.enum;
+
+  /**
    * InvitationStatusEnumSchema
    * @type { enum }
    * @description Invitation status,E,x,a,m,p,l,e,:, ,`,p,e,n,d,i,n,g,`
@@ -74,19 +90,6 @@ export namespace CommonModels {
   ]);
   export type InvitationStatusEnum = z.infer<typeof InvitationStatusEnumSchema>;
   export const InvitationStatusEnum = InvitationStatusEnumSchema.enum;
-
-  /**
-   * TournamentStatusEnumSchema
-   * @type { enum }
-   * @description Tournament approval status. Example: `pending`
-   */
-  export const TournamentStatusEnumSchema = z.enum([
-    "pending",
-    "approved",
-    "declined",
-  ]);
-  export type TournamentStatusEnum = z.infer<typeof TournamentStatusEnumSchema>;
-  export const TournamentStatusEnum = TournamentStatusEnumSchema.enum;
 
   /**
    * DisciplineEnumSchema
@@ -199,10 +202,10 @@ export namespace CommonModels {
    * @property { string } clubId Club ID assigned to the tournament. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { ClubResponseDto } club Club assigned to the tournament
    * @property { string[] } categoryIds Category IDs associated with this tournament. Example: `123e4567-e89b-12d3-a456-426614174000`
-   * @property { string } status Approval status. Example: `pending`
-   * @property { string } reviewedAt When the tournament was last approved or declined. Example: `2024-01-02T00:00:00.000Z`
-   * @property { string } reviewedBy User ID of the admin who last approved or declined. Example: `123e4567-e89b-12d3-a456-426614174000`
-   * @property { string } reviewNote Decline reason or resubmit note. Example: `Dates clash with an existing championship`
+   * @property { string } status Tournament review status. Example: `approved`
+   * @property { string } reviewedAt When the tournament was last approved or declined. Example: `2024-01-15T12:00:00.000Z`
+   * @property { string } reviewedBy Admin user ID who last approved or declined the tournament. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } reviewNote Note from decline or resubmit. Example: `Missing venue details`
    * @property { string } createdAt Creation timestamp. Example: `2024-01-01T00:00:00.000Z`
    * @property { string } updatedAt Last update timestamp. Example: `2024-01-01T00:00:00.000Z`
    */
@@ -217,8 +220,8 @@ export namespace CommonModels {
     clubId: z.string().nullish(),
     club: CommonModels.ClubResponseDtoSchema.nullish(),
     categoryIds: z.array(z.string()),
-    status: CommonModels.TournamentStatusEnumSchema,
-    reviewedAt: z.string().nullish(),
+    status: CommonModels.TournamentsFindAllStatusEnumSchema,
+    reviewedAt: z.string().datetime({ offset: true }).nullish(),
     reviewedBy: z.string().nullish(),
     reviewNote: z.string().nullish(),
     createdAt: z.string().datetime({ offset: true }),
@@ -245,7 +248,6 @@ export namespace CommonModels {
    * @property { number } teamSize Main team roster size (null = not applicable). Example: `3`
    * @property { number } teamReservesSize Number of reserve participants allowed (null = not applicable). Example: `1`
    * @property { string } clubId Owning club ID (null = global catalog). Example: `123e4567-e89b-12d3-a456-426614174000`
-   * @property { number } registrationCount Registrations in this category for the current tournament (absent until the counts API ships). Example: `12`
    * @property { string } createdAt Creation timestamp. Example: `2024-01-01T00:00:00.000Z`
    * @property { string } updatedAt Last update timestamp. Example: `2024-01-01T00:00:00.000Z`
    */
@@ -264,7 +266,6 @@ export namespace CommonModels {
     teamSize: z.number().nullish(),
     teamReservesSize: z.number().nullish(),
     clubId: z.string().nullish(),
-    registrationCount: z.number().nullish(),
     createdAt: z.string().datetime({ offset: true }),
     updatedAt: z.string().datetime({ offset: true }),
   });

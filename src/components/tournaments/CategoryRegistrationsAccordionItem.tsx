@@ -17,11 +17,13 @@ import { RegistrationsQueries } from "@/data/registrations/registrations.queries
 interface IProps {
   category: CommonModels.CategoryResponseDto;
   tournamentId: string;
+  registrationCount: number;
 }
 
 export const CategoryRegistrationsAccordionItem = ({
   category,
   tournamentId,
+  registrationCount,
 }: IProps) => {
   const { t } = useTranslation();
   const {
@@ -30,10 +32,8 @@ export const CategoryRegistrationsAccordionItem = ({
     formatBeltRange,
     formatTeamSize,
     formatWeightRange,
-    getCategoryRegistrationCount,
   } = useCategoryFormatters();
   const [isExpanded, setIsExpanded] = useState(false);
-  const count = getCategoryRegistrationCount(category);
 
   const { data, isLoading, error, refetch } =
     RegistrationsQueries.useFindByTournament(
@@ -116,7 +116,7 @@ export const CategoryRegistrationsAccordionItem = ({
             className="font-weight-500 text-tertiary-300"
             as="span"
           >
-            {t("registrations.registeredCount", { count })}
+            {t("registrations.registeredCount", { count: registrationCount })}
           </Typography>
         </Pill>
       </button>

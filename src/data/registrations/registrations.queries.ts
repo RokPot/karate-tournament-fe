@@ -29,6 +29,12 @@ export namespace RegistrationsQueries {
         dateOfBirth,
         gender,
       ] as const,
+    findCountsByTournament: (tournamentId: string) =>
+      [
+        ...keys.all,
+        "/registrations/by-tournament/counts",
+        tournamentId,
+      ] as const,
     findByTournament: (tournamentId: string, categoryId?: string) =>
       [
         ...keys.all,
@@ -241,6 +247,29 @@ export namespace RegistrationsQueries {
         invalidateQueries(queryClient, moduleName, options);
         options?.onSuccess?.(...args);
       },
+    });
+  };
+
+  /**
+   * Query `useFindCountsByTournament`
+   * @summary Get registration counts per assigned category
+   * @description Returns one row per category assigned to the tournament, including categories with zero registrations. Ordered by tournament category sort order.
+   * @param { string } object.tournamentId Query parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { AppQueryOptions } options Query options
+   * @returns { UseQueryResult<RegistrationsModels.FindCountsByTournamentResponse> } Registration counts per assigned category
+   * @statusCodes [200, 401, 403, 404]
+   */
+  export const useFindCountsByTournament = <TData>(
+    { tournamentId }: { tournamentId: string },
+    options?: AppQueryOptions<
+      typeof RegistrationsApi.findCountsByTournament,
+      TData
+    >,
+  ) => {
+    return useQuery({
+      queryKey: keys.findCountsByTournament(tournamentId),
+      queryFn: () => RegistrationsApi.findCountsByTournament(tournamentId),
+      ...options,
     });
   };
 

@@ -1,7 +1,7 @@
-import { useTranslation } from "react-i18next";
 import { faCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cva } from "class-variance-authority";
+import { useTranslation } from "react-i18next";
 
 import TableCell from "@/components/ui/table/TableCell";
 import { Typography } from "@/components/ui/text/Typography/Typography";
@@ -23,7 +23,7 @@ const statusIcon = cva("h-6 w-6 shrink-0 mr-2", {
 });
 
 interface TournamentStatusCellProps {
-  status: CommonModels.TournamentStatusEnum;
+  status: CommonModels.TournamentsFindAllStatusEnum;
 }
 
 export const TournamentStatusCell = ({ status }: TournamentStatusCellProps) => {
@@ -31,7 +31,7 @@ export const TournamentStatusCell = ({ status }: TournamentStatusCellProps) => {
 
   return (
     <TableCell className="flex flex-row items-center gap-2" align="start">
-      <Typography size="body-paragraph-m" variant="prominent-2">
+      <Typography size="body-paragraph-s" >
         <FontAwesomeIcon icon={faCircle} className={statusIcon({ variant: status })} />
         {t(TOURNAMENT_STATUS_I18N_KEYS[status])}
       </Typography>

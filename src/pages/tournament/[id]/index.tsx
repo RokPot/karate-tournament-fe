@@ -9,6 +9,9 @@ import { LoadingState } from "@/components/shared/layout/LoadingState";
 import { CategoryRegistrationsAccordion } from "@/components/tournaments/CategoryRegistrationsAccordion";
 import { DeclineTournamentDialog } from "@/components/tournaments/DeclineTournamentDialog";
 import {
+  getRegistrationClosedI18nKeys,
+  getRegistrationWindowState,
+  isRegistrationWindowOpen,
   isTournamentApproved,
   isTournamentDeclined,
   isTournamentPending,
@@ -16,13 +19,15 @@ import {
 } from "@/components/tournaments/tournament-status";
 import { useTournamentReview } from "@/components/tournaments/useTournamentReview";
 import Pill from "@/components/ui/Pill";
+import { useToast } from "@/components/ui/status/Toast/useToast";
 import { Link } from "@/components/ui/text/Link/Link";
 import { Typography } from "@/components/ui/text/Typography/Typography";
+import { getTournamentRegistrationRoute } from "@/config/route.config";
 import { CategoriesQueries } from "@/data/categories/categories.queries";
 import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
 import { useAuthRoles } from "@/hooks/useAuthRoles";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { faAdd, faPencil } from "@fortawesome/free-solid-svg-icons";
+import { faAdd, faLink, faPencil } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
 
@@ -34,6 +39,7 @@ const TournamentDetailPage = () => {
     useState(false);
   const [declineOpen, setDeclineOpen] = useState(false);
   const { t } = useTranslation();
+  const { successToast } = useToast();
   const authUser = useAuthUser();
   const {
     data: tournament,
@@ -80,9 +86,23 @@ const TournamentDetailPage = () => {
     !!authUser?.clubId &&
     authUser.clubId === tournament.clubId;
   const canManageSetup = isAdmin || isOwningClubStaff;
-  const registrationOpen = isTournamentApproved(tournament);
+  const windowState = getRegistrationWindowState(tournament);
+  const registrationOpen =
+    isTournamentApproved(tournament) && isRegistrationWindowOpen(tournament);
+  const registrationClosedCopy =
+    windowState === "open"
+      ? null
+      : getRegistrationClosedI18nKeys(windowState);
   const canReview = isAdmin && isTournamentPending(tournament);
   const canResubmit = isOwningClubStaff && isTournamentDeclined(tournament);
+  const registrationPath = getTournamentRegistrationRoute(tournamentId);
+
+  const handleCopyRegistrationLink = () => {
+    navigator.clipboard.writeText(`${window.location.origin}${registrationPath}`).then(
+      () => successToast({ text: t("tournaments.registration.copyLinkSuccess") }),
+      () => undefined,
+    );
+  };
 
   return (
     <div className="flex flex-row flex-1">
@@ -137,7 +157,7 @@ const TournamentDetailPage = () => {
         )}
 
         {registrationOpen ? (
-          <Link href={`/tournament/${tournamentId}/registration`}>
+          <Link href={registrationPath}>
             <Button variant="contained" className="w-full">
               {t("shared.registration")}
             </Button>
@@ -148,10 +168,23 @@ const TournamentDetailPage = () => {
               {t("shared.registration")}
             </Button>
             <Typography size="body-paragraph-s" className="text-secondary-200">
-              {t("tournaments.registration.locked")}
+              {registrationClosedCopy && isTournamentApproved(tournament)
+                ? t(registrationClosedCopy.body)
+                : t("tournaments.registration.locked")}
             </Typography>
           </>
         )}
+
+        <Button
+          variant="outlined"
+          className="w-full"
+          onClick={handleCopyRegistrationLink}
+        >
+          <span className="flex flex-row items-center justify-center gap-2">
+            <FontAwesomeIcon icon={faLink} />
+            {t("tournaments.registration.copyLink")}
+          </span>
+        </Button>
 
         {canReview && (
           <div className="flex flex-col gap-2 mt-2">
@@ -178,7 +211,7 @@ const TournamentDetailPage = () => {
             variant="contained"
             className="mt-2"
             disabled={isReviewPending}
-            onClick={() => resubmit.mutate({ id: tournamentId })}
+            onClick={() => resubmit.mutate({ id: tournamentId, data: {} })}
           >
             {t("tournaments.review.resubmit")}
           </Button>
@@ -236,7 +269,7 @@ const TournamentDetailPage = () => {
         onClose={() => setDeclineOpen(false)}
         onConfirm={(reason) => {
           decline.mutate(
-            { id: tournamentId, data: reason ? { reason } : undefined },
+            { id: tournamentId, data: reason ? { reason } : {} },
             { onSuccess: () => setDeclineOpen(false) },
           );
         }}

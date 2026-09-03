@@ -69,6 +69,7 @@ const AddOrCreateCategoryModal = ({ open, onClose, tournamentId, currentCategory
             successToast({ text: t("categories.addCategoryModal.success") });
             await queryClient.invalidateQueries({ queryKey: [QueryModule.Tournaments] });
             await queryClient.invalidateQueries({ queryKey: [TournamentsQueries.keys.findOne(tournamentId)] });
+            await queryClient.invalidateQueries({ queryKey: [QueryModule.Registrations] });
         },
         onError: (error) => {
             errorToast({ text: error?.message || t("categories.addCategoryModal.error") });
