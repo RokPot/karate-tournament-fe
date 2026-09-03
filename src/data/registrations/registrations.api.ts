@@ -115,6 +115,22 @@ export namespace RegistrationsApi {
     );
   };
 
+  export const findMine = (
+    tournamentId?: string,
+    status?: RegistrationsModels.FindMineStatusParam,
+  ) => {
+    return AppRestClient.get(
+      { resSchema: RegistrationsModels.FindMineResponseSchema },
+      `/registrations/me`,
+      {
+        params: {
+          tournamentId,
+          status,
+        },
+      },
+    );
+  };
+
   export const findOne = (id: string) => {
     return AppRestClient.get(
       { resSchema: RegistrationsModels.RegistrationResponseDtoSchema },

@@ -10,492 +10,351 @@ Copy this file into the backend repo and implement against it. Source: karate to
 
 Frontend resolves the dashboard from the first match: admin → club_owner / club_coach → club_member → judge → free_member.
 
-## Implementation order
+## Remaining work
 
 | Priority | Work | Why |
 | --- | --- | --- |
-| **P0** | [§1 First login upsert + invite profile data](#1-p0-first-login-user-upsert-and-invitation-profile-data) | New users infinite-load after Auth0 until they refresh; invitee name/email never appear on the profile modal |
-| **P1** | [§2 Club-scoped invitation list](#2-p1-club-scoped-invitation-list) | Club owner/coach dashboards error if `GET /invitations` is admin-only |
-| **P1** | [§3 Registrations / tournaments for free members](#3-p1-tournaments-the-user-registered-for) | Free-member dashboard currently lists **all** tournaments |
-| **P2** | [§4 Club-scoped categories](#4-p2-club-scoped-categories) | Club staff see the global category catalog |
-| **P2** | [§5 Invite to an existing club + accept-by-role](#5-p2-invite-to-an-existing-club--accept-by-role) | Invites exist only as a side-effect of `POST /clubs` |
-| **P2** | [§6 Team registrations](#6-p2-team-registrations-kata-team--kumite-team) | Public bulk register already sends `teams[]`; API may ignore it today |
-| **P3** | [§7 Auth tightening](#7-p3-authorization-tightening) | Club staff hitting admin-only or global lists |
+| **P0** | [§2 Tournament request approval](#2-p0-tournament-request-approval) | Club owner/coach create a **request**; SuperAdmin (`admin`) must approve before registration / public access open |
+| **P0** | [§1 Registration counts per tournament category](#1-p0-registration-counts-per-tournament-category) | Tournament detail accordion needs a count on every category without fetching every registration |
 
-Existing endpoints the frontend already calls must keep working. Confirm they are allowed for the roles that now hit them, not only `admin` — see [§8](#8-what-the-frontend-already-uses).
+Existing endpoints the frontend already calls must keep working.
 
 ---
 
-## 1. P0 — First login, user upsert, and invitation profile data
+## 1. P0 — Registration counts per tournament category
 
 ### Problem
 
-Signup is Auth0. Immediately after the callback the frontend:
+Tournament detail is an accordion of assigned categories. Each collapsed row must show **how many people registered in that category** so organizers can scan the whole tournament without opening every panel.
 
-1. `GET /users/me`
-2. If there is a pending invite token: `POST /invitations/:token/accept`
-3. Opens a complete-profile modal that **prefills `firstName`, `lastName`, `email` from those responses**
-
-Today:
-
-- First `GET /users/me` often `404` / `401` because the app user does not exist yet → user must **refresh**.
-- Invitation `firstName` / `lastName` / `email` (set when the club/invite was created) are not copied onto the user → modal is empty.
-
-### 1.1 Upsert on first authenticated `GET /users/me` (required)
-
-The first authenticated `GET /users/me` **must create the user from the Auth0 JWT** if none exists (lazy upsert).
-
-A dedicated `POST /users/sync` is acceptable **only if** the frontend would not need a second round-trip after Auth0. Prefer upsert inside `GET /users/me`.
-
-On create:
-
-- `auth0Id` ← JWT `sub`
-- `email` ← JWT email claim. **Must be returned on `GET /users/me`.** Must not be null after first login.
-- `firstName` / `lastName` ← JWT `given_name` / `family_name` when present and the user fields are empty
-
-| Status | When |
-| --- | --- |
-| `200` | User found **or just created**. Body: `UserResponseDto` including `email` |
-| `401` | Missing/invalid JWT only — **not** “user not in our DB yet” |
-
-Do **not** return `404` for a valid JWT whose user row has not been inserted.
-
-`PUT /users/me` (`UpdateUserDto`, all fields optional) stays the save path for the complete-profile modal:
-
-```json
-{
-  "firstName": "Jane",
-  "lastName": "Doe",
-  "email": "jane@example.com",
-  "gender": "female",
-  "dateOfBirth": "2000-07-07T00:00:00.000Z",
-  "weight": 62.5,
-  "beltLevel": "1-kyu"
-}
-```
-
-`gender`: `male` | `female` | `other`  
-`beltLevel`: `10-kyu` … `1-kyu`, `1-dan` … `10-dan`  
-`dateOfBirth`: ISO-8601 datetime with offset (same as `UserResponseDto`)
-
-Optional modal fields are **omitted** when empty; do not require them.
-
-`UserResponseDto` (keep existing shape; `email` must be populated after upsert):
-
-| Field | Type |
-| --- | --- |
-| `id` | string |
-| `auth0Id` | string |
-| `clubId` | string \| null |
-| `firstName` | string \| null |
-| `lastName` | string \| null |
-| `email` | string \| null |
-| `gender` | `male` \| `female` \| `other` \| null |
-| `dateOfBirth` | ISO-8601 datetime \| null |
-| `weight` | number \| null |
-| `beltLevel` | belt enum \| null |
-| `roles` | role enum[] |
-| `club` | `ClubResponseDto` \| null |
-| `createdAt` / `updatedAt` | ISO-8601 datetime |
-
-### 1.2 Copy invitation identity on accept (required)
+Today the frontend can only derive a count by fetching the full list:
 
 ```
-POST /invitations/:token/accept
+GET /registrations/by-tournament?tournamentId=&categoryId=
 ```
 
-Authenticated. After linking club + role, copy invitation fields onto the user **only when the user field is empty**:
+That is the **expand** path (keep it). It is the wrong path for header counts:
 
-| Invitation | User |
-| --- | --- |
-| `firstName` | `firstName` |
-| `lastName` | `lastName` |
-| `email` | `email` |
+- Opening every category just to read `registrations.length` downloads every attendee
+- Categories with **zero** registrations never appear in a list response, so `length` cannot drive the accordion — empty categories would look the same as “unknown”
 
-Do not overwrite values already set by the JWT upsert or by the user.
+The frontend ships with `0` on every category until this exists. Do not make the frontend call a counts URL that 404s.
 
-Response already includes `{ user: UserResponseDto, club: ClubResponseDto }`. `user` **must** contain the copied fields. A following `GET /users/me` must return the same.
+### Required: counts for every assigned category, including zero
 
-Also: assign the **invitation’s role**, not always `club_owner`. (Club-create invites may still be owner; member/coach invites must not promote to owner.) See [§5](#5-p2-invite-to-an-existing-club--accept-by-role).
-
-### 1.3 Public by-token preview includes invitee identity (required)
-
-```
-GET /invitations/by-token/:token
-```
-
-**Public.** The token in the URL is the secret.
-
-Extend `InvitationByTokenResponseDto`:
-
-| Field | Type | Notes |
-| --- | --- | --- |
-| `clubName` | string | Unchanged |
-| `expiresAt` | ISO-8601 datetime | Unchanged |
-| `status` | `pending` \| `accepted` \| `expired` \| `cancelled` | Unchanged |
-| `email` | string | Invitee email. Frontend uses this as Auth0 `login_hint` and shows it on the invite page |
-| `firstName` | string \| null | From create-invite / `POST /clubs` `ownerFirstName` |
-| `lastName` | string \| null | From create-invite / `POST /clubs` `ownerLastName` |
-
-`404` only if the token is unknown. Expired / cancelled / accepted invites still return `200` with `status` so the frontend can show “no longer valid”.
-
-### P0 acceptance
-
-- Sign up in Auth0 → land in the app → `GET /users/me` is `200` on the **first** request. No refresh.
-- Response includes `email` from the Auth0 account.
-- Open `/invite/{token}` for a pending invite created with name+email → preview shows those fields.
-- After accept, `user.firstName` / `lastName` / `email` match the invitation when the user had them empty.
-- `PUT /users/me` with only name+email (optional athlete fields omitted) returns `200` and persists.
-
-Keep working: `POST /clubs` with `ownerEmail` (+ optional `ownerFirstName` / `ownerLastName`) still creates an invitation and returns `inviteUrl` on `ClubResponseDto`.
-
----
-
-## 2. P1 — Club-scoped invitation list
-
-### Problem
-
-Club owner/coach dashboards list invitations for `user.clubId`. The only list endpoint is:
-
-```
-GET /invitations
-```
-
-Client description: all invitations, newest first. If this is admin-only, the club dashboard section errors.
-
-`/invitations/` in the UI stays admin-only. Club staff must list **their club’s** invitations from `/dashboard/` and my-club.
-
-### Required: list for a club
-
-**Option A (preferred)** — same path, optional filter:
-
-```
-GET /invitations
-GET /invitations?clubId={uuid}
-```
-
-| Caller | `clubId` query | Result |
-| --- | --- | --- |
-| `admin` | omitted | All invitations, newest first (today) |
-| `admin` | present | That club |
-| `club_owner` / `club_coach` | omitted | Caller’s club (`user.clubId`) |
-| `club_owner` / `club_coach` | own club | Same |
-| `club_owner` / `club_coach` | other club | `403` |
-| Other roles | any | `403` |
-
-**Option B:** `GET /clubs/:id/invitations` with the same auth as `GET /clubs/:id/members`.
-
-Response: `InvitationListItemDto[]` (newest first):
-
-| Field | Type |
-| --- | --- |
-| `id` | uuid |
-| `clubId` | uuid |
-| `clubName` | string |
-| `token` | string (frontend copies `{origin}/invite/{token}/`) |
-| `email` | string |
-| `firstName` | string \| null |
-| `lastName` | string \| null |
-| `status` | `pending` \| `accepted` \| `expired` \| `cancelled` |
-| `createdAt` | ISO-8601 datetime |
-| `expiresAt` | ISO-8601 datetime |
-| `acceptedAt` | ISO-8601 datetime \| null |
-
-Empty list: `200` `[]`, not `404`.
-
----
-
-## 3. P1 — Tournaments the user registered for
-
-### Problem
-
-Free-member dashboard should show **tournaments they signed up for**. There is no registrations-by-user query. Frontend currently shows **all** tournaments via `GET /tournaments`.
-
-Judge dashboard can keep `GET /tournaments` (all).
-
-### Required: current user’s registrations
-
-```
-GET /registrations/me
-```
-
-Any authenticated user. Never another user’s rows.
-
-Optional query: `tournamentId` (uuid), `status` (`pending` | `approved` | `rejected`).
-
-Response `200`: `RegistrationResponseDto[]` (newest first), including nested `user` / `club` as today.
-
-### Required: tournament list for the free-member dashboard
+One summary that includes **every category assigned to the tournament**, including `registrationCount: 0`. Never omit zeros.
 
 **Option A (preferred)**
 
 ```
-GET /tournaments/registered
+GET /registrations/by-tournament/counts?tournamentId=
 ```
 
-`TournamentResponseDto[]` — distinct tournaments where the caller has at least one registration (any status). Sort: `startDate` descending (or same as `GET /tournaments`).
+Query:
 
-**Option B** (do not pick unless A is delayed): FE would N+1 `GET /tournaments/:id` from `GET /registrations/me`.
-
-| Role | `GET /tournaments` | `GET /tournaments/registered` |
+| Param | Type | Notes |
 | --- | --- | --- |
-| `admin` | All | Optional |
-| `club_owner` / `club_coach` | All or own club | Not used by dashboard |
-| `judge` | All | Not used |
-| `free_member` | Should not be required for dashboard once `/registered` exists | **Used** |
-| `club_member` | Not used on dashboard | Optional later |
+| `tournamentId` | uuid, required | Tournament to summarize |
+
+Response `200`:
+
+```json
+[
+  { "categoryId": "123e4567-e89b-12d3-a456-426614174000", "registrationCount": 12 },
+  { "categoryId": "223e4567-e89b-12d3-a456-426614174001", "registrationCount": 0 }
+]
+```
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `categoryId` | uuid | Must be assigned to this tournament |
+| `registrationCount` | integer ≥ 0 | Registrations in that category for this tournament |
+
+Auth / roles: **same as** `GET /registrations/by-tournament` — `admin`; `club_owner` / `club_coach` of that tournament’s club.
+
+| Status | When |
+| --- | --- |
+| `200` | Body is an array. Tournament with **no** categories → `[]`. Empty is not `404` |
+| `401` | Missing/invalid JWT |
+| `403` | Authenticated but not allowed to see this tournament’s registrations |
+| `404` | Tournament does not exist |
+
+One row per assigned category. Order should match tournament category assignment order when the API already has one.
+
+**Option B:** embed `registrationCount` on each assigned category when the tournament is loaded (`GET /tournaments/:id` returns full categories the way public lite already returns `categories[]`). Same zero-included rule. Prefer Option A if you do not want to change the tournament DTO.
+
+### Already available — do not rebuild
+
+Accordion **expand** already uses:
+
+```
+GET /registrations/by-tournament?tournamentId=&categoryId=
+```
+
+Keep that for the attendee table inside the panel. This section is **only** the collapsed-row counts. Keep OpenAPI (`/docs-json`) in sync so the frontend can regenerate the client.
 
 ---
 
-## 4. P2 — Club-scoped categories
+## 2. P0 — Tournament request approval
 
 ### Problem
 
-`CategoryResponseDto` has **no `clubId`**. Club owner/coach load `GET /categories` (global catalog). Product intent: clubs own their catalog; admins keep a global/shared catalog.
+Club owner/coach can write up a full tournament (name, dates, location, categories), but that must **not** become publicly active until a SuperAdmin (`admin`) approves it. Until then it is a **tournament request**.
 
-### Model
+Today `POST /tournaments` creates an immediately usable tournament: public lite, registration page, and `POST /registrations/public*` all work with no approval step. There is **no** `status` on `TournamentResponseDto`.
 
-Add nullable ownership:
+### Product rules
 
-| Field | Type | Meaning |
+| Actor | Create | After create | Registration / public |
+| --- | --- | --- | --- |
+| `admin` | Unchanged. Tournament is **approved** immediately | Full detail, same as today | Unlocked |
+| `club_owner` / `club_coach` | Same create body as today. Result is `status: pending` | They **can** open authenticated detail and finish setup (categories, dates, assign categories) | **Locked** until approved |
+| Other roles / anonymous | Cannot create | Pending/declined tournaments are invisible (`404`) | Only `approved` tournaments exist |
+
+Declined requests stay visible to the creating club. Registration stays locked. Club staff may edit and **resubmit** (`pending` again). Admin Pending tab lists **`pending` only**; a declined request reappears there after resubmit.
+
+**Migration:** every existing tournament row must be `status: approved`. Do not leave `status` null.
+
+Frontend surfaces:
+
+- Admin `/tournaments/`: tabs **Active** (`status=approved`) and **Pending** (`status=pending`). Approve / Decline on the pending list and on detail.
+- Admin dashboard: Active only (`GET /tournaments?status=approved`).
+- Club `/tournaments/` and `GET /clubs/:id/tournaments`: status column; create for owner **and** coach.
+- Tournament detail: status pill; Registration button enabled only when `approved`; admin Approve/Decline when `pending`; club Resubmit when `declined`.
+- Public `/tournament/:id/registration`: unavailable unless `approved`.
+
+### 2.1 Model — add approval status on the tournament
+
+Same entity. Do **not** introduce a separate `tournament_requests` table/resource.
+
+Include on **`TournamentResponseDto`** (list, get-by-id, create, update, assign-categories, approve, decline, resubmit):
+
+| Field | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `status` | `pending` \| `approved` \| `declined` | yes | Approval state. Not a lifecycle (upcoming/ongoing/completed) |
+| `reviewedAt` | ISO-8601 datetime \| null | yes (nullable) | Set on approve and decline. Cleared on resubmit. Null until first review |
+| `reviewedBy` | uuid \| null | yes (nullable) | Admin user id who last approved/declined. Null until first review |
+| `reviewNote` | string \| null | yes (nullable) | Decline reason when provided. Null on approve. Club may send a note on resubmit; otherwise clear |
+
+Existing fields stay (`id`, `name`, `location`, `startDate`, `registrationDeadline`, `createdBy`, `createdByUser`, `clubId`, `club`, `categoryIds`, `createdAt`, `updatedAt`).
+
+`TournamentPublicLiteResponseDto` does **not** need `status`. Public lite is `404` unless the tournament is `approved` (see §2.6).
+
+### 2.2 Create — `POST /tournaments`
+
+Body unchanged (`CreateTournamentDto`: `name`, `location`, `startDate`, `registrationDeadline`, optional `clubId`).
+
+| Caller | `clubId` | Resulting `status` |
 | --- | --- | --- |
-| `clubId` | uuid \| null | `null` = global. Set = owned by that club |
-
-Include `clubId` on **`CategoryResponseDto`**. Frontend will regenerate the client.
-
-Existing fields stay (`name`, `discipline`, `subDiscipline`, `gender`, age/weight/belt limits, `teamSize`, `teamReservesSize`, timestamps).
-
-### List
-
-```
-GET /categories
-GET /categories?clubId={uuid}
-```
-
-| Caller | Query | Result |
-| --- | --- | --- |
-| `admin` | omitted | All (global + every club). Preferred. |
-| `admin` | `clubId` | That club only |
-| `admin` | `clubId` empty / `global=true` | Global (`clubId` null) |
-| `club_owner` / `club_coach` | omitted or own club | **Only** `clubId` = caller’s club |
-| `club_owner` / `club_coach` | other club | `403` |
+| `admin` | Optional. Omit/null → unassigned. Set → that club | `approved`. `reviewedAt` / `reviewedBy` / `reviewNote` remain null (no review happened) |
+| `club_owner` | Force caller’s `user.clubId`. Ignore a different id or `403` | `pending` |
+| `club_coach` | Same as owner | `pending` |
 | Other roles | — | `403` |
 
-Do not mix another club’s categories into a club user’s list.
+Club staff **must** have a `clubId` on the user. `400` if a club user has no club.
 
-### Create / update / delete / duplicate
+Response `201`: `TournamentResponseDto` including `status`.
+
+Club staff may immediately `PUT /tournaments/:id`, `PUT /tournaments/:id/categories`, and `POST /categories/create-and-assign` on a **pending** tournament they own — setup is allowed before approval.
+
+### 2.3 List — `GET /tournaments?status=`
 
 ```
-POST /categories
-PUT /categories/:id
-POST /categories/create-and-assign
-POST /categories/duplicate
+GET /tournaments
+GET /tournaments?status=pending
+GET /tournaments?status=approved
+GET /tournaments?status=declined
 ```
 
-Create body: existing `CreateCategoryDto` plus optional `clubId`.
+| Param | Type | Notes |
+| --- | --- | --- |
+| `status` | `pending` \| `approved` \| `declined` | Optional. When set, filter to that value **and** still apply the role visibility rules below |
 
-| Caller | `clubId` on create |
+Visibility (apply **after** the optional status filter):
+
+| Caller | Omitted `status` | `status=approved` | `status=pending` | `status=declined` |
+| --- | --- | --- | --- | --- |
+| `admin` | All tournaments | All approved | All pending | All declined |
+| `club_owner` / `club_coach` | All **approved** (any club) **plus** their club’s pending and declined | All approved | **Own club only** | **Own club only** |
+| `judge` | Approved only | Approved only | `403` or empty `[]` (preferred: `[]`) | `[]` |
+| `free_member` / `club_member` | Do not use this list for dashboards (`/registered` or club). If called: approved only | Approved only | `[]` | `[]` |
+| Other | `403` | `403` | `403` | `403` |
+
+Club staff must **never** see another club’s pending or declined requests.
+
+Sort: same as today (`startDate` descending, or current default). Empty list: `200` `[]`, not `404`.
+
+Admin UI:
+
+| Tab | Call |
 | --- | --- |
-| `admin` | Optional. Omit/null → global. Set → that club |
-| `club_owner` | Must be caller’s club (or omit and set from `user.clubId`). **Must not** create global categories |
-| `club_coach` | `403` on mutations until product asks otherwise. Coaches may `GET` |
+| Active | `GET /tournaments?status=approved` |
+| Pending | `GET /tournaments?status=pending` |
 
-- Admin: any category
-- `club_owner`: only `clubId` = their club
-- `403` if a club user targets a global category or another club’s category
-- `409` on delete if the category is assigned to a tournament (keep current rollback for bulk delete)
+Club `/tournaments/` calls **omitted** `status` so the table can show approved tournaments plus the club’s own requests, with a status column.
 
-`create-and-assign` must persist `clubId` the same way as `POST /categories`, then assign to the tournament.
+### 2.4 Club list — `GET /clubs/:id/tournaments`
 
-### Assign to tournament
+Auth unchanged (admin, or member of `:id`).
+
+Return **all statuses** for that club (`pending`, `approved`, `declined`). Include `status` / review fields on each row.
+
+Club members of another club still `403`.
+
+### 2.5 Get by id — authenticated `GET /tournaments/:id`
+
+| Caller | `approved` | `pending` / `declined` |
+| --- | --- | --- |
+| `admin` | `200` | `200` |
+| `club_owner` / `club_coach` of the tournament’s club | `200` | `200` (needed for setup and status) |
+| Other authenticated users | `200` | `404` (do not leak that a request exists) |
+| Unknown id | `404` | `404` |
+
+Same `404` for “does not exist” and “you may not see this pending request”.
+
+### 2.6 Public lite and public registration — only approved
 
 ```
-PUT /tournaments/:id/categories
-Body: { "categoryIds": ["..."] }
+GET /tournaments/public/:id
 ```
 
-A tournament of club A may only be assigned **global** categories or categories owned by club A. `400` if any `categoryId` belongs to another club. Array order remains display order.
+**Public.** `200` only when `status === approved`. Otherwise `404` (same as unknown id). Do not return pending/declined payloads.
 
----
-
-## 5. P2 — Invite to an existing club + accept-by-role
-
-Invitations are created today only via `POST /clubs` (`ownerEmail`). Club staff cannot invite someone to a club that already exists.
+All public registration endpoints that take a `tournamentId` must reject non-approved tournaments:
 
 ```
-POST /clubs/:id/invitations
+POST /registrations/public
+POST /registrations/public/bulk
+GET  /registrations/public/suitable-categories
+POST /registrations/public/suitable-categories/bulk
+POST /registrations/public/suitable-categories/by-category
 ```
 
-**Auth:** `admin`, or `club_owner` / `club_coach` of `:id`.
+| Status | When |
+| --- | --- |
+| `404` | Tournament missing **or** not `approved` (preferred for public GET lite — do not advertise pending ids) |
+| `400` | Acceptable on POST register if you prefer an explicit “registration is not open” message. Be consistent |
+
+Authenticated `POST /registrations` (non-public) must also refuse unless `approved` (`400`). Organizers listing registrations on a pending tournament may get `200` `[]`.
+
+`GET /tournaments/registered` must only return **approved** tournaments (a user cannot have a registration on a pending request if public register is locked; still filter).
+
+### 2.7 Approve — `POST /tournaments/:id/approve`
+
+**Auth:** `admin` only. Other roles: `403`.
+
+No body (or empty object).
+
+| Current `status` | Result |
+| --- | --- |
+| `pending` | Set `approved`. Set `reviewedAt` now, `reviewedBy` = caller. Clear `reviewNote` |
+| `declined` | Same as pending — admin may approve a declined request from detail if they still have the id. Preferred path is club resubmit first |
+| `approved` | `400` — already approved |
+
+Response `200`: `TournamentResponseDto`.
+
+`404` if the tournament does not exist.
+
+Approving **unlocks** public lite and public registration. No other fields change.
+
+### 2.8 Decline — `POST /tournaments/:id/decline`
+
+**Auth:** `admin` only.
 
 ```json
 {
-  "email": "member@example.com",
-  "firstName": "Jane",
-  "lastName": "Doe",
-  "role": "club_member"
+  "reason": "Dates clash with an existing championship"
 }
 ```
 
 | Field | Required | Notes |
 | --- | --- | --- |
-| `email` | yes | Invitee email |
-| `firstName` | no | Copied onto the user on accept (see §1.2) |
-| `lastName` | no | Same |
-| `role` | no | Default `club_member`. Allowed: `club_owner`, `club_coach`, `club_member` |
+| `reason` | no | Max length 1000. Stored as `reviewNote`. Empty/omitted → `reviewNote` null |
 
-**Response `201`:** `InvitationListItemDto` **plus** `inviteUrl` (absolute or path), same idea as `ClubResponseDto.inviteUrl`.
+| Current `status` | Result |
+| --- | --- |
+| `pending` | Set `declined`. Set `reviewedAt`, `reviewedBy`. Set `reviewNote` from `reason` |
+| `approved` | `400` — do not silently take an active tournament offline this way. (If product later wants “unpublish”, that is a separate endpoint) |
+| `declined` | `400` — already declined |
 
-`POST /invitations/:token/accept` must assign the role stored on the invitation (not always `club_owner`).
+Response `200`: `TournamentResponseDto`.
 
-Conflicts:
+Club staff still see the tournament on their lists and may keep editing categories/dates while declined.
 
-- `409` if a **pending** invitation already exists for that email + club
-- `409` if the email is already a member of that club
+### 2.9 Resubmit — `POST /tournaments/:id/resubmit`
 
-### Optional: cancel
+**Auth:** `admin` no. `club_owner` / `club_coach` of the tournament’s club only.
 
-```
-POST /invitations/:id/cancel
-```
-
-or `DELETE /invitations/:id`
-
-Admin, or owner/coach of the invitation’s club. Sets `status` to `cancelled`. `400` if not `pending`.
-
----
-
-## 6. P2 — Team registrations (kata-team / kumite-team)
-
-Public bulk register currently sent only `participants[].registrations: [{ categoryId }]`. That cannot express teams, starters vs reserves, or duplicate rosters.
-
-The frontend **already sends** optional `teams` on `POST /registrations/public/bulk`. Prefer accepting and validating it. Do not 400 on unknown `teams` by treating it as an illegal property.
-
-### Request
-
-Keep `participants[]` for identity (and for **individual** category registrations). Add:
+No required body. Optional:
 
 ```json
 {
-  "email": "coach@club.com",
-  "firstName": "Jane",
-  "lastName": "Coach",
-  "clubName": "Dragon Karate Club",
-  "tournamentId": "…",
-  "participants": [
-    {
-      "firstName": "A",
-      "lastName": "One",
-      "weight": 40,
-      "dateOfBirth": "2018-02-02T00:00:00.000Z",
-      "gender": "male",
-      "beltLevel": "10-kyu",
-      "registrations": []
-    }
-  ],
-  "teams": [
-    {
-      "categoryId": "…",
-      "starters": [{ "participantIndex": 0 }, { "participantIndex": 1 }, { "participantIndex": 2 }],
-      "reserves": [{ "participantIndex": 3 }]
-    }
-  ]
+  "note": "Updated start date and added missing kata categories"
 }
 ```
 
-| Field | Rules |
+| Field | Required | Notes |
+| --- | --- | --- |
+| `note` | no | Max 1000. Stored as `reviewNote` so admin sees context. If omitted, clear `reviewNote` |
+
+| Current `status` | Result |
 | --- | --- |
-| `participants[].registrations` | Individual categories only (`kata`, `yako-soku-kumite`, `yiju-kumite`, …). May be `[]` when the person is **only** on teams |
-| `teams[].categoryId` | Must belong to the tournament. Discipline `kata-team` or `kumite-team`, with `teamSize` set |
-| `teams[].starters` | Length **must equal** `category.teamSize`. `participantIndex` indexes `participants` in this request |
-| `teams[].reserves` | Length `0..teamReservesSize` (`0` if `teamReservesSize` is null). Optional |
-| Team membership | Comes **only** from `teams`. Do not also require those people in `participants[].registrations` for that category |
+| `declined` | Set `pending`. Clear `reviewedAt` / `reviewedBy`. Apply `note` as `reviewNote` |
+| `pending` | `400` — already awaiting review |
+| `approved` | `400` |
 
-Shared members across teams are allowed (`[A B C]`, `[A D E]`). The same **set** of people twice in the same category is not.
+Response `200`: `TournamentResponseDto`.
 
-### Validation
+The request reappears on `GET /tournaments?status=pending` for admin.
 
-- Category exists on the tournament and is a team discipline with `teamSize > 0`
-- No duplicate person on the same team (starter or reserve)
-- Unique roster in the same category: same set of participants (starters ∪ reserves, order-independent). Compare this request **plus** already stored teams for this tournament
-- Each member eligible (same rules as suitable-participants: age, and gender when the category has one)
-- `400` with a clear message for duplicate roster, roster size, or ineligible member
+### 2.10 Mutations while pending / declined
 
-### Persistence and reads
-
-- Store a **team** entity per category: starters, reserves, linked registrations
-- `RegistrationResponseDto` should include optional `teamId` and `teamRole`: `"starter" | "reserve"`
-- `GET /registrations/by-tournament` (and similar lists) should expose team grouping so UIs can show Team 1 / Team 2, not only a flat attendee list
-
-Keep per-registration `results` (partial success). When a row belongs to a team, include `teamId` / `teamRole` on the created `registration`. Bulk result items may stay indexed by `participantIndex`; add `teamIndex` if useful.
-
----
-
-## 7. P3 — Authorization tightening
-
-| Endpoint | admin | club_owner | club_coach | club_member | free_member | judge |
-| --- | --- | --- | --- | --- | --- | --- |
-| `GET /clubs` | yes | no | no | no | no | no |
-| `GET /clubs/:id` | yes | own club | own club | own club | no | no |
-| `GET/POST /clubs/:id/members` | yes | own club | own club | no | no | no |
-| `GET /clubs/:id/tournaments` | yes | own club | own club | own club | no | no |
-| `GET /invitations` | all / filter | own club | own club | no | no | no |
-| `POST /clubs/:id/invitations` | yes | own club | own club | no | no | no |
-| `GET /categories` | all / filter | own club | own club (read) | no | no | no |
-| `POST/PUT/DELETE /categories` | yes | own club | no (see §4) | no | no | no |
-| `GET /tournaments` | all | all or own club | all or own club | no | no (use registered) | all |
-| `GET /tournaments/registered` | yes | yes | yes | yes | **yes** | yes |
-| `GET /registrations/me` | yes | yes | yes | yes | **yes** | yes |
-| `GET /registrations/by-tournament` | yes | own tournament/club | own tournament/club | no | no | TBD |
-
-`GET /registrations/by-tournament` is used on the tournament detail page. Club staff managing their tournament must be allowed; do not leave it admin-only.
-
-Create tournament (`POST /tournaments`): frontend shows create for `admin` and `club_owner` only.
-
-- `admin`: `clubId` optional
-- `club_owner`: force `clubId` to caller’s club (ignore or `403` a different id)
-- `club_coach` / others: `403`
-
-Navbar still sends owners/coaches to `/tournaments/` (`GET /tournaments`). If product wants “only my club’s tournaments” there, reuse `GET /clubs/:id/tournaments` (already used on my-club). Not required to unblock dashboards.
-
----
-
-## 8. What the frontend already uses
-
-Confirm these are allowed for the roles that now hit them:
-
-| Surface | Roles | Call | Expected |
+| Endpoint | Pending | Declined | Approved |
 | --- | --- | --- | --- |
-| Admin dashboard — clubs | `admin` | `GET /clubs` | Unchanged. Admin-only |
-| Admin dashboard — tournaments | `admin` | `GET /tournaments` | Unchanged. All |
-| Club staff dashboard — members | `club_owner`, `club_coach` | `GET /clubs/:id/members` | Owner/coach of that club (and admin). `403` otherwise |
-| Club staff — add member | `club_owner`, `club_coach` | `POST /clubs/:id/members` | Same |
-| Club profile | `club_member` (also owner/coach on my-club) | `GET /clubs/:id` | Any member of that club (and admin) |
-| Club tournaments (my-club) | club users | `GET /clubs/:id/tournaments` | Members of that club (and admin) |
-| Categories page | `admin`, `club_owner`, `club_coach` | `GET /categories` (+ mutate) | Today all categories → [§4](#4-p2-club-scoped-categories) |
-| Tournaments page | `admin`, `club_owner`, `club_coach`; judge/free_member via dashboard | `GET /tournaments` | Today all → [§3](#3-p1-tournaments-the-user-registered-for) for free members |
-| Invitations (dashboard + my-club) | `club_owner`, `club_coach`; admin via `/invitations/` | `GET /invitations` | Today all → [§2](#2-p1-club-scoped-invitation-list) |
+| `PUT /tournaments/:id` (name, dates, location, clubId) | Allowed for admin and owning club owner/coach | Same | Same as today |
+| `PUT /tournaments/:id/categories` | Allowed (setup) | Allowed | Allowed |
+| `POST /categories/create-and-assign` | Allowed if caller may mutate that catalog | Same | Same |
+| `DELETE /tournaments/:id` | Admin, or owning club owner (if you already allow club delete). Keep current delete auth if stricter | Same | Same |
+| Public / authenticated **create registration** | Forbidden (§2.6) | Forbidden | Allowed (existing validation) |
 
----
+Changing `status` is **only** via approve / decline / resubmit. `UpdateTournamentDto` must **not** accept `status`. Club staff must not self-approve.
 
-## 9. Error conventions
+Admin `PUT` must not flip `status` either.
 
-Same JSON error shape as the rest of the API.
+### 2.11 Errors
+
+Use the same JSON error shape as the rest of the API.
 
 | Status | When |
 | --- | --- |
-| `400` | Validation (missing email, category from another club assigned to a tournament, cancel non-pending invite, team roster/duplicate) |
-| `401` | Missing/invalid JWT |
-| `403` | Authenticated but wrong role or another club’s resource |
-| `404` | Unknown club / category / invitation / tournament / unknown invite token |
-| `409` | Duplicate pending invite, user already in club, category in use on delete |
+| `200` / `201` | Success |
+| `400` | Invalid transition (approve already-approved, decline already-declined, resubmit when not declined, club user with no `clubId`, validation) |
+| `401` | Missing/invalid JWT (except public lite / public register, which stay public) |
+| `403` | Authenticated but wrong role (non-admin approve/decline, other club’s resubmit, create by `club_member` / `free_member` / `judge`) |
+| `404` | Unknown tournament; **or** public/other-role access to a non-approved tournament |
 
-Empty lists are `200` with `[]`, not `404`.
+Empty lists: `200` `[]`.
 
----
+### 2.12 OpenAPI
 
-## 10. Out of scope for this spec
+Add `status`, `reviewedAt`, `reviewedBy`, `reviewNote` to `TournamentResponseDto`.
 
-- Category-by-category registration wizard (frontend-only; uses existing suitable-participants APIs)
-- Pagination (lists are unbounded today)
-- New UI for creating invitations (frontend will follow once `POST /clubs/:id/invitations` exists)
+Add query `status` on `GET /tournaments`.
+
+Add:
+
+- `POST /tournaments/{id}/approve`
+- `POST /tournaments/{id}/decline`
+- `POST /tournaments/{id}/resubmit`
+
+Keep `/docs-json` in sync so the frontend can regenerate the client.
+
+### 2.13 Acceptance
+
+- Admin creates a tournament → `status=approved` → appears on Active tab → public lite `200` → registration works.
+- Club coach or owner creates a tournament → `status=pending` → they can open detail and assign categories → Registration CTA is locked → `GET /tournaments/public/:id` is `404` → public bulk register is `404`/`400`.
+- Admin Pending tab lists that request → Decline with optional reason → club sees `declined` and `reviewNote` → public still closed.
+- Club resubmits → back to Pending tab → Admin approves → public lite `200` and registration unlock.
+- Judge / free-member lists never include pending or declined requests.
+- Club A never sees Club B’s pending/declined rows on `GET /tournaments?status=pending`.
+- Existing tournaments after migrate: `status=approved`, registration unchanged.

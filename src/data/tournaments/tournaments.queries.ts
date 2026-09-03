@@ -13,7 +13,9 @@ export namespace TournamentsQueries {
 
   export const keys = {
     all: [moduleName] as const,
-    findAll: () => [...keys.all, "/tournaments"] as const,
+    findAll: (status?: TournamentsModels.FindAllStatusParam) =>
+      [...keys.all, "/tournaments", status] as const,
+    findRegistered: () => [...keys.all, "/tournaments/registered"] as const,
     findOnePublic: (id: string) =>
       [...keys.all, "/tournaments/public/:id", id] as const,
     findOne: (id: string) => [...keys.all, "/tournaments/:id", id] as const,
@@ -50,17 +52,37 @@ export namespace TournamentsQueries {
   /**
    * Query `useFindAll`
    * @summary Get all tournaments
-   * @description Retrieves a list of all tournaments
+   * @description Retrieves tournaments, optionally filtered by approval status
+   * @param { TournamentsModels.FindAllStatusParam } object.status Query parameter. Filter by approval status. Example: `pending`
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<TournamentsModels.TournamentsFindAllResponse> } List of tournaments
-   * @statusCodes [200, 401]
+   * @statusCodes [200, 401, 403]
    */
   export const useFindAll = <TData>(
+    { status }: { status?: TournamentsModels.FindAllStatusParam } = {},
     options?: AppQueryOptions<typeof TournamentsApi.findAll, TData>,
   ) => {
     return useQuery({
-      queryKey: keys.findAll(),
-      queryFn: TournamentsApi.findAll,
+      queryKey: keys.findAll(status),
+      queryFn: () => TournamentsApi.findAll(status),
+      ...options,
+    });
+  };
+
+  /**
+   * Query `useFindRegistered`
+   * @summary Get tournaments the current user registered for
+   * @description Returns distinct tournaments where the authenticated caller has at least one registration (any status).
+   * @param { AppQueryOptions } options Query options
+   * @returns { UseQueryResult<TournamentsModels.FindRegisteredResponse> } Registered tournaments
+   * @statusCodes [200, 401, 404]
+   */
+  export const useFindRegistered = <TData>(
+    options?: AppQueryOptions<typeof TournamentsApi.findRegistered, TData>,
+  ) => {
+    return useQuery({
+      queryKey: keys.findRegistered(),
+      queryFn: TournamentsApi.findRegistered,
       ...options,
     });
   };
@@ -180,6 +202,92 @@ export namespace TournamentsQueries {
 
     return useMutation({
       mutationFn: ({ id, data }) => TournamentsApi.assignCategories(id, data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
+   * Mutation `useApprove`
+   * @summary Approve a tournament request
+   * @description Admin only. Sets status to approved and unlocks public registration
+   * @param { string } mutation.id Path parameter. Tournament ID
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<CommonModels.TournamentResponseDto> } Tournament approved
+   * @statusCodes [200, 400, 401, 403, 404]
+   */
+  export const useApprove = (
+    options?: AppMutationOptions<
+      typeof TournamentsApi.approve,
+      { id: string }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id }) => TournamentsApi.approve(id),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
+   * Mutation `useDecline`
+   * @summary Decline a tournament request
+   * @description Admin only. Sets status to declined. Optional reason is stored as reviewNote
+   * @param { string } mutation.id Path parameter. Tournament ID
+   * @param { TournamentsModels.DeclineTournamentDto } mutation.data Body parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<CommonModels.TournamentResponseDto> } Tournament declined
+   * @statusCodes [200, 400, 401, 403, 404]
+   */
+  export const useDecline = (
+    options?: AppMutationOptions<
+      typeof TournamentsApi.decline,
+      { id: string; data?: TournamentsModels.DeclineTournamentDto }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id, data }) => TournamentsApi.decline(id, data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
+   * Mutation `useResubmit`
+   * @summary Resubmit a declined tournament request
+   * @description Club owner/coach of the tournament club. Sets status back to pending
+   * @param { string } mutation.id Path parameter. Tournament ID
+   * @param { TournamentsModels.ResubmitTournamentDto } mutation.data Body parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<CommonModels.TournamentResponseDto> } Tournament resubmitted
+   * @statusCodes [200, 400, 401, 403, 404]
+   */
+  export const useResubmit = (
+    options?: AppMutationOptions<
+      typeof TournamentsApi.resubmit,
+      { id: string; data?: TournamentsModels.ResubmitTournamentDto }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id, data }) => TournamentsApi.resubmit(id, data),
       ...options,
       onSuccess: (...args) => {
         invalidateQueries(queryClient, moduleName, options);

@@ -5,7 +5,9 @@
     "edit": "Uredi",
     "duplicate": "Podvoji",
     "delete": "Izbriši",
-    "updatedAt": "Posodobljeno"
+    "updatedAt": "Posodobljeno",
+    "status": "Status",
+    "club": "Klub"
   },
   "categories": {
     "title": "Kategorije",
@@ -24,9 +26,33 @@
       "success": "Kategorija je bila uspešno posodobljena",
       "error": "Posodobitev kategorije ni uspela",
       "saving": "Shranjevanje..."
+    },
+    "create": {
+      "teamReservesShort": "rez."
+    },
+    "format": {
+      "empty": "—",
+      "ageRange": "Starost: {{min}} - {{max}} let",
+      "ageUpTo": "Starost: do {{max}} let",
+      "ageFrom": "Starost: od {{min}} let naprej",
+      "ageYears": "Starost: {{age}} let",
+      "weightRange": "Teža: {{min}} - {{max}} kg",
+      "weightUpTo": "Teža: do {{max}} kg",
+      "weightFrom": "Teža: od {{min}} kg naprej",
+      "weightKg": "Teža: {{weight}} kg",
+      "beltRange": "Pas: {{min}} - {{max}}",
+      "beltSingle": "Pas: {{belt}}",
+      "teamSize": "Velikost ekipe: {{size}}",
+      "teamSizeWithReserves": "Velikost ekipe: {{size}} + {{reserves}} {{reservesLabel}}"
     }
   },
   "registrations": {
+    "title": "Prijave",
+    "attendees": "Udeleženci",
+    "noAttendees": "Ni najdenih udeležencev",
+    "registeredCount": "{{count}} prijavljenih",
+    "expandCategory": "Prikaži prijave za {{name}}",
+    "collapseCategory": "Skrij prijave za {{name}}",
     "public": {
       "pageTitle": "Prijava na turnir",
       "showCategories": "Prikaži kategorije",
@@ -160,7 +186,46 @@
     "noClub": "Klub ni dodeljen"
   },
   "tournaments": {
-    "noTournaments": "Ni najdenih turnirjev"
+    "addTournament": "Dodaj turnir",
+    "noTournaments": "Ni najdenih turnirjev",
+    "noPendingRequests": "Ni turnirjev v čakanju na odobritev",
+    "tabs": {
+      "active": "Aktivni",
+      "pending": "V čakanju"
+    },
+    "status": {
+      "label": "Status",
+      "pending": "V čakanju",
+      "approved": "Odobreno",
+      "declined": "Zavrnjeno"
+    },
+    "create": {
+      "title": "Ustvari turnir",
+      "requestTitle": "Ustvari zahtevo za turnir",
+      "success": "Turnir je bil uspešno ustvarjen",
+      "requestSuccess": "Zahteva za turnir je poslana. Čaka na odobritev.",
+      "error": "Ustvarjanje turnirja ni uspelo",
+      "startTime": "Začetni čas",
+      "submitRequest": "Pošlji zahtevo"
+    },
+    "review": {
+      "approve": "Odobri",
+      "decline": "Zavrni",
+      "resubmit": "Ponovno pošlji",
+      "declineTitle": "Zavrni zahtevo za turnir",
+      "reason": "Razlog (neobvezno)",
+      "approveSuccess": "Turnir je odobren. Prijava je zdaj odprta.",
+      "approveError": "Odobritev turnirja ni uspela",
+      "declineSuccess": "Zahteva za turnir je zavrnjena",
+      "declineError": "Zavrnitev turnirja ni uspela",
+      "resubmitSuccess": "Zahteva za turnir je ponovno poslana v pregled",
+      "resubmitError": "Ponovno pošiljanje zahteve ni uspelo"
+    },
+    "registration": {
+      "locked": "Prijava se odpre, ko je turnir odobren.",
+      "closedTitle": "Prijava ni odprta",
+      "closedBody": "Ta turnir še ni na voljo za prijavo."
+    }
   },
   "profile": {
     "title": "Profil",
@@ -241,6 +306,18 @@
     "invalidOrExpired": "Neveljavno ali pretečeno vabilo",
     "noLongerValid": "To vabilo ni več veljavno",
     "acceptSuccess": "Pridružili ste se klubu.",
-    "acceptInvalid": "Vabilo ni več veljavno"
+    "acceptInvalid": "Vabilo ni več veljavno",
+    "create": {
+      "title": "Povabi v klub",
+      "email": "E-pošta",
+      "firstName": "Ime",
+      "lastName": "Priimek",
+      "role": "Vloga",
+      "submit": "Pošlji vabilo",
+      "sending": "Pošiljanje...",
+      "success": "Vabilo je bilo ustvarjeno",
+      "error": "Vabila ni bilo mogoče ustvariti",
+      "inviteSuccessMessage": "Delite to povezavo, da se lahko pridružijo klubu."
+    }
   }
 }

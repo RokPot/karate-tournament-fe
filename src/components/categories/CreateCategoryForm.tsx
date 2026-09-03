@@ -28,6 +28,8 @@ import { CategoriesModels } from "@/data/categories/categories.models";
 import { CategoriesQueries } from "@/data/categories/categories.queries";
 import { CommonModels } from "@/data/common/common.models";
 import { QueryModule } from "@/data/invalidateQueries";
+import { useAuthRoles } from "@/hooks/useAuthRoles";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 interface IProps {
   open: boolean;
@@ -45,6 +47,8 @@ export const CreateCategoryForm = ({
   const { successToast, errorToast } = useToast();
   const queryClient = useQueryClient();
   const { t } = useTranslation();
+  const authUser = useAuthUser();
+  const { isAdmin } = useAuthRoles();
   const createCategoryMutation = CategoriesQueries.useCreate({
     invalidateCurrentModule: true,
     onSuccess: async (data) => {
@@ -125,7 +129,11 @@ export const CreateCategoryForm = ({
       return;
     }
 
-    createCategoryMutation.mutate({ data: toCreateCategoryPayload(data) });
+    const payload = toCreateCategoryPayload(data);
+    if (!isAdmin && authUser?.clubId) {
+      payload.clubId = authUser.clubId;
+    }
+    createCategoryMutation.mutate({ data: payload });
   };
 
   const handleClose = () => {

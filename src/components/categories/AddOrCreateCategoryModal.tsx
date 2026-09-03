@@ -6,6 +6,7 @@ import { Typography } from "@/components/ui/text/Typography/Typography";
 import { CategoriesQueries } from "@/data/categories/categories.queries";
 import { QueryModule } from "@/data/invalidateQueries";
 import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
+import { useAuthRoles } from "@/hooks/useAuthRoles";
 import { faGripVertical, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { DragDropContext, Draggable, Droppable, type DropResult } from "@hello-pangea/dnd";
@@ -48,11 +49,20 @@ const AddOrCreateCategoryModal = ({ open, onClose, tournamentId, currentCategory
     const { t } = useTranslation();
     const { successToast, errorToast } = useToast();
     const queryClient = useQueryClient();
+    const { isAdmin } = useAuthRoles();
 
     const [showNewCategoryForm, setShowNewCategoryForm] = useState(false);
     const [selectedCategoriesIds, setSelectedCategoriesIds] = useState<string[]>([]);
 
-    const { data: categories } = CategoriesQueries.useFindAll()
+    const { data: tournament } = TournamentsQueries.useFindOne(
+        { id: tournamentId },
+        { enabled: open && !!tournamentId },
+    );
+
+    const { data: categories } = CategoriesQueries.useFindAll(
+        { clubId: isAdmin ? undefined : tournament?.clubId ?? undefined },
+        { enabled: open && (isAdmin || !!tournament?.clubId) },
+    );
 
     const { mutate: assignCategoriesToTournament } = TournamentsQueries.useAssignCategories({
         onSuccess: async () => {

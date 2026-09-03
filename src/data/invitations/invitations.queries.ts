@@ -12,26 +12,54 @@ export namespace InvitationsQueries {
 
   export const keys = {
     all: [moduleName] as const,
-    findAll: () => [...keys.all, "/invitations"] as const,
+    findAll: (clubId?: string) =>
+      [...keys.all, "/invitations", clubId] as const,
     getByToken: (token: string) =>
       [...keys.all, "/invitations/by-token/:token", token] as const,
   };
 
   /**
    * Query `useFindAll`
-   * @summary Get all invitations
-   * @description Retrieves a list of all invitations, newest first. Requires Auth0 JWT.
+   * @summary Get invitations
+   * @description Lists invitations scoped by role. Admin sees all (optional clubId filter). Club owner/coach see their club. Empty list is 200 [].
+   * @param { string } object.clubId Query parameter. Filter invitations by club ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<InvitationsModels.InvitationsFindAllResponse> } List of invitations
-   * @statusCodes [200, 401]
+   * @statusCodes [200, 401, 403, 404]
    */
   export const useFindAll = <TData>(
+    { clubId }: { clubId?: string },
     options?: AppQueryOptions<typeof InvitationsApi.findAll, TData>,
   ) => {
     return useQuery({
-      queryKey: keys.findAll(),
-      queryFn: InvitationsApi.findAll,
+      queryKey: keys.findAll(clubId),
+      queryFn: () => InvitationsApi.findAll(clubId),
       ...options,
+    });
+  };
+
+  /**
+   * Mutation `useCancel`
+   * @summary Cancel invitation
+   * @description Cancels a pending invitation. Admin or owner/coach of the invitation club.
+   * @param { string } mutation.id Path parameter. Invitation ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<void> } Invitation cancelled
+   * @statusCodes [204, 400, 401, 403, 404]
+   */
+  export const useCancel = (
+    options?: AppMutationOptions<typeof InvitationsApi.cancel, { id: string }> &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id }) => InvitationsApi.cancel(id),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
     });
   };
 

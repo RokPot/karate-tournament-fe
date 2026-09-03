@@ -22,11 +22,15 @@ const HomePage = () => {
     return <ClubProfileDashboard clubId={clubId} />;
   }
 
-  if (isJudge || isFreeCompetitor) {
-    return <TournamentsDashboard />;
+  if (isJudge) {
+    return <TournamentsDashboard source="all" />;
   }
 
-  return <TournamentsDashboard />;
+  if (isFreeCompetitor) {
+    return <TournamentsDashboard source="registered" />;
+  }
+
+  return <TournamentsDashboard source="all" />;
 };
 
 export default HomePage;

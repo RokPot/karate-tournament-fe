@@ -31,12 +31,12 @@ export function mapToBulkDto(
       ? undefined
       : teams.map((team) => ({
           categoryId: team.categoryId,
-          starters: team.starterIds.map((id) => ({
-            participantIndex: indexByClientId.get(id) ?? -1,
-          })),
-          reserves: team.reserveIds.map((id) => ({
-            participantIndex: indexByClientId.get(id) ?? -1,
-          })),
+          starters: team.starterIds.map(
+            (id) => indexByClientId.get(id) ?? -1,
+          ),
+          reserves: team.reserveIds.map(
+            (id) => indexByClientId.get(id) ?? -1,
+          ),
         }));
 
   return {

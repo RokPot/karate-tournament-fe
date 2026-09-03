@@ -6,13 +6,20 @@ import { useToast } from "@/components/ui/status/Toast/useToast";
 interface IProps {
   inviteUrl: string;
   onDone: () => void;
+  title?: string;
+  message?: string;
 }
 
 /**
- * Shown in CreateClubModal after club creation when an invite URL was returned.
+ * Shown after club creation or inviting someone to an existing club.
  * Displays the link and a copy-to-clipboard action.
  */
-export const ClubCreatedWithInviteView = ({ inviteUrl, onDone }: IProps) => {
+export const ClubCreatedWithInviteView = ({
+  inviteUrl,
+  onDone,
+  title,
+  message,
+}: IProps) => {
   const { t } = useTranslation();
   const { successToast } = useToast();
 
@@ -25,9 +32,11 @@ export const ClubCreatedWithInviteView = ({ inviteUrl, onDone }: IProps) => {
 
   return (
     <>
-      <DialogTitle>{t("clubs.createTitle")}</DialogTitle>
+      <DialogTitle>{title ?? t("clubs.createTitle")}</DialogTitle>
       <DialogContent className="flex flex-col gap-4 pt-2!">
-        <p className="text-body-paragraph-m">{t("clubs.inviteSuccessMessage")}</p>
+        <p className="text-body-paragraph-m">
+          {message ?? t("clubs.inviteSuccessMessage")}
+        </p>
         <TextField
           label={t("clubs.inviteLinkLabel")}
           value={inviteUrl}

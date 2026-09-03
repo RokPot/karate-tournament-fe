@@ -66,9 +66,9 @@ const typography = cva("", {
     variant: {
       default: [],
       "default-italic": ["italic"],
-      "prominent-1": [],
+      "prominent-1": ["font-weight-500"],
       "prominent-1-italic": ["italic"],
-      "prominent-2": [],
+      "prominent-2": ["font-weight-700"],
       "prominent-2-italic": ["italic"],
     },
   },
@@ -115,7 +115,7 @@ type TypographyVariantProps = VariantProps<typeof typography>;
 
 interface TypographyPropsCva
   extends Omit<TypographyVariantProps, "size">,
-    Required<Pick<TypographyVariantProps, "size">> {}
+  Required<Pick<TypographyVariantProps, "size">> { }
 
 export type TypographyProps = {
   as?: TypographyTag;

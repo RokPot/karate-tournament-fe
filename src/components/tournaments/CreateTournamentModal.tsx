@@ -10,6 +10,9 @@ import { getTournamentDetailRoute } from "@/config/route.config";
 import { useRouter } from "next/router";
 import CustomDialog from "@/components/ui/overlays/CustomDialog";
 import { CommonModels } from "@/data/common/common.models";
+import { QueryModule } from "@/data/invalidateQueries";
+import { useAuthRoles } from "@/hooks/useAuthRoles";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 interface IProps {
   open: boolean;
@@ -20,12 +23,20 @@ interface IProps {
 export const CreateTournamentModal = ({ open, onClose, clubId }: IProps) => {
   const { t } = useTranslation();
   const router = useRouter();
+  const { isAdmin } = useAuthRoles();
+  const authUser = useAuthUser();
   const { successToast, errorToast } = useToast();
+  const isRequest = !isAdmin;
 
   const createMutation = TournamentsQueries.useCreate({
     invalidateCurrentModule: true,
+    invalidateModules: [QueryModule.Clubs],
     onSuccess: (data) => {
-      successToast({ text: t("tournaments.create.success") });
+      successToast({
+        text: isRequest
+          ? t("tournaments.create.requestSuccess")
+          : t("tournaments.create.success"),
+      });
       onClose(data);
       router.push(getTournamentDetailRoute(data.id));
     },
@@ -44,7 +55,6 @@ export const CreateTournamentModal = ({ open, onClose, clubId }: IProps) => {
   });
 
   const onSubmit = (data: TournamentsModels.CreateTournamentDto) => {
-    // Convert date and datetime-local inputs to proper formats
     const formattedData: TournamentsModels.CreateTournamentDto = {
       ...data,
       registrationDeadline: data.registrationDeadline
@@ -52,7 +62,7 @@ export const CreateTournamentModal = ({ open, onClose, clubId }: IProps) => {
         : data.registrationDeadline,
       startDate: data.startDate ? new Date(data.startDate).toISOString()
         : data.startDate,
-      clubId,
+      clubId: clubId ?? (!isAdmin ? authUser?.clubId ?? undefined : undefined),
     };
     createMutation.mutate({ data: formattedData });
   };
@@ -62,11 +72,20 @@ export const CreateTournamentModal = ({ open, onClose, clubId }: IProps) => {
     onClose();
   };
 
+  let submitLabel = t("shared.create");
+  if (createMutation.isPending) {
+    submitLabel = t("shared.creating");
+  } else if (isRequest) {
+    submitLabel = t("tournaments.create.submitRequest");
+  }
+
 
   return (
     <CustomDialog open={open} onClose={handleClose} >
       <form onSubmit={handleSubmit(onSubmit)} >
-        <DialogTitle>{t("tournaments.create.title")}</DialogTitle>
+        <DialogTitle>
+          {isRequest ? t("tournaments.create.requestTitle") : t("tournaments.create.title")}
+        </DialogTitle>
         <DialogContent className="flex flex-col gap-4 pt-2!">
           <TextField
             label={t("shared.name")}
@@ -110,7 +129,7 @@ export const CreateTournamentModal = ({ open, onClose, clubId }: IProps) => {
             {t("shared.cancel")}
           </Button>
           <Button type="submit" variant="contained" disabled={createMutation.isPending}>
-            {createMutation.isPending ? t("shared.creating") : t("shared.create")}
+            {submitLabel}
           </Button>
         </DialogActions>
       </form>

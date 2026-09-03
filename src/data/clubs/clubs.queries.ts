@@ -55,7 +55,7 @@ export namespace ClubsQueries {
    * @description Retrieves a list of all clubs
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<ClubsModels.ClubsFindAllResponse> } List of clubs
-   * @statusCodes [200, 401]
+   * @statusCodes [200, 401, 403]
    */
   export const useFindAll = <TData>(
     options?: AppQueryOptions<typeof ClubsApi.findAll, TData>,
@@ -75,7 +75,7 @@ export namespace ClubsQueries {
    * @param { ClubsModels.AddMemberDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<CommonModels.UserResponseDto> } Member created and added to club
-   * @statusCodes [201, 400, 401, 404]
+   * @statusCodes [201, 400, 401, 403, 404]
    */
   export const useAddMember = (
     options?: AppMutationOptions<
@@ -104,7 +104,7 @@ export namespace ClubsQueries {
    * @param { ClubsModels.GetMembersRoleParam } object.role Query parameter. Filter by member role
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<ClubsModels.GetMembersResponse> } List of club members
-   * @statusCodes [200, 401, 404]
+   * @statusCodes [200, 401, 403, 404]
    */
   export const useGetMembers = <TData>(
     { id, role }: { id: string; role?: ClubsModels.GetMembersRoleParam },
@@ -118,13 +118,42 @@ export namespace ClubsQueries {
   };
 
   /**
+   * Mutation `useCreateInvitation`
+   * @summary Invite a user to an existing club
+   * @description Creates an invitation for the club. Admin, or club owner/coach of this club. Default role is club_member.
+   * @param { string } mutation.id Path parameter. Club ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { ClubsModels.CreateClubInvitationDto } mutation.data Body parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<ClubsModels.InvitationCreatedResponseDto> } Invitation created
+   * @statusCodes [201, 400, 401, 403, 404, 409]
+   */
+  export const useCreateInvitation = (
+    options?: AppMutationOptions<
+      typeof ClubsApi.createInvitation,
+      { id: string; data: ClubsModels.CreateClubInvitationDto }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id, data }) => ClubsApi.createInvitation(id, data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
    * Query `useGetTournaments`
    * @summary Get club tournaments
    * @description Retrieves tournaments assigned to the club
    * @param { string } object.id Path parameter. Club ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<ClubsModels.GetTournamentsResponse> } List of tournaments
-   * @statusCodes [200, 401, 404]
+   * @statusCodes [200, 401, 403, 404]
    */
   export const useGetTournaments = <TData>(
     { id }: { id: string },
@@ -144,7 +173,7 @@ export namespace ClubsQueries {
    * @param { string } object.id Path parameter. Club ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<CommonModels.ClubResponseDto> } Club found
-   * @statusCodes [200, 401, 404]
+   * @statusCodes [200, 401, 403, 404]
    */
   export const useFindOne = <TData>(
     { id }: { id: string },
@@ -165,7 +194,7 @@ export namespace ClubsQueries {
    * @param { ClubsModels.UpdateClubDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<CommonModels.ClubResponseDto> } Club updated successfully
-   * @statusCodes [200, 400, 401, 404]
+   * @statusCodes [200, 400, 401, 403, 404]
    */
   export const useUpdate = (
     options?: AppMutationOptions<
@@ -193,7 +222,7 @@ export namespace ClubsQueries {
    * @param { string } mutation.id Path parameter. Club ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<void> } Club deleted successfully
-   * @statusCodes [204, 401, 404]
+   * @statusCodes [204, 401, 403, 404]
    */
   export const useRemove = (
     options?: AppMutationOptions<typeof ClubsApi.remove, { id: string }> &

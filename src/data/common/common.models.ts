@@ -62,6 +62,33 @@ export namespace CommonModels {
   export const ParticipantGenderEnum = ParticipantGenderEnumSchema.enum;
 
   /**
+   * InvitationStatusEnumSchema
+   * @type { enum }
+   * @description Invitation status,E,x,a,m,p,l,e,:, ,`,p,e,n,d,i,n,g,`
+   */
+  export const InvitationStatusEnumSchema = z.enum([
+    "pending",
+    "accepted",
+    "expired",
+    "cancelled",
+  ]);
+  export type InvitationStatusEnum = z.infer<typeof InvitationStatusEnumSchema>;
+  export const InvitationStatusEnum = InvitationStatusEnumSchema.enum;
+
+  /**
+   * TournamentStatusEnumSchema
+   * @type { enum }
+   * @description Tournament approval status. Example: `pending`
+   */
+  export const TournamentStatusEnumSchema = z.enum([
+    "pending",
+    "approved",
+    "declined",
+  ]);
+  export type TournamentStatusEnum = z.infer<typeof TournamentStatusEnumSchema>;
+  export const TournamentStatusEnum = TournamentStatusEnumSchema.enum;
+
+  /**
    * DisciplineEnumSchema
    * @type { enum }
    * @description Discipline,E,x,a,m,p,l,e,:, ,`,y,a,k,o,-,s,o,k,u,-,k,u,m,i,t,e,`
@@ -172,6 +199,10 @@ export namespace CommonModels {
    * @property { string } clubId Club ID assigned to the tournament. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { ClubResponseDto } club Club assigned to the tournament
    * @property { string[] } categoryIds Category IDs associated with this tournament. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } status Approval status. Example: `pending`
+   * @property { string } reviewedAt When the tournament was last approved or declined. Example: `2024-01-02T00:00:00.000Z`
+   * @property { string } reviewedBy User ID of the admin who last approved or declined. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } reviewNote Decline reason or resubmit note. Example: `Dates clash with an existing championship`
    * @property { string } createdAt Creation timestamp. Example: `2024-01-01T00:00:00.000Z`
    * @property { string } updatedAt Last update timestamp. Example: `2024-01-01T00:00:00.000Z`
    */
@@ -186,6 +217,10 @@ export namespace CommonModels {
     clubId: z.string().nullish(),
     club: CommonModels.ClubResponseDtoSchema.nullish(),
     categoryIds: z.array(z.string()),
+    status: CommonModels.TournamentStatusEnumSchema,
+    reviewedAt: z.string().nullish(),
+    reviewedBy: z.string().nullish(),
+    reviewNote: z.string().nullish(),
     createdAt: z.string().datetime({ offset: true }),
     updatedAt: z.string().datetime({ offset: true }),
   });
@@ -209,6 +244,8 @@ export namespace CommonModels {
    * @property { string } beltMax Maximum belt level (null = no upper limit). Example: `2-dan`
    * @property { number } teamSize Main team roster size (null = not applicable). Example: `3`
    * @property { number } teamReservesSize Number of reserve participants allowed (null = not applicable). Example: `1`
+   * @property { string } clubId Owning club ID (null = global catalog). Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { number } registrationCount Registrations in this category for the current tournament (absent until the counts API ships). Example: `12`
    * @property { string } createdAt Creation timestamp. Example: `2024-01-01T00:00:00.000Z`
    * @property { string } updatedAt Last update timestamp. Example: `2024-01-01T00:00:00.000Z`
    */
@@ -226,6 +263,8 @@ export namespace CommonModels {
     beltMax: CommonModels.BeltEnumSchema.nullish(),
     teamSize: z.number().nullish(),
     teamReservesSize: z.number().nullish(),
+    clubId: z.string().nullish(),
+    registrationCount: z.number().nullish(),
     createdAt: z.string().datetime({ offset: true }),
     updatedAt: z.string().datetime({ offset: true }),
   });

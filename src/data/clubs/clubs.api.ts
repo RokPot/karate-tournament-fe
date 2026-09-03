@@ -42,6 +42,17 @@ export namespace ClubsApi {
     );
   };
 
+  export const createInvitation = (
+    id: string,
+    data: ClubsModels.CreateClubInvitationDto,
+  ) => {
+    return AppRestClient.post(
+      { resSchema: ClubsModels.InvitationCreatedResponseDtoSchema },
+      `/clubs/${id}/invitations`,
+      data,
+    );
+  };
+
   export const getTournaments = (id: string) => {
     return AppRestClient.get(
       { resSchema: ClubsModels.GetTournamentsResponseSchema },

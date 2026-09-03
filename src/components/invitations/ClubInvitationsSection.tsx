@@ -1,3 +1,4 @@
+import { CreateInvitationModal } from "@/components/invitations/CreateInvitationModal";
 import { HeaderCell, TextCell } from "@/components/categories/CategoryList";
 import { ErrorState } from "@/components/shared/layout/ErrorState";
 import { LoadingState } from "@/components/shared/layout/LoadingState";
@@ -6,16 +7,18 @@ import { Table } from "@/components/ui/table/Table";
 import TableCell from "@/components/ui/table/TableCell";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { getInviteRoute } from "@/config/route.config";
+import { CommonModels } from "@/data/common/common.models";
 import { InvitationsModels } from "@/data/invitations/invitations.models";
 import { InvitationsQueries } from "@/data/invitations/invitations.queries";
 import { faCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button } from "@mui/material";
 import { ColumnDef } from "@tanstack/react-table";
 import { cva } from "class-variance-authority";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const STATUS_KEYS: Record<InvitationsModels.InvitationStatusEnum, string> = {
+const STATUS_KEYS: Record<CommonModels.InvitationStatusEnum, string> = {
   pending: "invitations.statusPending",
   accepted: "invitations.statusAccepted",
   expired: "invitations.statusExpired",
@@ -38,17 +41,9 @@ interface ClubInvitationsSectionProps {
 export const ClubInvitationsSection = ({ clubId, titleSize = "h2" }: ClubInvitationsSectionProps) => {
   const { t } = useTranslation();
   const { successToast } = useToast();
-  const { data: invitations, isError, isLoading, error, refetch } = InvitationsQueries.useFindAll();
-
-  const filteredInvitations = useMemo(() => {
-    if (!invitations) {
-      return [];
-    }
-    if (!clubId) {
-      return invitations;
-    }
-    return invitations.filter((invitation) => invitation.clubId === clubId);
-  }, [clubId, invitations]);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const { data: invitations, isError, isLoading, error, refetch } =
+    InvitationsQueries.useFindAll({ clubId });
 
   const columns: ColumnDef<InvitationsModels.InvitationListItemDto>[] = useMemo(() => {
     const baseColumns: ColumnDef<InvitationsModels.InvitationListItemDto>[] = [
@@ -112,14 +107,19 @@ export const ClubInvitationsSection = ({ clubId, titleSize = "h2" }: ClubInvitat
 
   return (
     <div>
-      <div className="mb-3 flex h-14 items-center justify-start">
+      <div className="mb-3 flex h-14 items-center justify-between">
         <Typography size={titleSize}>{t("invitations.title")}</Typography>
+        {clubId && (
+          <Button variant="contained" onClick={() => setInviteOpen(true)}>
+            {t("invitations.create.submit")}
+          </Button>
+        )}
       </div>
-      {!filteredInvitations.length ? (
+      {!(invitations?.length ?? 0) ? (
         <Typography size="body-paragraph-m">{t("invitations.noInvitations")}</Typography>
       ) : (
         <Table
-          data={filteredInvitations}
+          data={invitations ?? []}
           columns={columns}
           sorting={[]}
           onSortingChange={() => {}}
@@ -128,6 +128,13 @@ export const ClubInvitationsSection = ({ clubId, titleSize = "h2" }: ClubInvitat
             navigator.clipboard.writeText(`${window.location.origin}${getInviteRoute(row.token)}`);
             successToast({ text: t("clubs.inviteLinkCopied") });
           }}
+        />
+      )}
+      {clubId && (
+        <CreateInvitationModal
+          open={inviteOpen}
+          clubId={clubId}
+          onClose={() => setInviteOpen(false)}
         />
       )}
     </div>
@@ -149,7 +156,7 @@ const statusIcon = cva("h-6 w-6 shrink-0 mr-2", {
   },
 });
 
-const StatusCell = ({ status }: { status: InvitationsModels.InvitationStatusEnum }) => {
+const StatusCell = ({ status }: { status: CommonModels.InvitationStatusEnum }) => {
   const { t } = useTranslation();
   return (
     <TableCell className="flex flex-row items-center gap-2" align="start">

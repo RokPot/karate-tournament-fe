@@ -18,6 +18,15 @@ export namespace RegistrationsModels {
   export const RegistrationStatusEnum = RegistrationStatusEnumSchema.enum;
 
   /**
+   * TeamRoleEnumSchema
+   * @type { enum }
+   * @description Role on the team roster,E,x,a,m,p,l,e,:, ,`,s,t,a,r,t,e,r,`
+   */
+  export const TeamRoleEnumSchema = z.enum(["starter", "reserve"]);
+  export type TeamRoleEnum = z.infer<typeof TeamRoleEnumSchema>;
+  export const TeamRoleEnum = TeamRoleEnumSchema.enum;
+
+  /**
    * BulkParticipantRegistrationDtoSchema
    * @type { object }
    * @property { string } categoryId Category ID. Example: `123e4567-e89b-12d3-a456-426614174000`
@@ -40,7 +49,7 @@ export namespace RegistrationsModels {
    * @property { string } dateOfBirth Date of birth. Example: `2018-02-02T00:00:00.000Z`
    * @property { string } gender Gender (required when matching categories with a gender restriction). Example: `male`
    * @property { string } beltLevel Belt level. Example: `10-kyu`
-   * @property { BulkParticipantRegistrationDto[] } registrations Registrations for this participant. Min Items: `1`
+   * @property { BulkParticipantRegistrationDto[] } registrations Individual category registrations for this participant. May be empty when the person is only on teams.
    */
   export const BulkParticipantDtoSchema = z.object({
     firstName: z.string().max(100),
@@ -49,9 +58,23 @@ export namespace RegistrationsModels {
     dateOfBirth: z.string().datetime({ offset: true }),
     gender: CommonModels.ParticipantGenderEnumSchema.optional(),
     beltLevel: CommonModels.BeltEnumSchema.optional(),
-    registrations: z.array(BulkParticipantRegistrationDtoSchema).min(1),
+    registrations: z.array(BulkParticipantRegistrationDtoSchema).optional(),
   });
   export type BulkParticipantDto = z.infer<typeof BulkParticipantDtoSchema>;
+
+  /**
+   * BulkTeamDtoSchema
+   * @type { object }
+   * @property { string } categoryId Team category ID (must be a team discipline on the tournament). Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { number[] } starters Participant indexes for starters (length must equal category teamSize). Min Items: `1`. Example: `0,1,2`
+   * @property { number[] } reserves Participant indexes for reserves. Example: `3`
+   */
+  export const BulkTeamDtoSchema = z.object({
+    categoryId: z.string(),
+    starters: z.array(z.number().gte(0)).min(1),
+    reserves: z.array(z.number().gte(0)).optional(),
+  });
+  export type BulkTeamDto = z.infer<typeof BulkTeamDtoSchema>;
 
   /**
    * BulkPublicRegistrationDtoSchema
@@ -62,6 +85,7 @@ export namespace RegistrationsModels {
    * @property { string } clubName Club name (free text). If a matching club exists in the system, it is linked; otherwise registrations proceed without a club.. Min Length: `1`. Max Length: `255`. Example: `Dragon Karate Club`
    * @property { string } tournamentId Tournament ID for all registrations in this request. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { BulkParticipantDto[] } participants Participants to register. Min Items: `1`
+   * @property { BulkTeamDto[] } teams Team rosters (kata-team / kumite-team). Participant indexes refer to participants[].
    */
   export const BulkPublicRegistrationDtoSchema = z.object({
     email: z.string().email(),
@@ -70,6 +94,7 @@ export namespace RegistrationsModels {
     clubName: z.string().min(1).max(255).optional(),
     tournamentId: z.string(),
     participants: z.array(BulkParticipantDtoSchema).min(1),
+    teams: z.array(BulkTeamDtoSchema).optional(),
   });
   export type BulkPublicRegistrationDto = z.infer<
     typeof BulkPublicRegistrationDtoSchema
@@ -183,6 +208,8 @@ export namespace RegistrationsModels {
    * @property { string } categoryId Category ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { string } status Registration status. Example: `pending`
    * @property { number } finalWeight Final weight in kg. Example: `75.5`
+   * @property { string } teamId Team ID when this registration is part of a team roster. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } teamRole Role on the team roster. Example: `starter`
    * @property { CommonModels.UserResponseDto } user User information
    * @property { CommonModels.ClubResponseDto } club Club information
    * @property { string } createdAt Creation timestamp. Example: `2024-01-01T00:00:00.000Z`
@@ -196,6 +223,8 @@ export namespace RegistrationsModels {
     categoryId: z.string(),
     status: RegistrationStatusEnumSchema,
     finalWeight: z.number().nullish(),
+    teamId: z.string().nullish(),
+    teamRole: TeamRoleEnumSchema.nullish(),
     user: CommonModels.UserResponseDtoSchema.nullish(),
     club: CommonModels.ClubResponseDtoSchema.nullish(),
     createdAt: z.string().datetime({ offset: true }),
@@ -210,6 +239,7 @@ export namespace RegistrationsModels {
    * @type { object }
    * @property { number } participantIndex Index of the participant in the request array
    * @property { number } registrationIndex Index of the registration within the participant
+   * @property { number } teamIndex Index of the team in the request teams array (present for team roster registrations)
    * @property { boolean } success Whether this registration was created successfully. Example: `true`
    * @property { RegistrationResponseDto } registration Created registration (present when success is true)
    * @property { string } error Error message (present when success is false). Example: `User belt level (white) is not within category range`
@@ -217,6 +247,7 @@ export namespace RegistrationsModels {
   export const BulkRegistrationResultItemDtoSchema = z.object({
     participantIndex: z.number(),
     registrationIndex: z.number(),
+    teamIndex: z.number().optional(),
     success: z.boolean(),
     registration: RegistrationResponseDtoSchema.optional(),
     error: z.string().optional(),
@@ -367,4 +398,20 @@ export namespace RegistrationsModels {
   export type GetSuitableCategoriesResponse = z.infer<
     typeof GetSuitableCategoriesResponseSchema
   >;
+
+  /**
+   * FindMineStatusParamSchema
+   * @type { string }
+   * @description E,x,a,m,p,l,e,:, ,`,p,e,n,d,i,n,g,`
+   */
+  export const FindMineStatusParamSchema =
+    RegistrationStatusEnumSchema.optional();
+  export type FindMineStatusParam = z.infer<typeof FindMineStatusParamSchema>;
+
+  /**
+   * FindMineResponseSchema
+   * @type { array }
+   */
+  export const FindMineResponseSchema = z.array(RegistrationResponseDtoSchema);
+  export type FindMineResponse = z.infer<typeof FindMineResponseSchema>;
 }

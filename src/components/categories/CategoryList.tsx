@@ -5,10 +5,10 @@ import {
   RowSelectionState,
   Updater,
 } from "@tanstack/react-table";
-import { TFunction } from "i18next";
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
+import { useCategoryFormatters } from "@/components/categories/category-formatters";
 import { Table } from "@/components/ui/table/Table";
 import TableCell from "@/components/ui/table/TableCell";
 import TableHeaderCell from "@/components/ui/table/TableHeaderCell";
@@ -16,11 +16,9 @@ import { Typography } from "@/components/ui/text/Typography/Typography";
 import { CommonModels } from "@/data/common/common.models";
 import { DateUtils } from "@/util/date.utils";
 
-
 interface IProps {
   categories: CommonModels.CategoryResponseDto[];
   mode?: "view" | "edit";
-  setSelectedCategory?: (category: CommonModels.CategoryResponseDto) => void;
   selectedCategoryIds?: string[];
   onSelectedCategoryIdsChange?: (categoryIds: string[]) => void;
 }
@@ -50,13 +48,12 @@ const SelectionTableCell = ({ row }: { row: any }) => (
 export const CategoryList = ({
   categories,
   mode = "view",
-  setSelectedCategory,
   selectedCategoryIds = [],
   onSelectedCategoryIdsChange,
 }: IProps) => {
   const { t } = useTranslation();
-  const [tournamentRowSelection, setTournamentRowSelection] =
-    useState<RowSelectionState>({});
+  const { formatAgeRange, formatBeltRange, formatTeamSize, formatWeightRange } =
+    useCategoryFormatters();
 
   const managementRowSelection = useMemo(
     () =>
@@ -72,8 +69,7 @@ export const CategoryList = ({
     [categories, selectedCategoryIds],
   );
 
-  const rowSelection =
-    mode === "edit" ? managementRowSelection : tournamentRowSelection;
+  const rowSelection = mode === "edit" ? managementRowSelection : {};
 
   const columns = useMemo<ColumnDef<CommonModels.CategoryResponseDto>[]>(() => {
     const categoryColumns: ColumnDef<CommonModels.CategoryResponseDto>[] = [
@@ -126,14 +122,14 @@ export const CategoryList = ({
       {
         header: ({ header }) => HeaderCell(header, t("shared.belt")),
         accessorKey: "beltMin",
-        cell: ({ row }) => TextCell(formatBeltRange(row.original, t)),
+        cell: ({ row }) => TextCell(formatBeltRange(row.original)),
         size: 180,
       },
       {
         header: ({ header }) =>
           HeaderCell(header, t("categories.create.teamSize")),
         accessorKey: "teamSize",
-        cell: ({ row }) => TextCell(formatTeamSize(row.original, t)),
+        cell: ({ row }) => TextCell(formatTeamSize(row.original)),
         size: 140,
       },
     ];
@@ -162,22 +158,28 @@ export const CategoryList = ({
     }
 
     return categoryColumns;
-  }, [mode, t]);
+  }, [
+    formatAgeRange,
+    formatBeltRange,
+    formatTeamSize,
+    formatWeightRange,
+    mode,
+    t,
+  ]);
 
   const handleRowSelectionChange = (updater: Updater<RowSelectionState>) => {
     const nextSelection =
       typeof updater === "function" ? updater(rowSelection) : updater;
 
-    if (mode === "edit") {
-      onSelectedCategoryIdsChange?.(
-        categories
-          .filter((_, index) => Boolean(nextSelection[index]))
-          .map((category) => category.id),
-      );
+    if (mode !== "edit") {
       return;
     }
 
-    setTournamentRowSelection(nextSelection);
+    onSelectedCategoryIdsChange?.(
+      categories
+        .filter((_, index) => Boolean(nextSelection[index]))
+        .map((category) => category.id),
+    );
   };
 
   if (categories.length === 0) {
@@ -197,90 +199,15 @@ export const CategoryList = ({
         columns={columns}
         sorting={[]}
         onSortingChange={() => { }}
-        onRowClick={
-          mode === "view" && setSelectedCategory
-            ? (row) => setSelectedCategory(row)
-            : undefined
+        onRowSelectionChange={
+          mode === "edit" ? handleRowSelectionChange : undefined
         }
-        onRowSelectionChange={handleRowSelectionChange}
         rowSelection={rowSelection}
         tableLayout="auto"
       />
     </div>
   );
 };
-
-function formatAgeRange(category: CommonModels.CategoryResponseDto) {
-  if (
-    category.ageMin !== null &&
-    category.ageMin !== undefined &&
-    category.ageMin >= 0 &&
-    category.ageMax !== null &&
-    category.ageMax !== undefined &&
-    category.ageMax >= 0
-  ) {
-    return `${category.ageMin} - ${category.ageMax}`;
-  }
-  if (category.ageMin) {
-    return `${category.ageMin.toString()} years`;
-  }
-  if (category.ageMax) {
-    return `${category.ageMax.toString()} years`;
-  }
-  return "—";
-}
-
-function formatWeightRange(category: CommonModels.CategoryResponseDto) {
-  if (
-    category.weightMin !== null &&
-    category.weightMin !== undefined &&
-    category.weightMin >= 0 &&
-    category.weightMax !== null &&
-    category.weightMax !== undefined &&
-    category.weightMax >= 0
-  ) {
-    return `${category.weightMin} - ${category.weightMax}`;
-  }
-  if (category.weightMin) {
-    return `${category.weightMin.toString()} kg`;
-  }
-  if (category.weightMax) {
-    return `${category.weightMax.toString()} kg`;
-  }
-  return "—";
-}
-
-function formatBeltRange(
-  category: CommonModels.CategoryResponseDto,
-  t: TFunction,
-) {
-  if (category.beltMin && category.beltMax) {
-    return `${t(`belt.${category.beltMin}`)} - ${t(`belt.${category.beltMax}`)}`;
-  }
-  if (category.beltMin) {
-    return t(`belt.${category.beltMin}`);
-  }
-  if (category.beltMax) {
-    return t(`belt.${category.beltMax}`);
-  }
-  return "—";
-}
-
-function formatTeamSize(
-  category: CommonModels.CategoryResponseDto,
-  t: TFunction,
-) {
-  if (category.teamSize == null) {
-    return "—";
-  }
-
-  const reserves =
-    category.teamReservesSize != null
-      ? ` + ${category.teamReservesSize} ${t("categories.create.teamReservesShort")}`
-      : "";
-
-  return `${category.teamSize}${reserves}`;
-}
 
 export const HeaderCell = (header: Header<any, unknown>, label: string) => {
   return <TableHeaderCell header={header} label={label} align="start" />;
@@ -289,7 +216,7 @@ export const HeaderCell = (header: Header<any, unknown>, label: string) => {
 export const TextCell = (label: ReactNode) => {
   return (
     <TableCell className="flex flex-row items-center gap-2" align="start">
-      <Typography size="body-paragraph-m" variant="prominent-2">
+      <Typography size="body-paragraph-m" >
         {label}
       </Typography>
     </TableCell>

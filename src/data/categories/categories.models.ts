@@ -17,6 +17,7 @@ export namespace CategoriesModels {
    * @property { string } beltMax Maximum belt level (null/omit = no upper limit). Example: `2-dan`
    * @property { number } teamSize Main team roster size (null/omit = not applicable for individual categories). Example: `3`
    * @property { number } teamReservesSize Number of reserve participants allowed (null/omit = not applicable). Example: `1`
+   * @property { string } clubId Owning club ID (null/omit = global catalog for admins). Example: `123e4567-e89b-12d3-a456-426614174000`
    */
   export const CreateCategoryDtoSchema = z.object({
     name: z.string().max(255),
@@ -31,6 +32,7 @@ export namespace CategoriesModels {
     beltMax: CommonModels.BeltEnumSchema.nullish(),
     teamSize: z.number().gte(0).nullish(),
     teamReservesSize: z.number().gte(0).nullish(),
+    clubId: z.string().nullish(),
   });
   export type CreateCategoryDto = z.infer<typeof CreateCategoryDtoSchema>;
 
@@ -49,6 +51,7 @@ export namespace CategoriesModels {
    * @property { string } beltMax Maximum belt level (null/omit = no upper limit). Example: `2-dan`
    * @property { number } teamSize Main team roster size (null/omit = not applicable for individual categories). Example: `3`
    * @property { number } teamReservesSize Number of reserve participants allowed (null/omit = not applicable). Example: `1`
+   * @property { string } clubId Owning club ID (null/omit = global catalog for admins). Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { string } tournamentId Tournament ID to assign the category to. Example: `123e4567-e89b-12d3-a456-426614174000`
    */
   export const CreateCategoryWithTournamentDtoSchema = z.object({
@@ -64,6 +67,7 @@ export namespace CategoriesModels {
     beltMax: CommonModels.BeltEnumSchema.nullish(),
     teamSize: z.number().gte(0).nullish(),
     teamReservesSize: z.number().gte(0).nullish(),
+    clubId: z.string().nullish(),
     tournamentId: z.string(),
   });
   export type CreateCategoryWithTournamentDto = z.infer<
@@ -97,6 +101,7 @@ export namespace CategoriesModels {
    * @property { string } beltMax Maximum belt level (null = no upper limit). Example: `2-dan`
    * @property { number } teamSize Main team roster size (null = not applicable). Example: `3`
    * @property { number } teamReservesSize Number of reserve participants allowed (null = not applicable). Example: `1`
+   * @property { string } clubId Owning club ID (null = global catalog). Admin only.. Example: `123e4567-e89b-12d3-a456-426614174000`
    */
   export const UpdateCategoryDtoSchema = z
     .object({
@@ -112,6 +117,7 @@ export namespace CategoriesModels {
       beltMax: CommonModels.BeltEnumSchema.nullable(),
       teamSize: z.number().gte(0).nullable(),
       teamReservesSize: z.number().gte(0).nullable(),
+      clubId: z.string().nullable(),
     })
     .partial();
   export type UpdateCategoryDto = z.infer<typeof UpdateCategoryDtoSchema>;

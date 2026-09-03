@@ -14,10 +14,12 @@ import { RouteConfig } from "@/config/route.config";
 import { AuthGuard } from "@/data/auth/AuthGuard";
 import { CategoriesQueries } from "@/data/categories/categories.queries";
 import { useAuthRoles } from "@/hooks/useAuthRoles";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 const CategoriesPage = () => {
   const { t } = useTranslation();
   const { successToast, errorToast } = useToast();
+  const authUser = useAuthUser();
   const { isClubOwner, isAdmin } = useAuthRoles();
   const [createCategoryDialogOpen, setCreateCategoryDialogOpen] = useState(false);
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
@@ -30,7 +32,9 @@ const CategoriesPage = () => {
     isLoading,
     error,
     refetch,
-  } = CategoriesQueries.useFindAll();
+  } = CategoriesQueries.useFindAll({
+    clubId: isAdmin ? undefined : authUser?.clubId ?? undefined,
+  });
 
   const duplicateMutation = CategoriesQueries.useDuplicate({
     invalidateCurrentModule: true,

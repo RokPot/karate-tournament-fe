@@ -82,4 +82,47 @@ export namespace TournamentsModels {
   export type TournamentsFindAllResponse = z.infer<
     typeof TournamentsFindAllResponseSchema
   >;
+
+  /**
+   * FindRegisteredResponseSchema
+   * @type { array }
+   */
+  export const FindRegisteredResponseSchema = z.array(
+    CommonModels.TournamentResponseDtoSchema,
+  );
+  export type FindRegisteredResponse = z.infer<
+    typeof FindRegisteredResponseSchema
+  >;
+
+  /**
+   * FindAllStatusParamSchema
+   * @type { enum }
+   * @description Filter tournaments by approval status. Example: `pending`
+   */
+  export const FindAllStatusParamSchema =
+    CommonModels.TournamentStatusEnumSchema;
+  export type FindAllStatusParam = z.infer<typeof FindAllStatusParamSchema>;
+  export const FindAllStatusParam = FindAllStatusParamSchema.enum;
+
+  /**
+   * DeclineTournamentDtoSchema
+   * @type { object }
+   * @property { string } reason Optional reason shown to the club. Max Length: `1000`
+   */
+  export const DeclineTournamentDtoSchema = z.object({
+    reason: z.string().max(1000).optional(),
+  });
+  export type DeclineTournamentDto = z.infer<typeof DeclineTournamentDtoSchema>;
+
+  /**
+   * ResubmitTournamentDtoSchema
+   * @type { object }
+   * @property { string } note Optional note for the admin reviewing the resubmitted request. Max Length: `1000`
+   */
+  export const ResubmitTournamentDtoSchema = z.object({
+    note: z.string().max(1000).optional(),
+  });
+  export type ResubmitTournamentDto = z.infer<
+    typeof ResubmitTournamentDtoSchema
+  >;
 }

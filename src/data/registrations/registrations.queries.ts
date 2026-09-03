@@ -43,6 +43,10 @@ export namespace RegistrationsQueries {
         userId,
         tournamentId,
       ] as const,
+    findMine: (
+      tournamentId?: string,
+      status?: RegistrationsModels.FindMineStatusParam,
+    ) => [...keys.all, "/registrations/me", tournamentId, status] as const,
     findOne: (id: string) => [...keys.all, "/registrations/:id", id] as const,
   };
 
@@ -248,7 +252,7 @@ export namespace RegistrationsQueries {
    * @param { string } object.categoryId Query parameter. Category ID — when set, only registrations for this category are returned. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<RegistrationsModels.FindByTournamentResponse> } Registrations list
-   * @statusCodes [200, 401, 404]
+   * @statusCodes [200, 401, 403, 404]
    */
   export const useFindByTournament = <TData>(
     { tournamentId, categoryId }: { tournamentId: string; categoryId?: string },
@@ -283,6 +287,33 @@ export namespace RegistrationsQueries {
       queryKey: keys.getSuitableCategories(userId, tournamentId),
       queryFn: () =>
         RegistrationsApi.getSuitableCategories(userId, tournamentId),
+      ...options,
+    });
+  };
+
+  /**
+   * Query `useFindMine`
+   * @summary Get current user registrations
+   * @description Returns registrations for the authenticated caller only. Optionally filter by tournamentId and status.
+   * @param { string } object.tournamentId Query parameter. Filter by tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { RegistrationsModels.FindMineStatusParam } object.status Query parameter. Filter by registration status. Example: `pending`
+   * @param { AppQueryOptions } options Query options
+   * @returns { UseQueryResult<RegistrationsModels.FindMineResponse> } Caller registrations
+   * @statusCodes [200, 401, 404]
+   */
+  export const useFindMine = <TData>(
+    {
+      tournamentId,
+      status,
+    }: {
+      tournamentId?: string;
+      status?: RegistrationsModels.FindMineStatusParam;
+    },
+    options?: AppQueryOptions<typeof RegistrationsApi.findMine, TData>,
+  ) => {
+    return useQuery({
+      queryKey: keys.findMine(tournamentId, status),
+      queryFn: () => RegistrationsApi.findMine(tournamentId, status),
       ...options,
     });
   };

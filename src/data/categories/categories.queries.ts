@@ -13,18 +13,19 @@ export namespace CategoriesQueries {
 
   export const keys = {
     all: [moduleName] as const,
-    findAll: () => [...keys.all, "/categories"] as const,
+    findAll: (clubId?: string, global?: boolean) =>
+      [...keys.all, "/categories", clubId, global] as const,
     findOne: (id: string) => [...keys.all, "/categories/:id", id] as const,
   };
 
   /**
    * Mutation `useCreate`
    * @summary Create a new category
-   * @description Creates a new tournament category. Only name and discipline are required; subDiscipline, gender, age, weight, belt limits, and team size (teamSize, teamReservesSize) are optional.
+   * @description Creates a new tournament category. Only name and discipline are required; subDiscipline, gender, age, weight, belt limits, and team size (teamSize, teamReservesSize) are optional. clubId is optional for admins (null &#x3D; global) and defaults to the caller club for club owners.
    * @param { CategoriesModels.CreateCategoryDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<CommonModels.CategoryResponseDto> } Category created successfully
-   * @statusCodes [201, 400, 401]
+   * @statusCodes [201, 400, 401, 403, 404]
    */
   export const useCreate = (
     options?: AppMutationOptions<
@@ -47,18 +48,21 @@ export namespace CategoriesQueries {
 
   /**
    * Query `useFindAll`
-   * @summary Get all categories
-   * @description Retrieves a list of all categories
+   * @summary Get categories
+   * @description Lists categories scoped by role. Admin sees all, or filter by clubId / global&#x3D;true. Club owner/coach see only their club.
+   * @param { string } object.clubId Query parameter. Filter by club ID (admin). Club staff may only pass their own club.. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { boolean } object.global Query parameter. When true, list only global categories (clubId null). Admin only.. Example: `true`
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<CategoriesModels.CategoriesFindAllResponse> } List of categories
-   * @statusCodes [200, 401]
+   * @statusCodes [200, 401, 403, 404]
    */
   export const useFindAll = <TData>(
+    { clubId, global }: { clubId?: string; global?: boolean },
     options?: AppQueryOptions<typeof CategoriesApi.findAll, TData>,
   ) => {
     return useQuery({
-      queryKey: keys.findAll(),
-      queryFn: CategoriesApi.findAll,
+      queryKey: keys.findAll(clubId, global),
+      queryFn: () => CategoriesApi.findAll(clubId, global),
       ...options,
     });
   };
@@ -70,7 +74,7 @@ export namespace CategoriesQueries {
    * @param { CategoriesModels.DeleteCategoriesDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<void> } Categories deleted successfully
-   * @statusCodes [204, 400, 401, 404, 409]
+   * @statusCodes [204, 400, 401, 403, 404, 409]
    */
   export const useRemoveMany = (
     options?: AppMutationOptions<
@@ -98,7 +102,7 @@ export namespace CategoriesQueries {
    * @param { CategoriesModels.CreateCategoryWithTournamentDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<CommonModels.CategoryResponseDto> } Category created and assigned successfully
-   * @statusCodes [201, 400, 401, 404]
+   * @statusCodes [201, 400, 401, 403, 404]
    */
   export const useCreateAndAssign = (
     options?: AppMutationOptions<
@@ -126,7 +130,7 @@ export namespace CategoriesQueries {
    * @param { CategoriesModels.DuplicateCategoriesDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<CategoriesModels.DuplicateResponse> } Categories duplicated successfully
-   * @statusCodes [201, 400, 401, 404]
+   * @statusCodes [201, 400, 401, 403, 404]
    */
   export const useDuplicate = (
     options?: AppMutationOptions<
@@ -154,7 +158,7 @@ export namespace CategoriesQueries {
    * @param { string } object.id Path parameter. Category ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<CommonModels.CategoryResponseDto> } Category found
-   * @statusCodes [200, 401, 404]
+   * @statusCodes [200, 401, 403, 404]
    */
   export const useFindOne = <TData>(
     { id }: { id: string },
@@ -175,7 +179,7 @@ export namespace CategoriesQueries {
    * @param { CategoriesModels.UpdateCategoryDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<CommonModels.CategoryResponseDto> } Category updated successfully
-   * @statusCodes [200, 400, 401, 404]
+   * @statusCodes [200, 400, 401, 403, 404]
    */
   export const useUpdate = (
     options?: AppMutationOptions<
@@ -203,7 +207,7 @@ export namespace CategoriesQueries {
    * @param { string } mutation.id Path parameter. Category ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<void> } Category deleted successfully
-   * @statusCodes [204, 401, 404, 409]
+   * @statusCodes [204, 401, 403, 404, 409]
    */
   export const useRemove = (
     options?: AppMutationOptions<typeof CategoriesApi.remove, { id: string }> &

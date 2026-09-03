@@ -70,7 +70,9 @@
     "tournaments": "Tournaments",
     "none": "None",
     "subDiscipline": "Sub-discipline",
-    "updatedAt": "Updated At"
+    "updatedAt": "Updated At",
+    "status": "Status",
+    "club": "Club"
   },
   "belt": {
     "10-kyu": "10. Kyu",
@@ -200,11 +202,30 @@
       "sortByName": "Sort by name",
       "success": "Categories added successfully",
       "error": "Failed to add categories"
+    },
+    "format": {
+      "empty": "—",
+      "ageRange": "Age: {{min}} - {{max}} years",
+      "ageUpTo": "Age: up to {{max}} years",
+      "ageFrom": "Age: from {{min}} years up",
+      "ageYears": "Age: {{age}} years",
+      "weightRange": "Weight: {{min}} - {{max}} kg",
+      "weightUpTo": "Weight: up to {{max}} kg",
+      "weightFrom": "Weight: from {{min}} kg up",
+      "weightKg": "Weight: {{weight}} kg",
+      "beltRange": "Belt: {{min}} - {{max}}",
+      "beltSingle": "Belt: {{belt}}",
+      "teamSize": "Team Size: {{size}}",
+      "teamSizeWithReserves": "Team Size: {{size}} + {{reserves}} {{reservesLabel}}"
     }
   },
   "registrations": {
+    "title": "Registrations",
     "attendees": "Attendees",
     "noAttendees": "No attendees found",
+    "registeredCount": "{{count}} registered",
+    "expandCategory": "Show registrations for {{name}}",
+    "collapseCategory": "Hide registrations for {{name}}",
     "public": {
       "pageTitle": "Tournament registration",
       "showCategories": "Show categories",
@@ -314,11 +335,43 @@
   "tournaments": {
     "addTournament": "Add Tournament",
     "noTournaments": "No tournaments found",
+    "noPendingRequests": "No pending tournament requests",
+    "tabs": {
+      "active": "Active",
+      "pending": "Pending"
+    },
+    "status": {
+      "label": "Status",
+      "pending": "Pending",
+      "approved": "Approved",
+      "declined": "Declined"
+    },
     "create": {
       "title": "Create Tournament",
+      "requestTitle": "Create Tournament Request",
       "success": "Tournament created successfully",
+      "requestSuccess": "Tournament request submitted. Waiting for approval.",
       "error": "Failed to create tournament",
-      "startTime": "Start Time"
+      "startTime": "Start Time",
+      "submitRequest": "Submit request"
+    },
+    "review": {
+      "approve": "Approve",
+      "decline": "Decline",
+      "resubmit": "Resubmit",
+      "declineTitle": "Decline tournament request",
+      "reason": "Reason (optional)",
+      "approveSuccess": "Tournament approved. Registration is now open.",
+      "approveError": "Failed to approve tournament",
+      "declineSuccess": "Tournament request declined",
+      "declineError": "Failed to decline tournament",
+      "resubmitSuccess": "Tournament request resubmitted for review",
+      "resubmitError": "Failed to resubmit tournament request"
+    },
+    "registration": {
+      "locked": "Registration opens after the tournament is approved.",
+      "closedTitle": "Registration is not open",
+      "closedBody": "This tournament is not available for registration yet."
     }
   },
   "invitations": {
@@ -344,7 +397,19 @@
     "expiresOn": "Invitation expires on {{date}}",
     "noLongerValid": "This invitation is no longer valid",
     "acceptSuccess": "You have joined the club.",
-    "acceptInvalid": "Invitation no longer valid"
+    "acceptInvalid": "Invitation no longer valid",
+    "create": {
+      "title": "Invite to club",
+      "email": "Email",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "role": "Role",
+      "submit": "Send invite",
+      "sending": "Sending...",
+      "success": "Invitation created",
+      "error": "Failed to create invitation",
+      "inviteSuccessMessage": "Share this link so they can join the club."
+    }
   },
   "landing": {
     "head": {

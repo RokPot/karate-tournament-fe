@@ -101,11 +101,11 @@ export const AddMemberModal = ({ open, onClose, clubId }: IProps) => {
             <Select
               value={role || ""}
               onChange={(e) =>
-                setValue("role", e.target.value as ClubsModels.RoleEnum)
+                setValue("role", e.target.value as ClubsModels.AddMemberRoleEnum)
               }
               label={t("members.create.role")}
             >
-              {Object.values(ClubsModels.RoleEnum).map((r) => (
+              {Object.values(ClubsModels.AddMemberRoleEnum).map((r) => (
                 <MenuItem key={r} value={r}>
                   {formatRoleLabel(r)}
                 </MenuItem>

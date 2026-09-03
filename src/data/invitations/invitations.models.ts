@@ -3,20 +3,6 @@ import { CommonModels } from "@/data/common/common.models";
 
 export namespace InvitationsModels {
   /**
-   * InvitationStatusEnumSchema
-   * @type { enum }
-   * @description Invitation status,E,x,a,m,p,l,e,:, ,`,p,e,n,d,i,n,g,`
-   */
-  export const InvitationStatusEnumSchema = z.enum([
-    "pending",
-    "accepted",
-    "expired",
-    "cancelled",
-  ]);
-  export type InvitationStatusEnum = z.infer<typeof InvitationStatusEnumSchema>;
-  export const InvitationStatusEnum = InvitationStatusEnumSchema.enum;
-
-  /**
    * AcceptInvitationResponseDtoSchema
    * @type { object }
    * @property { CommonModels.UserResponseDto } user Updated user (linked to club with owner role)
@@ -53,7 +39,7 @@ export namespace InvitationsModels {
     email: z.string(),
     firstName: z.string().nullable(),
     lastName: z.string().nullable(),
-    status: InvitationStatusEnumSchema,
+    status: CommonModels.InvitationStatusEnumSchema,
     createdAt: z.string().datetime({ offset: true }),
     expiresAt: z.string().datetime({ offset: true }),
     acceptedAt: z.string().datetime({ offset: true }).nullish(),
@@ -75,7 +61,7 @@ export namespace InvitationsModels {
   export const InvitationByTokenResponseDtoSchema = z.object({
     clubName: z.string(),
     expiresAt: z.string().datetime({ offset: true }),
-    status: InvitationStatusEnumSchema,
+    status: CommonModels.InvitationStatusEnumSchema,
     email: z.string(),
     firstName: z.string().nullish(),
     lastName: z.string().nullish(),
