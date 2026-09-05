@@ -43,7 +43,7 @@ export const Pagination = ({ pagination, table }: { pagination: PaginationState;
   const visiblePages = getVisiblePages();
 
   return (
-    <div className="mt-2 flex w-full flex-row items-center justify-center p-4">
+    <div className="mt-2 flex w-full flex-row items-center justify-center p-1">
       {visiblePages.map((pageNum, index) => {
         const showEllipsis = index > 0 && pageNum - visiblePages[index - 1] > 1;
 

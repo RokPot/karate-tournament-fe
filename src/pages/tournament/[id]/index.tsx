@@ -9,14 +9,15 @@ import { LoadingState } from "@/components/shared/layout/LoadingState";
 import { CategoryRegistrationsAccordion } from "@/components/tournaments/CategoryRegistrationsAccordion";
 import { DeclineTournamentDialog } from "@/components/tournaments/DeclineTournamentDialog";
 import {
-  getRegistrationClosedI18nKeys,
-  getRegistrationWindowState,
-  isRegistrationWindowOpen,
+  getTournamentRegistrationClosedCopy,
   isTournamentApproved,
   isTournamentDeclined,
+  isTournamentInProgress,
   isTournamentPending,
+  isTournamentRegistrationOpen,
   TOURNAMENT_STATUS_I18N_KEYS,
 } from "@/components/tournaments/tournament-status";
+import { useTournamentLifecycle } from "@/components/tournaments/useTournamentLifecycle";
 import { useTournamentReview } from "@/components/tournaments/useTournamentReview";
 import Pill from "@/components/ui/Pill";
 import { useToast } from "@/components/ui/status/Toast/useToast";
@@ -53,10 +54,14 @@ const TournamentDetailPage = () => {
 
   const { isClubOwner, isClubCoach, isAdmin } = useAuthRoles();
   const { approve, decline, resubmit, isReviewPending } = useTournamentReview();
+  const { start, end, isLifecyclePending } = useTournamentLifecycle();
 
+  const tournamentClubId = tournament?.clubId ?? undefined;
   const { data: allCategories } = CategoriesQueries.useFindAll(
-    { clubId: isAdmin ? undefined : (tournament?.clubId ?? undefined) },
-    { enabled: !!tournamentId && (isAdmin || !!tournament?.clubId) },
+    tournamentClubId
+      ? { clubId: tournamentClubId, includeGlobal: true }
+      : {},
+    { enabled: !!tournamentId && (isAdmin || !!tournamentClubId) },
   );
 
   const tournamentCategories = useMemo(() => {
@@ -86,15 +91,13 @@ const TournamentDetailPage = () => {
     !!authUser?.clubId &&
     authUser.clubId === tournament.clubId;
   const canManageSetup = isAdmin || isOwningClubStaff;
-  const windowState = getRegistrationWindowState(tournament);
-  const registrationOpen =
-    isTournamentApproved(tournament) && isRegistrationWindowOpen(tournament);
+  const registrationOpen = isTournamentRegistrationOpen(tournament);
   const registrationClosedCopy =
-    windowState === "open"
-      ? null
-      : getRegistrationClosedI18nKeys(windowState);
+    getTournamentRegistrationClosedCopy(tournament);
   const canReview = isAdmin && isTournamentPending(tournament);
   const canResubmit = isOwningClubStaff && isTournamentDeclined(tournament);
+  const canStart = canManageSetup && isTournamentApproved(tournament);
+  const canEnd = canManageSetup && isTournamentInProgress(tournament);
   const registrationPath = getTournamentRegistrationRoute(tournamentId);
 
   const handleCopyRegistrationLink = () => {
@@ -105,21 +108,91 @@ const TournamentDetailPage = () => {
   };
 
   return (
-    <div className="flex flex-row flex-1">
-      <div className="flex flex-col gap-2 border-r border-primary-300 bg-primary-75 p-4 min-w-[300px] max-w-[300px]">
-        <div className="flex flex-row items-center justify-between">
-          <Typography size="h2">{tournament.name}</Typography>
-          {isClubOwner && (
-            <IconButton className="h-10 w-10">
-              <FontAwesomeIcon
-                icon={faPencil}
-                className="text-tertiary-300"
-                size="xs"
-              />
-            </IconButton>
-          )}
+    <div className="flex flex-1 flex-col gap-6 bg-primary-75 p-6">
+      <section className="flex flex-col gap-3 rounded-m bg-primary-200 p-4 shadow-1">
+        <div className="flex flex-row flex-wrap items-center justify-between gap-3">
+          <div className="flex min-w-0 flex-row items-center gap-2">
+            <Button variant="outlined" onClick={() => router.back()}>
+              {t("shared.back")}
+            </Button>
+            <Typography size="h2" className="truncate">
+              {tournament.name}
+            </Typography>
+            {isClubOwner && (
+              <IconButton className="h-10 w-10">
+                <FontAwesomeIcon
+                  icon={faPencil}
+                  className="text-tertiary-300"
+                  size="xs"
+                />
+              </IconButton>
+            )}
+          </div>
+          <div className="flex flex-row flex-wrap items-center gap-2">
+            {registrationOpen ? (
+              <Link href={registrationPath} className="no-underline!">
+                <Button variant="contained">{t("shared.registration")}</Button>
+              </Link>
+            ) : (
+              <Button variant="contained" disabled>
+                {t("shared.registration")}
+              </Button>
+            )}
+            <Button variant="outlined" onClick={handleCopyRegistrationLink}>
+              <span className="flex flex-row items-center justify-center gap-2">
+                <FontAwesomeIcon icon={faLink} />
+                {t("tournaments.registration.copyLink")}
+              </span>
+            </Button>
+            {canReview && (
+              <>
+                <Button
+                  variant="contained"
+                  disabled={isReviewPending}
+                  onClick={() => approve.mutate({ id: tournamentId })}
+                >
+                  {t("tournaments.review.approve")}
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  disabled={isReviewPending}
+                  onClick={() => setDeclineOpen(true)}
+                >
+                  {t("tournaments.review.decline")}
+                </Button>
+              </>
+            )}
+            {canResubmit && (
+              <Button
+                variant="contained"
+                disabled={isReviewPending}
+                onClick={() => resubmit.mutate({ id: tournamentId, data: {} })}
+              >
+                {t("tournaments.review.resubmit")}
+              </Button>
+            )}
+            {canStart && (
+              <Button
+                variant="contained"
+                disabled={isLifecyclePending}
+                onClick={() => start.mutate({ id: tournamentId })}
+              >
+                {t("tournaments.lifecycle.start")}
+              </Button>
+            )}
+            {canEnd && (
+              <Button
+                variant="contained"
+                disabled={isLifecyclePending}
+                onClick={() => end.mutate({ id: tournamentId })}
+              >
+                {t("tournaments.lifecycle.end")}
+              </Button>
+            )}
+          </div>
         </div>
-        <div className="flex flex-row gap-1 flex-wrap">
+        <div className="flex flex-row flex-wrap gap-1">
           <Pill>
             <Typography size="body-paragraph-s" className="text-secondary-200">
               {t("tournaments.status.label")}:
@@ -150,84 +223,23 @@ const TournamentDetailPage = () => {
             </Typography>
           </Pill>
         </div>
+        {!registrationOpen && (
+          <Typography size="body-paragraph-s" className="text-secondary-200">
+            {t(
+              registrationClosedCopy?.body ??
+                "tournaments.registration.locked",
+            )}
+          </Typography>
+        )}
         {isTournamentDeclined(tournament) && tournament.reviewNote && (
           <Typography size="body-paragraph-s" className="text-secondary-200">
             {tournament.reviewNote}
           </Typography>
         )}
+      </section>
 
-        {registrationOpen ? (
-          <Link href={registrationPath}>
-            <Button variant="contained" className="w-full">
-              {t("shared.registration")}
-            </Button>
-          </Link>
-        ) : (
-          <>
-            <Button variant="contained" className="w-full" disabled>
-              {t("shared.registration")}
-            </Button>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
-              {registrationClosedCopy && isTournamentApproved(tournament)
-                ? t(registrationClosedCopy.body)
-                : t("tournaments.registration.locked")}
-            </Typography>
-          </>
-        )}
-
-        <Button
-          variant="outlined"
-          className="w-full"
-          onClick={handleCopyRegistrationLink}
-        >
-          <span className="flex flex-row items-center justify-center gap-2">
-            <FontAwesomeIcon icon={faLink} />
-            {t("tournaments.registration.copyLink")}
-          </span>
-        </Button>
-
-        {canReview && (
-          <div className="flex flex-col gap-2 mt-2">
-            <Button
-              variant="contained"
-              disabled={isReviewPending}
-              onClick={() => approve.mutate({ id: tournamentId })}
-            >
-              {t("tournaments.review.approve")}
-            </Button>
-            <Button
-              variant="outlined"
-              color="error"
-              disabled={isReviewPending}
-              onClick={() => setDeclineOpen(true)}
-            >
-              {t("tournaments.review.decline")}
-            </Button>
-          </div>
-        )}
-
-        {canResubmit && (
-          <Button
-            variant="contained"
-            className="mt-2"
-            disabled={isReviewPending}
-            onClick={() => resubmit.mutate({ id: tournamentId, data: {} })}
-          >
-            {t("tournaments.review.resubmit")}
-          </Button>
-        )}
-      </div>
-      <div className="flex flex-col flex-1 p-4">
-        <div>
-          <Button
-            variant="outlined"
-            onClick={() => router.back()}
-            className="mb-4!"
-          >
-            {t("shared.back")}
-          </Button>
-        </div>
-        <div className="mb-5 flex items-center justify-between">
+      <div className="flex flex-col gap-5">
+        <div className="flex items-center justify-between">
           <Typography size="h3">
             {t("categories.title")} ({tournamentCategories.length})
           </Typography>
@@ -243,18 +255,12 @@ const TournamentDetailPage = () => {
             </Button>
           )}
         </div>
-        <div className="max-w-[calc(100vw-330px)] pb-5">
-          <CategoryList categories={tournamentCategories} />
-        </div>
-        <div className="mb-5 flex items-center">
-          <Typography size="h3">{t("registrations.title")}</Typography>
-        </div>
-        <div className="max-w-[calc(100vw-330px)] pb-5">
-          <CategoryRegistrationsAccordion
-            categories={tournamentCategories}
-            tournamentId={tournamentId}
-          />
-        </div>
+        <CategoryList categories={tournamentCategories} />
+        <Typography size="h3">{t("registrations.title")}</Typography>
+        <CategoryRegistrationsAccordion
+          categories={tournamentCategories}
+          tournamentId={tournamentId}
+        />
       </div>
 
       <AddOrCreateCategoryModal

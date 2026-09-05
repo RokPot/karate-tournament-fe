@@ -69,6 +69,20 @@ export namespace TournamentsApi {
     );
   };
 
+  export const start = (id: string) => {
+    return AppRestClient.post(
+      { resSchema: CommonModels.TournamentResponseDtoSchema },
+      `/tournaments/${id}/start`,
+    );
+  };
+
+  export const end = (id: string) => {
+    return AppRestClient.post(
+      { resSchema: CommonModels.TournamentResponseDtoSchema },
+      `/tournaments/${id}/end`,
+    );
+  };
+
   export const findOne = (id: string) => {
     return AppRestClient.get(
       { resSchema: CommonModels.TournamentResponseDtoSchema },

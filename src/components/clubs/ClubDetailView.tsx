@@ -8,7 +8,8 @@ import ClubMembersSection from "@/pages/clubs/ClubMembersSection";
 import ClubTournamentSection from "@/pages/clubs/ClubTournamentSection";
 import { faPencil } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconButton } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
+import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 
 interface ClubDetailViewProps {
@@ -16,8 +17,12 @@ interface ClubDetailViewProps {
   showTournaments?: boolean;
 }
 
-export const ClubDetailView = ({ clubId, showTournaments = false }: ClubDetailViewProps) => {
+export const ClubDetailView = ({
+  clubId,
+  showTournaments = false,
+}: ClubDetailViewProps) => {
   const { t } = useTranslation();
+  const router = useRouter();
   const { data: club, isLoading, error, refetch } = ClubsQueries.useFindOne(
     { id: clubId },
     { enabled: !!clubId },
@@ -32,12 +37,21 @@ export const ClubDetailView = ({ clubId, showTournaments = false }: ClubDetailVi
   }
 
   return (
-    <div className="flex flex-1 flex-row">
-      <div className="flex min-w-[300px] max-w-[300px] flex-col gap-2 border-r border-primary-300 bg-primary-75 p-4">
-        <div className="flex flex-row items-center justify-between">
-          <Typography size="h2">{club.name}</Typography>
+    <div className="flex flex-1 flex-col gap-6 bg-primary-75 p-6">
+      <section className="flex flex-col gap-3 rounded-m bg-primary-200 p-4 shadow-1">
+        <div className="flex min-w-0 flex-row flex-wrap items-center gap-2">
+          <Button variant="outlined" onClick={() => router.back()}>
+            {t("shared.back")}
+          </Button>
+          <Typography size="h2" className="truncate">
+            {club.name}
+          </Typography>
           <IconButton className="h-10 w-10">
-            <FontAwesomeIcon icon={faPencil} className="text-tertiary-300" size="xs" />
+            <FontAwesomeIcon
+              icon={faPencil}
+              className="text-tertiary-300"
+              size="xs"
+            />
           </IconButton>
         </div>
         <div className="flex flex-row flex-wrap gap-1">
@@ -66,8 +80,9 @@ export const ClubDetailView = ({ clubId, showTournaments = false }: ClubDetailVi
             </Typography>
           </Pill>
         </div>
-      </div>
-      <div className="flex flex-1 flex-col gap-5 px-6 py-4">
+      </section>
+
+      <div className="flex flex-1 flex-col gap-5">
         <ClubMembersSection clubId={clubId} />
         <ClubInvitationsSection clubId={clubId} />
         {showTournaments && <ClubTournamentSection clubId={clubId} />}

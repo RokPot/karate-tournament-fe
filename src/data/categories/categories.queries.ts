@@ -13,8 +13,8 @@ export namespace CategoriesQueries {
 
   export const keys = {
     all: [moduleName] as const,
-    findAll: (clubId?: string, global?: boolean) =>
-      [...keys.all, "/categories", clubId, global] as const,
+    findAll: (clubId?: string, global?: boolean, includeGlobal?: boolean) =>
+      [...keys.all, "/categories", clubId, global, includeGlobal] as const,
     findOne: (id: string) => [...keys.all, "/categories/:id", id] as const,
   };
 
@@ -49,20 +49,25 @@ export namespace CategoriesQueries {
   /**
    * Query `useFindAll`
    * @summary Get categories
-   * @description Lists categories scoped by role. Admin sees all, or filter by clubId / global&#x3D;true. Club owner/coach see only their club.
+   * @description Lists categories scoped by role. Admin sees all, or filter by clubId / global&#x3D;true (globals only). Club owner/coach see only their club by default. Pass clubId and includeGlobal&#x3D;true to list globals and that club&#x27;s categories.
    * @param { string } object.clubId Query parameter. Filter by club ID (admin). Club staff may only pass their own club.. Example: `123e4567-e89b-12d3-a456-426614174000`
-   * @param { boolean } object.global Query parameter. When true, list only global categories (clubId null). Admin only.. Example: `true`
+   * @param { boolean } object.global Query parameter. When true, list only global categories (clubId null). Admin only. Mutually exclusive with includeGlobal.. Example: `true`
+   * @param { boolean } object.includeGlobal Query parameter. When true and clubId is set, list global categories (clubId null) and that club's categories. Club staff may only pass their own clubId. Mutually exclusive with global=true.. Example: `true`
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<CategoriesModels.CategoriesFindAllResponse> } List of categories
-   * @statusCodes [200, 401, 403, 404]
+   * @statusCodes [200, 400, 401, 403, 404]
    */
   export const useFindAll = <TData>(
-    { clubId, global }: { clubId?: string; global?: boolean },
+    {
+      clubId,
+      global,
+      includeGlobal,
+    }: { clubId?: string; global?: boolean; includeGlobal?: boolean },
     options?: AppQueryOptions<typeof CategoriesApi.findAll, TData>,
   ) => {
     return useQuery({
-      queryKey: keys.findAll(clubId, global),
-      queryFn: () => CategoriesApi.findAll(clubId, global),
+      queryKey: keys.findAll(clubId, global, includeGlobal),
+      queryFn: () => CategoriesApi.findAll(clubId, global, includeGlobal),
       ...options,
     });
   };

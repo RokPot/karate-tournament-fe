@@ -1,4 +1,5 @@
 import { Button, LinearProgress } from "@mui/material";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -17,6 +18,29 @@ import { SelectedRegistrationsSummary } from "../SelectedRegistrationsSummary";
 import { CategoryParticipantsSection } from "./CategoryParticipantsSection";
 import { CategoryRegistrationsModal } from "./CategoryRegistrationsModal";
 import { CategoryTeamAssignmentSection } from "./CategoryTeamAssignmentSection";
+
+const PANEL_SLIDE_PX = 32;
+const PANEL_TRANSITION = { duration: 0.3, ease: "easeOut" as const };
+
+const panelVariants = {
+  enter: (direction: number) => ({
+    opacity: 0,
+    x: direction * PANEL_SLIDE_PX,
+  }),
+  center: { opacity: 1, x: 0 },
+  exit: (direction: number) => ({
+    opacity: 0,
+    x: direction * -PANEL_SLIDE_PX,
+  }),
+};
+
+const panelTransformTemplate = ({ x }: { x?: number | string }) => {
+  const offset = typeof x === "number" ? x : Number.parseFloat(String(x ?? 0));
+  if (!offset) {
+    return "none";
+  }
+  return `translateX(${typeof x === "number" ? `${x}px` : x})`;
+};
 
 interface CategoryAssignmentStepProps {
   draft: UseDraftParticipantsReturn;
@@ -38,6 +62,7 @@ export function CategoryAssignmentStep({
   onWizardNext,
 }: CategoryAssignmentStepProps) {
   const { t } = useTranslation();
+  const shouldReduceMotion = useReducedMotion();
   const { participants } = draft;
   const [isRegistrationsModalOpen, setIsRegistrationsModalOpen] =
     useState(false);
@@ -106,43 +131,23 @@ export function CategoryAssignmentStep({
 
   return (
     <div className="flex flex-1 flex-col">
-      {stepper.phase === "overview" ? (
-        <div className="flex flex-col gap-6 px-6 py-6">
-          <div className="flex flex-col gap-1">
-            <Typography size="h3">
-              {t("registrations.public.stepper.overviewTitle")}
-            </Typography>
-          </div>
-          <SelectedRegistrationsSummary
-            participants={participants}
-            tournamentCategories={tournamentCategories}
-            teams={teamsDraft.teams}
-            groupBy="category"
-            emptyLabel={t("registrations.public.stepper.emptyCategory")}
-          />
-          {!canContinue && (
-            <Typography size="body-paragraph-s" className="text-secondary-200">
-              {t("registrations.public.validation.assignAtLeastOne")}
-            </Typography>
-          )}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-6 px-6 py-6">
-          <div className="flex flex-col gap-1">
-            <Typography size="h3">
-              {t("registrations.public.steps.categories")}
-            </Typography>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
-              {t("registrations.public.categoriesHint")}
-            </Typography>
-          </div>
+      <div className="flex flex-col gap-6 px-6 py-6">
+        {stepper.phase === "assign" && (
+          <>
+            <div className="flex flex-col gap-1">
+              <Typography size="h3">
+                {t("registrations.public.steps.categories")}
+              </Typography>
+              <Typography size="body-paragraph-s" className="text-secondary-200">
+                {t("registrations.public.categoriesHint")}
+              </Typography>
+            </div>
 
-          {totalCategories === 0 ? (
-            <Typography size="body-paragraph-m">
-              {t("registrations.public.noCategories")}
-            </Typography>
-          ) : (
-            <>
+            {totalCategories === 0 ? (
+              <Typography size="body-paragraph-m">
+                {t("registrations.public.noCategories")}
+              </Typography>
+            ) : (
               <div className="flex flex-col gap-2">
                 <div className="flex flex-row items-baseline justify-between gap-3">
                   <Typography size="body-paragraph-s" variant="prominent-2">
@@ -162,9 +167,57 @@ export function CategoryAssignmentStep({
                 </div>
                 <LinearProgress variant="determinate" value={progressValue} />
               </div>
+            )}
+          </>
+        )}
 
-              {currentItem &&
-                (isTeamCategory(currentItem.category) ? (
+        <div className="overflow-x-clip">
+          <AnimatePresence mode="wait" custom={stepper.direction}>
+            {stepper.phase === "overview" ? (
+              <motion.div
+                key="overview"
+                custom={stepper.direction}
+                variants={panelVariants}
+                initial={shouldReduceMotion ? false : "enter"}
+                animate="center"
+                exit={shouldReduceMotion ? undefined : "exit"}
+                transition={PANEL_TRANSITION}
+                transformTemplate={panelTransformTemplate}
+                className="flex flex-col gap-6"
+              >
+                <div className="flex flex-col gap-1">
+                  <Typography size="h3">
+                    {t("registrations.public.stepper.overviewTitle")}
+                  </Typography>
+                </div>
+                <SelectedRegistrationsSummary
+                  participants={participants}
+                  tournamentCategories={tournamentCategories}
+                  teams={teamsDraft.teams}
+                  groupBy="category"
+                  emptyLabel={t("registrations.public.stepper.emptyCategory")}
+                />
+                {!canContinue && (
+                  <Typography
+                    size="body-paragraph-s"
+                    className="text-secondary-200"
+                  >
+                    {t("registrations.public.validation.assignAtLeastOne")}
+                  </Typography>
+                )}
+              </motion.div>
+            ) : currentItem ? (
+              <motion.div
+                key={currentItem.category.id}
+                custom={stepper.direction}
+                variants={panelVariants}
+                initial={shouldReduceMotion ? false : "enter"}
+                animate="center"
+                exit={shouldReduceMotion ? undefined : "exit"}
+                transition={PANEL_TRANSITION}
+                transformTemplate={panelTransformTemplate}
+              >
+                {isTeamCategory(currentItem.category) ? (
                   <CategoryTeamAssignmentSection
                     item={currentItem}
                     draftParticipants={participants}
@@ -188,11 +241,12 @@ export function CategoryAssignmentStep({
                     isAssigned={assignments.isAssigned}
                     onToggle={assignments.toggleAssignment}
                   />
-                ))}
-            </>
-          )}
+                )}
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
         </div>
-      )}
+      </div>
 
       <CategoryStepperNav
         backLabel={t("registrations.public.back")}

@@ -1,5 +1,4 @@
 import { ColumnDef } from "@tanstack/react-table";
-import clsx from "clsx";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -11,10 +10,9 @@ import { DateUtils } from "@/util/date.utils";
 
 interface IProps {
   registrations: RegistrationsModels.RegistrationResponseDto[];
-  compact?: boolean;
 }
 
-const RegistrationList = ({ registrations, compact = false }: IProps) => {
+const RegistrationList = ({ registrations }: IProps) => {
   const { t } = useTranslation();
 
   const columns = useMemo<
@@ -77,12 +75,7 @@ const RegistrationList = ({ registrations, compact = false }: IProps) => {
 
   if (registrations.length === 0) {
     return (
-      <div
-        className={clsx(
-          "flex flex-col items-center justify-center gap-4",
-          compact ? "p-6" : "p-10",
-        )}
-      >
+      <div className="flex flex-col items-center justify-center gap-4 p-10">
         <Typography size="body-paragraph-lg">
           {t("registrations.noAttendees")}
         </Typography>
@@ -91,9 +84,7 @@ const RegistrationList = ({ registrations, compact = false }: IProps) => {
   }
 
   return (
-    <div
-      className={clsx("flex w-full flex-[1_1_0]", !compact && "min-h-[400px]")}
-    >
+    <div className="flex min-h-[400px] w-full flex-[1_1_0]">
       <Table
         data={registrations}
         columns={columns}

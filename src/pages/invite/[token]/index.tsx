@@ -127,4 +127,4 @@ const InvitePage = () => {
   );
 };
 
-export default InvitePage;
+export default Object.assign(InvitePage, { shell: { sidebar: false } });

@@ -53,7 +53,7 @@ export namespace TournamentsQueries {
    * Query `useFindAll`
    * @summary Get all tournaments
    * @description Retrieves tournaments visible to the caller. Optional status filter is applied before visibility.
-   * @param { TournamentsModels.TournamentsFindAllStatusParam } object.status Query parameter. Filter by review status. Example: `approved`
+   * @param { TournamentsModels.TournamentsFindAllStatusParam } object.status Query parameter. Filter by review or lifecycle status. Example: `approved`
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<TournamentsModels.TournamentsFindAllResponse> } List of tournaments
    * @statusCodes [200, 401, 403]
@@ -72,7 +72,7 @@ export namespace TournamentsQueries {
   /**
    * Query `useFindRegistered`
    * @summary Get tournaments the current user registered for
-   * @description Returns distinct approved tournaments where the authenticated caller has at least one registration (any status).
+   * @description Returns distinct approved, in-progress, or ended tournaments where the authenticated caller has at least one registration (any status).
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<TournamentsModels.FindRegisteredResponse> } Registered tournaments
    * @statusCodes [200, 401, 404]
@@ -90,7 +90,7 @@ export namespace TournamentsQueries {
   /**
    * Query `useFindOnePublic`
    * @summary Get tournament (public lite)
-   * @description Returns tournament name, dates, location, and full category details. No authentication required.
+   * @description Returns tournament name, dates, location, status, and full category details. No authentication required. Pending and declined tournaments are not returned.
    * @param { string } object.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<TournamentsModels.TournamentPublicLiteResponseDto> } Tournament found
@@ -185,6 +185,56 @@ export namespace TournamentsQueries {
 
     return useMutation({
       mutationFn: ({ id, data }) => TournamentsApi.resubmit(id, data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
+   * Mutation `useStart`
+   * @summary Start a tournament
+   * @description Admin or owning club staff. Sets an approved tournament to in_progress and closes registration.
+   * @param { string } mutation.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<CommonModels.TournamentResponseDto> } Tournament started
+   * @statusCodes [200, 400, 401, 403, 404]
+   */
+  export const useStart = (
+    options?: AppMutationOptions<typeof TournamentsApi.start, { id: string }> &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id }) => TournamentsApi.start(id),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
+   * Mutation `useEnd`
+   * @summary End a tournament
+   * @description Admin or owning club staff. Sets an in-progress tournament to ended.
+   * @param { string } mutation.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<CommonModels.TournamentResponseDto> } Tournament ended
+   * @statusCodes [200, 400, 401, 403, 404]
+   */
+  export const useEnd = (
+    options?: AppMutationOptions<typeof TournamentsApi.end, { id: string }> &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id }) => TournamentsApi.end(id),
       ...options,
       onSuccess: (...args) => {
         invalidateQueries(queryClient, moduleName, options);

@@ -3,6 +3,22 @@ import { CommonModels } from "@/data/common/common.models";
 
 export namespace TournamentsModels {
   /**
+   * TournamentPublicLiteStatusEnumSchema
+   * @type { enum }
+   * @description Public lifecycle status. Pending and declined tournaments are not returned.,E,x,a,m,p,l,e,:, ,`,a,p,p,r,o,v,e,d,`
+   */
+  export const TournamentPublicLiteStatusEnumSchema = z.enum([
+    "approved",
+    "in_progress",
+    "ended",
+  ]);
+  export type TournamentPublicLiteStatusEnum = z.infer<
+    typeof TournamentPublicLiteStatusEnumSchema
+  >;
+  export const TournamentPublicLiteStatusEnum =
+    TournamentPublicLiteStatusEnumSchema.enum;
+
+  /**
    * TournamentPublicLiteResponseDtoSchema
    * @type { object }
    * @property { string } id Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
@@ -10,6 +26,9 @@ export namespace TournamentsModels {
    * @property { string } startDate Tournament start date and time. Example: `2024-06-15T09:00:00.000Z`
    * @property { string } location Tournament location. Example: `Paris, France`
    * @property { string } registrationDeadline Registration deadline. Example: `2024-06-01T23:59:59.000Z`
+   * @property { string } status Public lifecycle status. Pending and declined tournaments are not returned.. Example: `approved`
+   * @property { string } startedAt When the tournament was marked in progress. Example: `2024-06-15T09:00:00.000Z`
+   * @property { string } endedAt When the tournament was marked ended. Example: `2024-06-16T18:00:00.000Z`
    * @property { CommonModels.CategoryResponseDto[] } categories Categories assigned to this tournament
    */
   export const TournamentPublicLiteResponseDtoSchema = z.object({
@@ -18,6 +37,9 @@ export namespace TournamentsModels {
     startDate: z.string().datetime({ offset: true }),
     location: z.string(),
     registrationDeadline: z.string().datetime({ offset: true }),
+    status: TournamentPublicLiteStatusEnumSchema,
+    startedAt: z.string().datetime({ offset: true }).nullish(),
+    endedAt: z.string().datetime({ offset: true }).nullish(),
     categories: z.array(CommonModels.CategoryResponseDtoSchema),
   });
   export type TournamentPublicLiteResponseDto = z.infer<

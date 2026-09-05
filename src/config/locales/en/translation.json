@@ -62,7 +62,7 @@
     "remove": "Remove",
     "country": "Country",
     "name": "Name",
-    "membersCount": "Members Count",
+    "membersCount": "# of members",
     "address": "Address",
     "birthday": "Birthday",
     "categories": "Categories",
@@ -331,22 +331,40 @@
     "copyInviteLink": "Copy invite link",
     "inviteLinkCopied": "Invite link copied to clipboard"
   },
+  "nav": {
+    "home": "Home",
+    "openMenu": "Open menu"
+  },
   "dashboard": {
-    "noClub": "No club assigned"
+    "noClub": "No club assigned",
+    "viewAll": "View all",
+    "stats": {
+      "clubs": "Clubs",
+      "activeTournaments": "Active tournaments",
+      "pendingRequests": "Pending requests",
+      "members": "Members",
+      "invitations": "Invitations"
+    }
   },
   "tournaments": {
     "addTournament": "Add Tournament",
     "noTournaments": "No tournaments found",
     "noPendingRequests": "No pending tournament requests",
+    "noInProgressTournaments": "No tournaments in progress",
+    "noEndedTournaments": "No ended tournaments",
     "tabs": {
       "active": "Active",
+      "inProgress": "In progress",
+      "ended": "Ended",
       "pending": "Pending"
     },
     "status": {
       "label": "Status",
       "pending": "Pending",
       "approved": "Approved",
-      "declined": "Declined"
+      "declined": "Declined",
+      "in_progress": "In progress",
+      "ended": "Ended"
     },
     "create": {
       "title": "Create Tournament",
@@ -370,14 +388,26 @@
       "resubmitSuccess": "Tournament request resubmitted for review",
       "resubmitError": "Failed to resubmit tournament request"
     },
+    "lifecycle": {
+      "start": "Start tournament",
+      "end": "End tournament",
+      "startSuccess": "Tournament started. Registration is now closed.",
+      "startError": "Failed to start tournament",
+      "endSuccess": "Tournament ended.",
+      "endError": "Failed to end tournament"
+    },
     "registration": {
       "locked": "Registration opens after the tournament is approved.",
       "closedTitle": "Registration is not open",
       "closedBody": "This tournament is not available for registration yet.",
-      "finishedTitle": "This tournament has finished",
-      "finishedBody": "Registration is no longer available because this tournament has finished.",
+      "finishedTitle": "Registration is closed",
+      "finishedBody": "Registration is no longer available because the scheduled start has passed.",
       "deadlineClosedTitle": "Registration is closed",
       "deadlineClosedBody": "Registration is no longer available because the deadline has run out.",
+      "inProgressTitle": "This tournament is in progress",
+      "inProgressBody": "Registration is closed because this tournament has started.",
+      "endedTitle": "This tournament has ended",
+      "endedBody": "Registration is no longer available because this tournament has ended.",
       "copyLink": "Copy registration link",
       "copyLinkSuccess": "Registration link copied to clipboard"
     }

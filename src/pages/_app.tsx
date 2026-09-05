@@ -10,6 +10,7 @@ import { ErrorBoundaryTrigger } from "@/components/shared/error/ErrorBoundaryTri
 import { DefaultAppHead } from "@/components/shared/head/DefaultAppHead";
 import { PageWrapper } from "@/components/shared/layout/PageWrapper";
 import { ToastContainer } from "@/components/ui/status/Toast/Toast";
+import type { AppShellConfig } from "@/config/app-shell";
 import { AppConfig } from "@/config/app.config";
 import { initA11y } from "@/config/inits/a11y";
 import { initSentry } from "@/config/inits/sentry";
@@ -26,7 +27,11 @@ import { logger } from "@/util/logger";
 initSentry();
 initA11y();
 
-export function App(props: AppProps) {
+type AppPropsWithShell = AppProps & {
+  Component: AppProps["Component"] & { shell?: AppShellConfig };
+};
+
+export function App(props: AppPropsWithShell) {
   const { Component, pageProps } = props;
   const { i18n } = useTranslation();
   const { isDarkMode } = useThemeStore();
@@ -59,7 +64,7 @@ export function App(props: AppProps) {
           <ErrorBoundaryTrigger />
           <Fonts />
           <DefaultAppHead />
-          <PageWrapper>
+          <PageWrapper shell={Component.shell}>
             <Component {...pageProps} />
 
             <ToastContainer />

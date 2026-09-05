@@ -8,8 +8,9 @@ import {
 import { ErrorState } from "@/components/shared/layout/ErrorState";
 import { LoadingState } from "@/components/shared/layout/LoadingState";
 import {
-  getRegistrationClosedI18nKeys,
-  getRegistrationWindowState,
+  getTournamentRegistrationClosedCopy,
+  isTournamentRegistrationOpen,
+  RegistrationClosedI18nKeys,
 } from "@/components/tournaments/tournament-status";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
@@ -21,18 +22,11 @@ const isRetryableError = (error: unknown) =>
     error.code === "INTERNAL_ERROR" ||
     error.code === "CANCELED_ERROR");
 
-type RegistrationClosedCopy = {
-  title:
-    | "tournaments.registration.closedTitle"
-    | "tournaments.registration.finishedTitle"
-    | "tournaments.registration.deadlineClosedTitle";
-  body:
-    | "tournaments.registration.closedBody"
-    | "tournaments.registration.finishedBody"
-    | "tournaments.registration.deadlineClosedBody";
-};
-
-const RegistrationClosedMessage = ({ copy }: { copy: RegistrationClosedCopy }) => {
+const RegistrationClosedMessage = ({
+  copy,
+}: {
+  copy: RegistrationClosedI18nKeys;
+}) => {
   const { t } = useTranslation();
   return (
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 p-10 text-center">
@@ -77,11 +71,15 @@ const RegistrationPage = () => {
     );
   }
 
-  const windowState = getRegistrationWindowState(tournament);
-  if (windowState !== "open") {
+  if (!isTournamentRegistrationOpen(tournament)) {
     return (
       <RegistrationClosedMessage
-        copy={getRegistrationClosedI18nKeys(windowState)}
+        copy={
+          getTournamentRegistrationClosedCopy(tournament) ?? {
+            title: "tournaments.registration.closedTitle",
+            body: "tournaments.registration.closedBody",
+          }
+        }
       />
     );
   }
@@ -94,4 +92,4 @@ const RegistrationPage = () => {
   );
 };
 
-export default RegistrationPage;
+export default Object.assign(RegistrationPage, { shell: { sidebar: false } });

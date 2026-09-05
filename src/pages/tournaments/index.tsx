@@ -5,55 +5,115 @@ import { useTranslation } from "react-i18next";
 import { TournamentsList } from "@/components/tournaments/TournamentsList";
 import { RouteConfig } from "@/config/route.config";
 import { AuthGuard } from "@/data/auth/AuthGuard";
+import { ClubsQueries } from "@/data/clubs/clubs.queries";
 import { TournamentsModels } from "@/data/tournaments/tournaments.models";
+import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
 import { useAuthRoles } from "@/hooks/useAuthRoles";
 import { useAuthUser } from "@/hooks/useAuthUser";
 
 const TournamentsPage = () => {
-  const { t } = useTranslation();
-  const authUser = useAuthUser();
   const { isClubOwner, isClubCoach, isAdmin } = useAuthRoles();
-  const [tab, setTab] = useState<Extract<TournamentsModels.TournamentsFindAllStatusParam, "approved" | "pending">>("approved");
-  const canCreate = isAdmin || isClubOwner || isClubCoach;
+  const authUser = useAuthUser();
 
   if (isAdmin) {
-    return (
-      <div className="mx-auto w-full max-w-7xl p-6">
-        <Tabs
-          value={tab}
-          onChange={(_event, value: "approved" | "pending") => setTab(value)}
-          className="mb-4"
-        >
-          <Tab value="approved" label={t("tournaments.tabs.active")} />
-          <Tab value="pending" label={t("tournaments.tabs.pending")} />
-        </Tabs>
-        <TournamentsList
-          showCreateButton={tab === "approved"}
-          titleSize="h2"
-          status={tab}
-          showApprovalActions={tab === "pending"}
-          showClubColumn={tab === "pending"}
-        />
-      </div>
-    );
+    return <AdminTournamentsView />;
   }
 
   if (isClubOwner || isClubCoach) {
-    return (
-      <div className="mx-auto w-full max-w-7xl p-6">
-        <TournamentsList
-          showCreateButton={canCreate}
-          titleSize="h2"
-          source="club"
-          clubId={authUser?.clubId ?? undefined}
-        />
-      </div>
-    );
+    return <ClubTournamentsView clubId={authUser?.clubId ?? ""} />;
   }
+
+  return <AllTournamentsView />;
+};
+
+type AdminTournamentTab = Extract<
+  TournamentsModels.TournamentsFindAllStatusParam,
+  "approved" | "pending" | "in_progress" | "ended"
+>;
+
+const ADMIN_TAB_EMPTY_LABEL: Partial<
+  Record<
+    AdminTournamentTab,
+    | "tournaments.noPendingRequests"
+    | "tournaments.noInProgressTournaments"
+    | "tournaments.noEndedTournaments"
+  >
+> = {
+  pending: "tournaments.noPendingRequests",
+  in_progress: "tournaments.noInProgressTournaments",
+  ended: "tournaments.noEndedTournaments",
+};
+
+const AdminTournamentsView = () => {
+  const { t } = useTranslation();
+  const [tab, setTab] = useState<AdminTournamentTab>("approved");
+  const { data, isLoading, error, refetch } = TournamentsQueries.useFindAll({
+    status: tab,
+  });
+  const emptyLabelKey = ADMIN_TAB_EMPTY_LABEL[tab];
 
   return (
     <div className="mx-auto w-full max-w-7xl p-6">
-      <TournamentsList showCreateButton={canCreate} titleSize="h2" />
+      <Tabs
+        value={tab}
+        onChange={(_event, value: AdminTournamentTab) => setTab(value)}
+        className="mb-4"
+      >
+        <Tab value="approved" label={t("tournaments.tabs.active")} />
+        <Tab value="in_progress" label={t("tournaments.tabs.inProgress")} />
+        <Tab value="ended" label={t("tournaments.tabs.ended")} />
+        <Tab value="pending" label={t("tournaments.tabs.pending")} />
+      </Tabs>
+      <TournamentsList
+        tournaments={data}
+        isLoading={isLoading}
+        error={error}
+        onRetry={refetch}
+        showCreateButton={tab === "approved"}
+        titleSize="h2"
+        showApprovalActions={tab === "pending"}
+        showStatusColumn={tab === "pending"}
+        showClubColumn
+        emptyLabel={emptyLabelKey ? t(emptyLabelKey) : undefined}
+      />
+    </div>
+  );
+};
+
+const ClubTournamentsView = ({ clubId }: { clubId: string }) => {
+  const { data, isLoading, error, refetch } = ClubsQueries.useGetTournaments(
+    { id: clubId },
+    { enabled: !!clubId },
+  );
+
+  return (
+    <div className="mx-auto w-full max-w-7xl p-6">
+      <TournamentsList
+        tournaments={data}
+        isLoading={isLoading}
+        error={error}
+        onRetry={refetch}
+        showCreateButton
+        createClubId={clubId || undefined}
+        titleSize="h2"
+        showClubColumn={false}
+      />
+    </div>
+  );
+};
+
+const AllTournamentsView = () => {
+  const { data, isLoading, error, refetch } = TournamentsQueries.useFindAll({});
+
+  return (
+    <div className="mx-auto w-full max-w-7xl p-6">
+      <TournamentsList
+        tournaments={data}
+        isLoading={isLoading}
+        error={error}
+        onRetry={refetch}
+        titleSize="h2"
+      />
     </div>
   );
 };

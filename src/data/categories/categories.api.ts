@@ -12,7 +12,11 @@ export namespace CategoriesApi {
     );
   };
 
-  export const findAll = (clubId?: string, global?: boolean) => {
+  export const findAll = (
+    clubId?: string,
+    global?: boolean,
+    includeGlobal?: boolean,
+  ) => {
     return AppRestClient.get(
       { resSchema: CategoriesModels.CategoriesFindAllResponseSchema },
       `/categories`,
@@ -20,6 +24,7 @@ export namespace CategoriesApi {
         params: {
           clubId,
           global,
+          includeGlobal,
         },
       },
     );

@@ -44,35 +44,33 @@ export const ProfileLayout = ({ children }: PropsWithChildren) => {
   ];
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-      <nav className="flex w-full flex-col gap-1 border-b border-primary-300 bg-primary-75 p-4 md:min-w-[260px] md:max-w-[260px] md:border-b-0 md:border-r">
-        <Typography size="h3" className="mb-2 px-3">
-          {t("profile.title")}
-        </Typography>
-        {navItems.map((item) => {
-          const isActive = currentPath === normalizePath(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cx(
-                "flex flex-row items-center gap-2 rounded-md px-3 py-2 no-underline!",
-                isActive
-                  ? "bg-primary-100 font-weight-500 text-tertiary-300"
-                  : "text-secondary-500 hover:bg-primary-100 hover:text-tertiary-300! dark:text-white",
-              )}
-            >
-              <FontAwesomeIcon icon={item.icon} className="w-4" />
-              <Typography size="body-paragraph-s" as="span">
-                {item.label}
-              </Typography>
-            </Link>
-          );
-        })}
-      </nav>
-      <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-6 py-4">
-        {children}
+    <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto p-6">
+      <div className="flex flex-col gap-3">
+        <Typography size="h2">{t("profile.title")}</Typography>
+        <nav className="flex flex-row flex-wrap gap-1 overflow-x-auto">
+          {navItems.map((item) => {
+            const isActive = currentPath === normalizePath(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cx(
+                  "flex shrink-0 flex-row items-center gap-2 rounded-m px-3 py-2 no-underline!",
+                  isActive
+                    ? "bg-primary-100 font-weight-500 text-tertiary-300"
+                    : "text-secondary-500 hover:bg-primary-100 hover:text-tertiary-300! dark:text-white",
+                )}
+              >
+                <FontAwesomeIcon icon={item.icon} className="w-4" />
+                <Typography size="body-paragraph-s" as="span">
+                  {item.label}
+                </Typography>
+              </Link>
+            );
+          })}
+        </nav>
       </div>
+      <div className="flex min-h-0 flex-1 flex-col gap-5">{children}</div>
     </div>
   );
 };

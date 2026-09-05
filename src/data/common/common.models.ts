@@ -64,12 +64,14 @@ export namespace CommonModels {
   /**
    * TournamentsFindAllStatusEnumSchema
    * @type { enum }
-   * @description Tournament review status,E,x,a,m,p,l,e,:, ,`,a,p,p,r,o,v,e,d,`
+   * @description Tournament review and lifecycle status,E,x,a,m,p,l,e,:, ,`,a,p,p,r,o,v,e,d,`
    */
   export const TournamentsFindAllStatusEnumSchema = z.enum([
     "pending",
     "approved",
     "declined",
+    "in_progress",
+    "ended",
   ]);
   export type TournamentsFindAllStatusEnum = z.infer<
     typeof TournamentsFindAllStatusEnumSchema
@@ -202,10 +204,14 @@ export namespace CommonModels {
    * @property { string } clubId Club ID assigned to the tournament. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { ClubResponseDto } club Club assigned to the tournament
    * @property { string[] } categoryIds Category IDs associated with this tournament. Example: `123e4567-e89b-12d3-a456-426614174000`
-   * @property { string } status Tournament review status. Example: `approved`
+   * @property { string } status Tournament review and lifecycle status. Example: `approved`
    * @property { string } reviewedAt When the tournament was last approved or declined. Example: `2024-01-15T12:00:00.000Z`
    * @property { string } reviewedBy Admin user ID who last approved or declined the tournament. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { string } reviewNote Note from decline or resubmit. Example: `Missing venue details`
+   * @property { string } startedAt When the tournament was marked in progress. Example: `2024-06-15T09:00:00.000Z`
+   * @property { string } startedBy User ID who marked the tournament in progress. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } endedAt When the tournament was marked ended. Example: `2024-06-16T18:00:00.000Z`
+   * @property { string } endedBy User ID who marked the tournament ended. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { string } createdAt Creation timestamp. Example: `2024-01-01T00:00:00.000Z`
    * @property { string } updatedAt Last update timestamp. Example: `2024-01-01T00:00:00.000Z`
    */
@@ -224,6 +230,10 @@ export namespace CommonModels {
     reviewedAt: z.string().datetime({ offset: true }).nullish(),
     reviewedBy: z.string().nullish(),
     reviewNote: z.string().nullish(),
+    startedAt: z.string().datetime({ offset: true }).nullish(),
+    startedBy: z.string().nullish(),
+    endedAt: z.string().datetime({ offset: true }).nullish(),
+    endedBy: z.string().nullish(),
     createdAt: z.string().datetime({ offset: true }),
     updatedAt: z.string().datetime({ offset: true }),
   });

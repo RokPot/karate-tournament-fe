@@ -59,9 +59,12 @@ const AddOrCreateCategoryModal = ({ open, onClose, tournamentId, currentCategory
         { enabled: open && !!tournamentId },
     );
 
+    const tournamentClubId = tournament?.clubId ?? undefined;
     const { data: categories } = CategoriesQueries.useFindAll(
-        { clubId: isAdmin ? undefined : tournament?.clubId ?? undefined },
-        { enabled: open && (isAdmin || !!tournament?.clubId) },
+        tournamentClubId
+            ? { clubId: tournamentClubId, includeGlobal: true }
+            : {},
+        { enabled: open && (isAdmin || !!tournamentClubId) },
     );
 
     const { mutate: assignCategoriesToTournament } = TournamentsQueries.useAssignCategories({
@@ -190,12 +193,12 @@ const AddOrCreateCategoryModal = ({ open, onClose, tournamentId, currentCategory
                                                 {...draggableProvided.draggableProps}
                                                 {...draggableProvided.dragHandleProps}
                                                 style={draggableProvided.draggableProps.style}
-                                                className={`flex cursor-grab flex-row items-center justify-between gap-2 rounded-md border border-primary-300 p-2 active:cursor-grabbing ${uiOutlineClass} focus-visible:outline-primary-300 ${draggableSnapshot.isDragging ? "bg-primary-100 shadow-sm" : "bg-elevation-surface-1 hover:bg-primary-75"}`}
+                                                className={`flex cursor-grab flex-row items-center justify-between gap-2 rounded-m border border-primary-300 p-2 active:cursor-grabbing ${uiOutlineClass} focus-visible:outline-primary-300 ${draggableSnapshot.isDragging ? "bg-primary-100 shadow-sm" : "bg-elevation-surface-1 hover:bg-primary-75"}`}
                                             >
                                                 <div className="flex min-w-0 flex-1 flex-row items-start gap-2">
                                                     <div
                                                         aria-hidden="true"
-                                                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-tertiary-300"
+                                                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-m text-tertiary-300"
                                                     >
                                                         <FontAwesomeIcon icon={faGripVertical} size="xs" />
                                                     </div>

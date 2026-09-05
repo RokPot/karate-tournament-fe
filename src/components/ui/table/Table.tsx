@@ -100,7 +100,7 @@ export const Table = <TData,>({
   });
 
   return (
-    <div className="flex w-full flex-1 flex-col items-center gap-3">
+    <div className="flex w-full flex-1 flex-col items-center">
       {/* Filters */}
       {children}
       {/* Table */}

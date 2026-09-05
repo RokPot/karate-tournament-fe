@@ -2,10 +2,11 @@ import { Checkbox } from "@mui/material";
 import {
   ColumnDef,
   Header,
+  PaginationState,
   RowSelectionState,
   Updater,
 } from "@tanstack/react-table";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useCategoryFormatters } from "@/components/categories/category-formatters";
@@ -181,6 +182,17 @@ export const CategoryList = ({
         .map((category) => category.id),
     );
   };
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 6
+  });
+  const totalItemsCount = categories.length;
+  const currentItems = useMemo(() => {
+    return categories.slice(pagination.pageIndex * pagination.pageSize, (pagination.pageIndex + 1) * pagination.pageSize);
+  }, [categories, pagination])
+
+
+
 
   if (categories.length === 0) {
     return (
@@ -192,10 +204,12 @@ export const CategoryList = ({
     );
   }
 
+
+
   return (
-    <div className="flex h-fit min-h-[90px] w-full flex-[1_1_0]">
+    <div className="flex h-fit min-h-[450px] w-full flex-[1_1_0]">
       <Table
-        data={categories}
+        data={currentItems}
         columns={columns}
         sorting={[]}
         onSortingChange={() => { }}
@@ -203,7 +217,21 @@ export const CategoryList = ({
           mode === "edit" ? handleRowSelectionChange : undefined
         }
         rowSelection={rowSelection}
+        pagination={{
+          pageIndex: 0,
+          pageSize: 6
+
+        }}
+        onPaginationChange={(newPagination) => {
+          setPagination(newPagination);
+        }}
         tableLayout="auto"
+        paginationOptions={{
+          rowCount: totalItemsCount,
+          pageCount: Math.ceil(totalItemsCount / pagination.pageSize)
+        }}
+
+
       />
     </div>
   );
@@ -213,9 +241,9 @@ export const HeaderCell = (header: Header<any, unknown>, label: string) => {
   return <TableHeaderCell header={header} label={label} align="start" />;
 };
 
-export const TextCell = (label: ReactNode) => {
+export const TextCell = (label: ReactNode, align: "start" | "end" = "start") => {
   return (
-    <TableCell className="flex flex-row items-center gap-2" align="start">
+    <TableCell className="flex flex-row items-center gap-2" align={align}>
       <Typography size="body-paragraph-m" >
         {label}
       </Typography>

@@ -18,9 +18,10 @@ import { useTranslation } from "react-i18next";
 interface ClubsListProps {
   showCreateButton?: boolean;
   titleSize?: "h2" | "h3";
+  hideHeader?: boolean;
 }
 
-export const ClubsList = ({ showCreateButton = true, titleSize = "h3" }: ClubsListProps) => {
+export const ClubsList = ({ showCreateButton = true, titleSize = "h3", hideHeader = false }: ClubsListProps) => {
   const router = useRouter();
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const { data: clubs, isError, isLoading, error, refetch } = ClubsQueries.useFindAll();
@@ -37,16 +38,13 @@ export const ClubsList = ({ showCreateButton = true, titleSize = "h3" }: ClubsLi
         header: ({ header }) => HeaderCell(header, t("shared.address")),
         accessorKey: "address",
         cell: ({ row }) => TextCell(row.original.address || ""),
+        flex: 1
       },
-      {
-        header: ({ header }) => HeaderCell(header, t("shared.country")),
-        accessorKey: "country",
-        cell: ({ row }) => TextCell(row.original.country || ""),
-      },
+
       {
         header: ({ header }) => HeaderCell(header, t("shared.membersCount")),
         accessorKey: "membersCount",
-        cell: ({ row }) => TextCell(row.original.membersCount.toString()),
+        cell: ({ row }) => TextCell(row.original.membersCount.toString(), "end"),
       },
     ];
   }, [t]);
@@ -61,25 +59,27 @@ export const ClubsList = ({ showCreateButton = true, titleSize = "h3" }: ClubsLi
 
   return (
     <div>
-      <div className="mb-3 flex h-14 items-center justify-between">
-        <Typography size={titleSize}>{t("clubs.title")}</Typography>
-        {showCreateButton && (
-          <Button
-            variant="contained"
-            color="primary"
-            className="flex items-center gap-2"
-            onClick={() => setCreateModalOpen(true)}
-          >
-            <FontAwesomeIcon icon={faPlus} />
-            {t("clubs.createNew")}
-          </Button>
-        )}
-      </div>
+      {!hideHeader && (
+        <div className="mb-3 flex h-14 items-center justify-between">
+          <Typography size={titleSize}>{t("clubs.title")}</Typography>
+          {showCreateButton && (
+            <Button
+              variant="contained"
+              color="primary"
+              className="flex items-center gap-2"
+              onClick={() => setCreateModalOpen(true)}
+            >
+              <FontAwesomeIcon icon={faPlus} />
+              {t("clubs.createNew")}
+            </Button>
+          )}
+        </div>
+      )}
       <Table
         data={clubs || []}
         columns={columns}
         sorting={[]}
-        onSortingChange={() => {}}
+        onSortingChange={() => { }}
         rowSelection={{}}
         onRowClick={(row) => router.push(getClubDetailRoute(row.id))}
       />

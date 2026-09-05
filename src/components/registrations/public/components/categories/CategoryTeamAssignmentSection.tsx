@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import clsx from "clsx";
-import { useMemo, useState } from "react";
+import { useReducedMotion } from "motion/react";
+import { useMemo, useRef, useState, type Ref } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Typography } from "@/components/ui/text/Typography/Typography";
@@ -54,6 +55,16 @@ function toDraftTeam(team: EditorTeam, categoryId: string): DraftTeam {
   };
 }
 
+function scrollElementIntoView(
+  element: HTMLElement | null | undefined,
+  reduceMotion: boolean | null,
+) {
+  element?.scrollIntoView({
+    behavior: reduceMotion ? "auto" : "smooth",
+    block: "center",
+  });
+}
+
 export function CategoryTeamAssignmentSection({
   item,
   draftParticipants,
@@ -73,6 +84,8 @@ export function CategoryTeamAssignmentSection({
   const [activeTeamId, setActiveTeamId] = useState(
     () => editorTeams[0]?.localId ?? "",
   );
+  const shouldReduceMotion = useReducedMotion();
+  const pendingScrollTeamIdRef = useRef<string | null>(null);
 
   const eligibleParticipants = useMemo(() => {
     return item.participants.flatMap((suitable) => {
@@ -186,6 +199,7 @@ export function CategoryTeamAssignmentSection({
 
   const handleAddTeam = () => {
     const team = createEmptyTeam();
+    pendingScrollTeamIdRef.current = team.localId;
     setEditorTeams((prev) => [...prev, team]);
     setActiveTeamId(team.localId);
   };
@@ -245,6 +259,13 @@ export function CategoryTeamAssignmentSection({
           {editorTeams.map((team, index) => (
             <TeamCard
               key={team.localId}
+              ref={(node) => {
+                if (!node || pendingScrollTeamIdRef.current !== team.localId) {
+                  return;
+                }
+                pendingScrollTeamIdRef.current = null;
+                scrollElementIntoView(node, shouldReduceMotion);
+              }}
               team={team}
               index={index}
               teamSize={teamSize}
@@ -258,7 +279,10 @@ export function CategoryTeamAssignmentSection({
                   otherTeamsAsDraft(team.localId),
                 )
               }
-              onActivate={() => setActiveTeamId(team.localId)}
+              onActivate={(element) => {
+                setActiveTeamId(team.localId);
+                scrollElementIntoView(element, shouldReduceMotion);
+              }}
               onRemoveMember={(clientId) =>
                 handleRemoveMember(team.localId, clientId)
               }
@@ -293,7 +317,7 @@ export function CategoryTeamAssignmentSection({
                     type="button"
                     disabled={disabled}
                     onClick={() => handleSelect(participant.clientId)}
-                    className="flex cursor-pointer flex-row items-center justify-between rounded-md px-2 py-1 text-left hover:bg-primary-75 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex cursor-pointer flex-row items-center justify-between rounded-m px-2 py-1 text-left hover:bg-primary-75 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <Typography size="body-paragraph-m">
                       {getParticipantLabel(
@@ -329,6 +353,7 @@ export function CategoryTeamAssignmentSection({
 }
 
 function TeamCard({
+  ref,
   team,
   index,
   teamSize,
@@ -340,6 +365,7 @@ function TeamCard({
   onRemoveMember,
   onDelete,
 }: {
+  ref?: Ref<HTMLDivElement>;
   team: EditorTeam;
   index: number;
   teamSize: number;
@@ -347,7 +373,7 @@ function TeamCard({
   isActive: boolean;
   participants: DraftParticipant[];
   isDuplicate: boolean;
-  onActivate: () => void;
+  onActivate: (element: HTMLDivElement) => void;
   onRemoveMember: (clientId: string) => void;
   onDelete: () => void;
 }) {
@@ -355,9 +381,10 @@ function TeamCard({
 
   return (
     <div
-      onClick={onActivate}
+      ref={ref}
+      onClick={(event) => onActivate(event.currentTarget)}
       className={clsx(
-        "flex cursor-pointer flex-col gap-2 rounded-md border p-3 text-left rounded-s transition ease-in-out duration-200",
+        "flex cursor-pointer flex-col gap-2 rounded-m border p-3 text-left rounded-s transition ease-in-out duration-200",
         isActive
           ? "border-tertiary-100  shadow-4 scale-105"
           : "border-primary-200",
@@ -443,7 +470,7 @@ function SlotPlaceholders({
                 event.stopPropagation();
                 onRemove(id);
               }}
-              className="flex h-10 cursor-pointer flex-row items-center justify-between rounded-md border border-primary-200 bg-white px-2 text-left"
+              className="flex h-10 cursor-pointer flex-row items-center justify-between rounded-m border border-primary-200 bg-white px-2 text-left"
             >
               <Typography size="body-paragraph-s">{name}</Typography>
               <Typography size="body-paragraph-s" className="text-secondary-200">
@@ -455,7 +482,7 @@ function SlotPlaceholders({
         {Array.from({ length: emptyCount }).map((_, index) => (
           <div
             key={`empty-${index}`}
-            className="flex h-10 items-center justify-center rounded-md border border-dashed border-primary-300 bg-primary-50 px-2"
+            className="flex h-10 items-center justify-center rounded-m border border-dashed border-primary-300 bg-primary-50 px-2"
           >
             <Typography size="body-paragraph-xs" className="text-secondary-200">
               {t("registrations.public.teams.emptySlot")}

@@ -184,22 +184,40 @@
       "imageLabel": "Slika CTA"
     }
   },
+  "nav": {
+    "home": "Domov",
+    "openMenu": "Odpri meni"
+  },
   "dashboard": {
-    "noClub": "Klub ni dodeljen"
+    "noClub": "Klub ni dodeljen",
+    "viewAll": "Prikaži vse",
+    "stats": {
+      "clubs": "Klubi",
+      "activeTournaments": "Aktivni turnirji",
+      "pendingRequests": "Zahteve v čakanju",
+      "members": "Člani",
+      "invitations": "Povabila"
+    }
   },
   "tournaments": {
     "addTournament": "Dodaj turnir",
     "noTournaments": "Ni najdenih turnirjev",
     "noPendingRequests": "Ni turnirjev v čakanju na odobritev",
+    "noInProgressTournaments": "Ni turnirjev v teku",
+    "noEndedTournaments": "Ni zaključenih turnirjev",
     "tabs": {
       "active": "Aktivni",
+      "inProgress": "V teku",
+      "ended": "Zaključeni",
       "pending": "V čakanju"
     },
     "status": {
       "label": "Status",
       "pending": "V čakanju",
       "approved": "Odobreno",
-      "declined": "Zavrnjeno"
+      "declined": "Zavrnjeno",
+      "in_progress": "V teku",
+      "ended": "Zaključeno"
     },
     "create": {
       "title": "Ustvari turnir",
@@ -223,14 +241,26 @@
       "resubmitSuccess": "Zahteva za turnir je ponovno poslana v pregled",
       "resubmitError": "Ponovno pošiljanje zahteve ni uspelo"
     },
+    "lifecycle": {
+      "start": "Začni turnir",
+      "end": "Zaključi turnir",
+      "startSuccess": "Turnir se je začel. Prijava je zdaj zaprta.",
+      "startError": "Začetek turnirja ni uspel",
+      "endSuccess": "Turnir je zaključen.",
+      "endError": "Zaključek turnirja ni uspel"
+    },
     "registration": {
       "locked": "Prijava se odpre, ko je turnir odobren.",
       "closedTitle": "Prijava ni odprta",
       "closedBody": "Ta turnir še ni na voljo za prijavo.",
-      "finishedTitle": "Turnir se je zaključil",
-      "finishedBody": "Prijava ni več na voljo, ker se je turnir zaključil.",
+      "finishedTitle": "Prijava je zaprta",
+      "finishedBody": "Prijava ni več na voljo, ker je predvideni začetek turnirja že mimo.",
       "deadlineClosedTitle": "Prijava je zaprta",
       "deadlineClosedBody": "Prijava ni več na voljo, ker je rok za prijavo potekel.",
+      "inProgressTitle": "Turnir je v teku",
+      "inProgressBody": "Prijava je zaprta, ker se je turnir začel.",
+      "endedTitle": "Turnir se je zaključil",
+      "endedBody": "Prijava ni več na voljo, ker se je turnir zaključil.",
       "copyLink": "Kopiraj povezavo za prijavo",
       "copyLinkSuccess": "Povezava za prijavo je kopirana"
     }

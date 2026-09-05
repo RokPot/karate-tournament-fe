@@ -15,32 +15,37 @@ import { Table } from "@/components/ui/table/Table";
 import TableCell from "@/components/ui/table/TableCell";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { getTournamentDetailRoute } from "@/config/route.config";
-import { ClubsQueries } from "@/data/clubs/clubs.queries";
 import { CommonModels } from "@/data/common/common.models";
-import { TournamentsModels } from "@/data/tournaments/tournaments.models";
-import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
 import { DateUtils } from "@/util/date.utils";
 
 interface TournamentsListProps {
+  tournaments?: CommonModels.TournamentResponseDto[];
+  isLoading?: boolean;
+  error?: unknown;
+  onRetry?: () => void;
   showCreateButton?: boolean;
+  createClubId?: string;
   titleSize?: "h2" | "h3";
-  source?: "all" | "registered" | "club";
-  clubId?: string;
-  status?: TournamentsModels.TournamentsFindAllStatusParam;
   showApprovalActions?: boolean;
   showClubColumn?: boolean;
   showStatusColumn?: boolean;
+  hideHeader?: boolean;
+  emptyLabel?: string;
 }
 
 export const TournamentsList = ({
+  tournaments,
+  isLoading = false,
+  error,
+  onRetry,
   showCreateButton = false,
+  createClubId,
   titleSize = "h2",
-  source = "all",
-  clubId,
-  status,
   showApprovalActions = false,
-  showClubColumn = false,
-  showStatusColumn,
+  showClubColumn = true,
+  showStatusColumn = true,
+  hideHeader = false,
+  emptyLabel,
 }: TournamentsListProps) => {
   const router = useRouter();
   const { t } = useTranslation();
@@ -49,26 +54,6 @@ export const TournamentsList = ({
     null,
   );
   const { approve, decline, isReviewPending } = useTournamentReview();
-  const includeStatusColumn = showStatusColumn ?? source !== "registered";
-
-  const allQuery = TournamentsQueries.useFindAll(
-    { status },
-    { enabled: source === "all" },
-  );
-  const registeredQuery = TournamentsQueries.useFindRegistered({
-    enabled: source === "registered",
-  });
-  const clubQuery = ClubsQueries.useGetTournaments(
-    { id: clubId ?? "" },
-    { enabled: source === "club" && !!clubId },
-  );
-  let activeQuery = allQuery;
-  if (source === "registered") {
-    activeQuery = registeredQuery;
-  } else if (source === "club") {
-    activeQuery = clubQuery;
-  }
-  const { data: tournaments, isLoading, error, refetch } = activeQuery;
 
   const columns: ColumnDef<CommonModels.TournamentResponseDto>[] = useMemo(
     () => {
@@ -112,7 +97,7 @@ export const TournamentsList = ({
         },
       );
 
-      if (includeStatusColumn) {
+      if (showStatusColumn) {
         cols.push({
           header: ({ header }) => HeaderCell(header, t("tournaments.status.label")),
           accessorKey: "status",
@@ -130,7 +115,7 @@ export const TournamentsList = ({
 
       return cols;
     },
-    [approve, includeStatusColumn, isReviewPending, showApprovalActions, showClubColumn, t],
+    [approve, isReviewPending, showApprovalActions, showClubColumn, showStatusColumn, t],
   );
 
   if (isLoading) {
@@ -138,29 +123,29 @@ export const TournamentsList = ({
   }
 
   if (error) {
-    return <ErrorState error={error} onRetry={() => refetch()} />;
+    return <ErrorState error={error} onRetry={onRetry} />;
   }
 
   const hasTournaments = tournaments && Array.isArray(tournaments) && tournaments.length > 0;
-  const emptyLabel =
-    status === "pending"
-      ? t("tournaments.noPendingRequests")
-      : t("tournaments.noTournaments");
 
   return (
     <div>
-      <div className="mb-3 flex items-center justify-between">
-        <Typography size={titleSize}>{t("shared.tournaments")}</Typography>
-        {showCreateButton && (
-          <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>
-            {t("tournaments.addTournament")}
-          </Button>
-        )}
-      </div>
+      {!hideHeader && (
+        <div className="mb-3 flex items-center justify-between">
+          <Typography size={titleSize}>{t("shared.tournaments")}</Typography>
+          {showCreateButton && (
+            <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>
+              {t("tournaments.addTournament")}
+            </Button>
+          )}
+        </div>
+      )}
 
       {!hasTournaments ? (
         <div className="flex min-h-[200px] flex-col items-center justify-center gap-4 p-10">
-          <Typography size="body-paragraph-lg">{emptyLabel}</Typography>
+          <Typography size="body-paragraph-lg">
+            {emptyLabel ?? t("tournaments.noTournaments")}
+          </Typography>
           {showCreateButton && (
             <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>
               {t("tournaments.addTournament")}
@@ -179,6 +164,7 @@ export const TournamentsList = ({
       {showCreateButton && (
         <CreateTournamentModal
           open={createDialogOpen}
+          clubId={createClubId}
           onClose={(newTournament) => {
             setCreateDialogOpen(false);
             if (newTournament) {

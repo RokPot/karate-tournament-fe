@@ -25,4 +25,4 @@ const SignInPage = () => {
   return <LoadingState />;
 };
 
-export default SignInPage;
+export default Object.assign(SignInPage, { shell: { sidebar: false } });

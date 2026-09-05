@@ -94,6 +94,7 @@ const config = {
         "5xl": "1.75rem",
         "6xl": "2rem",
         m: "0.625rem",
+        md: "0.625rem",
         l: "0.875rem",
         "2xl": "1.125rem",
         "3xl": "1.25rem",
@@ -209,7 +210,7 @@ const config = {
       },
       boxShadow: {
         "1": "0px 2px 3px 0px rgba(0, 0, 0, 0.20)",
-        "2": "0px 0px 1px 0px rgba(0, 0, 0, 0.20)",
+        "2": "0px 3px 5px 0px rgba(0, 0, 0, 0.18)",
         "3": "0px 1.13px 0.75px 0px rgba(0, 0, 0, 0.30)",
         "4": "0px 4px 7px 0px rgba(0, 0, 0, 0.25)",
         "5": "0px 2px 3px 0px rgba(0, 0, 0, 0.10)",
