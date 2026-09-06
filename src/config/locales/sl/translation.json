@@ -88,8 +88,10 @@
         "addTeam": "Dodaj ekipo",
         "starters": "Člani",
         "reserves": "Rezerve",
-        "starterRole": "član",
-        "reserveRole": "rezerva",
+        "roles": {
+          "starter": "član",
+          "reserve": "rezerva"
+        },
         "optional": "neobvezno",
         "teamN": "Ekipa {{n}}",
         "available": "Na voljo",
@@ -202,9 +204,11 @@
   "tournaments": {
     "addTournament": "Dodaj turnir",
     "noTournaments": "Ni najdenih turnirjev",
-    "noPendingRequests": "Ni turnirjev v čakanju na odobritev",
-    "noInProgressTournaments": "Ni turnirjev v teku",
-    "noEndedTournaments": "Ni zaključenih turnirjev",
+    "empty": {
+      "pending": "Ni turnirjev v čakanju na odobritev",
+      "in_progress": "Ni turnirjev v teku",
+      "ended": "Ni zaključenih turnirjev"
+    },
     "tabs": {
       "active": "Aktivni",
       "inProgress": "V teku",
@@ -335,6 +339,13 @@
     }
   },
   "invitations": {
+    "status": {
+      "label": "Status",
+      "pending": "V čakanju",
+      "accepted": "Sprejeto",
+      "expired": "Poteklo",
+      "cancelled": "Preklicano"
+    },
     "signUpToJoin": "Ustvari račun",
     "invitedAs": "Povabljeni kot {{name}}",
     "invitedEmail": "To vabilo je bilo poslano na {{email}}",

@@ -1,6 +1,5 @@
 import Pill from "@/components/ui/Pill";
 import { Typography } from "@/components/ui/text/Typography/Typography";
-import { CommonModels } from "@/data/common/common.models";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { DateUtils } from "@/util/date.utils";
 import { Button } from "@mui/material";
@@ -9,34 +8,6 @@ import { useTranslation } from "react-i18next";
 
 import { CompleteProfileModal } from "./CompleteProfileModal";
 import { ProfileField } from "./ProfileField";
-
-const roleLabelKey = (role: CommonModels.UserEnum) => {
-  switch (role) {
-    case "admin":
-      return "profile.roles.admin" as const;
-    case "club_owner":
-      return "profile.roles.club_owner" as const;
-    case "club_member":
-      return "profile.roles.club_member" as const;
-    case "club_coach":
-      return "profile.roles.club_coach" as const;
-    case "free_member":
-      return "profile.roles.free_member" as const;
-    case "judge":
-      return "profile.roles.judge" as const;
-  }
-};
-
-const genderLabelKey = (gender: CommonModels.ParticipantGenderEnum) => {
-  switch (gender) {
-    case "male":
-      return "profile.gender.male" as const;
-    case "female":
-      return "profile.gender.female" as const;
-    case "other":
-      return "profile.gender.other" as const;
-  }
-};
 
 export const ProfileOverview = () => {
   const { t } = useTranslation();
@@ -78,7 +49,7 @@ export const ProfileOverview = () => {
                     size="body-paragraph-s"
                     className="font-weight-500"
                   >
-                    {t(roleLabelKey(role))}
+                    {t(`profile.roles.${role}`)}
                   </Typography>
                 </Pill>
               ))
@@ -89,7 +60,7 @@ export const ProfileOverview = () => {
         </ProfileField>
         <ProfileField label={t("shared.gender")}>
           <Typography size="body-paragraph-m">
-            {user?.gender ? t(genderLabelKey(user.gender)) : empty}
+            {user?.gender ? t(`profile.gender.${user.gender}`) : empty}
           </Typography>
         </ProfileField>
         <ProfileField label={t("shared.birthday")}>

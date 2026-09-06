@@ -97,7 +97,7 @@ export function SelectedRegistrationsSummary({
                               key={`${team.clientId}-s-${id}`}
                               participantId={id}
                               participants={participants}
-                              suffix={t("registrations.public.teams.starterRole")}
+                              suffix={t("registrations.public.teams.roles.starter")}
                             />
                           ))}
                           {team.reserveIds.map((id) => (
@@ -105,7 +105,7 @@ export function SelectedRegistrationsSummary({
                               key={`${team.clientId}-r-${id}`}
                               participantId={id}
                               participants={participants}
-                              suffix={t("registrations.public.teams.reserveRole")}
+                              suffix={t("registrations.public.teams.roles.reserve")}
                             />
                           ))}
                         </div>

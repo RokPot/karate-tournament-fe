@@ -7,8 +7,6 @@ import TableCell from "@/components/ui/table/TableCell";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { CommonModels } from "@/data/common/common.models";
 
-import { TOURNAMENT_STATUS_I18N_KEYS } from "./tournament-status";
-
 const statusIcon = cva("h-6 w-6 shrink-0 mr-2", {
   variants: {
     variant: {
@@ -35,7 +33,7 @@ export const TournamentStatusCell = ({ status }: TournamentStatusCellProps) => {
     <TableCell className="flex flex-row items-center gap-2" align="start">
       <Typography size="body-paragraph-s" >
         <FontAwesomeIcon icon={faCircle} className={statusIcon({ variant: status })} />
-        {t(TOURNAMENT_STATUS_I18N_KEYS[status])}
+        {t(`tournaments.status.${status}`)}
       </Typography>
     </TableCell>
   );

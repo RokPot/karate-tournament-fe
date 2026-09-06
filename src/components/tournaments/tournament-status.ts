@@ -1,3 +1,5 @@
+import type { TFunction } from "i18next";
+
 import { CommonModels } from "@/data/common/common.models";
 import { TournamentsModels } from "@/data/tournaments/tournaments.models";
 
@@ -6,21 +8,6 @@ type PublicLiteStatus = TournamentsModels.TournamentPublicLiteStatusEnum;
 
 type TournamentWithStatus = {
   status?: TournamentStatus | PublicLiteStatus | null;
-};
-
-export const TOURNAMENT_STATUS_I18N_KEYS: Record<
-  TournamentStatus,
-  | "tournaments.status.pending"
-  | "tournaments.status.approved"
-  | "tournaments.status.declined"
-  | "tournaments.status.in_progress"
-  | "tournaments.status.ended"
-> = {
-  pending: "tournaments.status.pending",
-  approved: "tournaments.status.approved",
-  declined: "tournaments.status.declined",
-  in_progress: "tournaments.status.in_progress",
-  ended: "tournaments.status.ended",
 };
 
 export const isTournamentApproved = (tournament: TournamentWithStatus) =>
@@ -68,33 +55,24 @@ export const isTournamentRegistrationOpen = (
   },
 ) => isTournamentApproved(tournament) && isRegistrationWindowOpen(tournament);
 
-export type RegistrationClosedI18nKeys = {
-  title:
-    | "tournaments.registration.closedTitle"
-    | "tournaments.registration.finishedTitle"
-    | "tournaments.registration.deadlineClosedTitle"
-    | "tournaments.registration.inProgressTitle"
-    | "tournaments.registration.endedTitle";
-  body:
-    | "tournaments.registration.closedBody"
-    | "tournaments.registration.finishedBody"
-    | "tournaments.registration.deadlineClosedBody"
-    | "tournaments.registration.inProgressBody"
-    | "tournaments.registration.endedBody";
+export type RegistrationClosedCopy = {
+  title: string;
+  body: string;
 };
 
-export const getRegistrationClosedI18nKeys = (
+const getDateWindowClosedCopy = (
   state: Exclude<RegistrationWindowState, "open">,
-): RegistrationClosedI18nKeys => {
+  t: TFunction,
+): RegistrationClosedCopy => {
   if (state === "finished") {
     return {
-      title: "tournaments.registration.finishedTitle",
-      body: "tournaments.registration.finishedBody",
+      title: t("tournaments.registration.finishedTitle"),
+      body: t("tournaments.registration.finishedBody"),
     };
   }
   return {
-    title: "tournaments.registration.deadlineClosedTitle",
-    body: "tournaments.registration.deadlineClosedBody",
+    title: t("tournaments.registration.deadlineClosedTitle"),
+    body: t("tournaments.registration.deadlineClosedBody"),
   };
 };
 
@@ -103,17 +81,18 @@ export const getTournamentRegistrationClosedCopy = (
     startDate: string;
     registrationDeadline: string;
   },
-): RegistrationClosedI18nKeys | null => {
+  t: TFunction,
+): RegistrationClosedCopy | null => {
   if (isTournamentInProgress(tournament)) {
     return {
-      title: "tournaments.registration.inProgressTitle",
-      body: "tournaments.registration.inProgressBody",
+      title: t("tournaments.registration.inProgressTitle"),
+      body: t("tournaments.registration.inProgressBody"),
     };
   }
   if (isTournamentEnded(tournament)) {
     return {
-      title: "tournaments.registration.endedTitle",
-      body: "tournaments.registration.endedBody",
+      title: t("tournaments.registration.endedTitle"),
+      body: t("tournaments.registration.endedBody"),
     };
   }
   if (!isTournamentApproved(tournament)) {
@@ -123,5 +102,5 @@ export const getTournamentRegistrationClosedCopy = (
   if (windowState === "open") {
     return null;
   }
-  return getRegistrationClosedI18nKeys(windowState);
+  return getDateWindowClosedCopy(windowState, t);
 };

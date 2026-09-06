@@ -25,7 +25,7 @@ interface DashboardPanelProps extends PropsWithChildren {
 
 export const DashboardPanel = ({ title, action, children }: DashboardPanelProps) => {
   return (
-    <section className="rounded-m bg-primary-200 p-4 shadow-1">
+    <section className="rounded-m 200 p-4 shadow-1 bg-linear-to-bl/oklab  from-primary-50 via-tertiary-50 to-tertiary-75">
       {(title || action) && (
         <div className="mb-3 flex items-center justify-between gap-3">
           {title ? (

@@ -262,8 +262,10 @@
         "addTeam": "Add team",
         "starters": "Starters",
         "reserves": "Reserves",
-        "starterRole": "starter",
-        "reserveRole": "reserve",
+        "roles": {
+          "starter": "starter",
+          "reserve": "reserve"
+        },
         "optional": "optional",
         "teamN": "Team {{n}}",
         "available": "Available",
@@ -349,9 +351,11 @@
   "tournaments": {
     "addTournament": "Add Tournament",
     "noTournaments": "No tournaments found",
-    "noPendingRequests": "No pending tournament requests",
-    "noInProgressTournaments": "No tournaments in progress",
-    "noEndedTournaments": "No ended tournaments",
+    "empty": {
+      "pending": "No pending tournament requests",
+      "in_progress": "No tournaments in progress",
+      "ended": "No ended tournaments"
+    },
     "tabs": {
       "active": "Active",
       "inProgress": "In progress",
@@ -417,14 +421,16 @@
     "clubName": "Club",
     "email": "Email",
     "inviteeName": "Invitee",
-    "status": "Status",
+    "status": {
+      "label": "Status",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "expired": "Expired",
+      "cancelled": "Cancelled"
+    },
     "createdAt": "Created",
     "expiresAt": "Expires",
     "acceptedAt": "Accepted",
-    "statusPending": "Pending",
-    "statusAccepted": "Accepted",
-    "statusExpired": "Expired",
-    "statusCancelled": "Cancelled",
     "noInvitations": "No invitations found",
     "inviteHeading": "You're invited to join {{clubName}}",
     "invalidOrExpired": "Invalid or expired invitation",

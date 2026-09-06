@@ -177,11 +177,6 @@ const AccordionRegistrationsPanel = ({
   );
 };
 
-const TEAM_ROLE_I18N_KEYS = {
-  starter: "registrations.public.teams.starterRole",
-  reserve: "registrations.public.teams.reserveRole",
-} as const;
-
 const RegistrationRow = ({
   registration,
 }: {
@@ -198,7 +193,7 @@ const RegistrationRow = ({
       : null,
     user?.weight ? `${user.weight} kg` : null,
     user?.beltLevel ? t(`belt.${user.beltLevel}`) : null,
-    teamRole ? t(TEAM_ROLE_I18N_KEYS[teamRole]) : null,
+    teamRole ? t(`registrations.public.teams.roles.${teamRole}`) : null,
   ].filter((label): label is string => Boolean(label) && label !== "-");
 
   return (

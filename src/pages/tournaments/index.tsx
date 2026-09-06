@@ -31,26 +31,12 @@ type AdminTournamentTab = Extract<
   "approved" | "pending" | "in_progress" | "ended"
 >;
 
-const ADMIN_TAB_EMPTY_LABEL: Partial<
-  Record<
-    AdminTournamentTab,
-    | "tournaments.noPendingRequests"
-    | "tournaments.noInProgressTournaments"
-    | "tournaments.noEndedTournaments"
-  >
-> = {
-  pending: "tournaments.noPendingRequests",
-  in_progress: "tournaments.noInProgressTournaments",
-  ended: "tournaments.noEndedTournaments",
-};
-
 const AdminTournamentsView = () => {
   const { t } = useTranslation();
   const [tab, setTab] = useState<AdminTournamentTab>("approved");
   const { data, isLoading, error, refetch } = TournamentsQueries.useFindAll({
     status: tab,
   });
-  const emptyLabelKey = ADMIN_TAB_EMPTY_LABEL[tab];
 
   return (
     <div className="mx-auto w-full max-w-7xl p-6">
@@ -74,7 +60,9 @@ const AdminTournamentsView = () => {
         showApprovalActions={tab === "pending"}
         showStatusColumn={tab === "pending"}
         showClubColumn
-        emptyLabel={emptyLabelKey ? t(emptyLabelKey) : undefined}
+        emptyLabel={
+          tab === "approved" ? undefined : t(`tournaments.empty.${tab}`)
+        }
       />
     </div>
   );

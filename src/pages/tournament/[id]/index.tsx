@@ -15,7 +15,6 @@ import {
   isTournamentInProgress,
   isTournamentPending,
   isTournamentRegistrationOpen,
-  TOURNAMENT_STATUS_I18N_KEYS,
 } from "@/components/tournaments/tournament-status";
 import { useTournamentLifecycle } from "@/components/tournaments/useTournamentLifecycle";
 import { useTournamentReview } from "@/components/tournaments/useTournamentReview";
@@ -92,8 +91,10 @@ const TournamentDetailPage = () => {
     authUser.clubId === tournament.clubId;
   const canManageSetup = isAdmin || isOwningClubStaff;
   const registrationOpen = isTournamentRegistrationOpen(tournament);
-  const registrationClosedCopy =
-    getTournamentRegistrationClosedCopy(tournament);
+  const registrationClosedCopy = getTournamentRegistrationClosedCopy(
+    tournament,
+    t,
+  );
   const canReview = isAdmin && isTournamentPending(tournament);
   const canResubmit = isOwningClubStaff && isTournamentDeclined(tournament);
   const canStart = canManageSetup && isTournamentApproved(tournament);
@@ -129,21 +130,18 @@ const TournamentDetailPage = () => {
             )}
           </div>
           <div className="flex flex-row flex-wrap items-center gap-2">
-            {registrationOpen ? (
+            {registrationOpen && <>
               <Link href={registrationPath} className="no-underline!">
                 <Button variant="contained">{t("shared.registration")}</Button>
               </Link>
-            ) : (
-              <Button variant="contained" disabled>
-                {t("shared.registration")}
+              <Button variant="outlined" onClick={handleCopyRegistrationLink}>
+                <span className="flex flex-row items-center justify-center gap-2">
+                  <FontAwesomeIcon icon={faLink} />
+                  {t("tournaments.registration.copyLink")}
+                </span>
               </Button>
-            )}
-            <Button variant="outlined" onClick={handleCopyRegistrationLink}>
-              <span className="flex flex-row items-center justify-center gap-2">
-                <FontAwesomeIcon icon={faLink} />
-                {t("tournaments.registration.copyLink")}
-              </span>
-            </Button>
+            </>}
+
             {canReview && (
               <>
                 <Button
@@ -198,7 +196,7 @@ const TournamentDetailPage = () => {
               {t("tournaments.status.label")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">
-              {t(TOURNAMENT_STATUS_I18N_KEYS[tournament.status])}
+              {t(`tournaments.status.${tournament.status}`)}
             </Typography>
           </Pill>
           <Pill>
@@ -225,10 +223,8 @@ const TournamentDetailPage = () => {
         </div>
         {!registrationOpen && (
           <Typography size="body-paragraph-s" className="text-secondary-200">
-            {t(
-              registrationClosedCopy?.body ??
-                "tournaments.registration.locked",
-            )}
+            {registrationClosedCopy?.body ??
+              t("tournaments.registration.locked")}
           </Typography>
         )}
         {isTournamentDeclined(tournament) && tournament.reviewNote && (

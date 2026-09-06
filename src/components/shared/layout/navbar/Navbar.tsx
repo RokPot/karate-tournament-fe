@@ -25,7 +25,6 @@ export const Navbar = ({
   const { useLogout } = AuthContext.useAuth();
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const isProfileMenuOpen = Boolean(menuAnchorEl);
-
   const handleProfileMenuOpen = (
     event: React.MouseEvent<HTMLButtonElement>,
   ) => {
@@ -57,6 +56,7 @@ export const Navbar = ({
           <Image src={logo} alt="Logo" width={56} height={56} />
         </div>
       )}
+
       <div className="ml-auto">
         <Button
           type="button"

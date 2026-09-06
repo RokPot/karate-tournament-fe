@@ -18,13 +18,6 @@ import { cva } from "class-variance-authority";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const STATUS_KEYS: Record<CommonModels.InvitationStatusEnum, string> = {
-  pending: "invitations.statusPending",
-  accepted: "invitations.statusAccepted",
-  expired: "invitations.statusExpired",
-  cancelled: "invitations.statusCancelled",
-};
-
 const formatDate = (iso: string) => {
   try {
     return new Date(iso).toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" });
@@ -88,7 +81,7 @@ export const ClubInvitationsSection = ({ clubId, titleSize = "h2" }: ClubInvitat
         cell: ({ row }) => TextCell(row.original.acceptedAt ? formatDate(row.original.acceptedAt) : "—"),
       },
       {
-        header: ({ header }) => HeaderCell(header, t("invitations.status")),
+        header: ({ header }) => HeaderCell(header, t("invitations.status.label")),
         accessorKey: "status",
         cell: ({ row }) => StatusCell({ status: row.original.status }),
       },
@@ -162,7 +155,7 @@ const StatusCell = ({ status }: { status: CommonModels.InvitationStatusEnum }) =
     <TableCell className="flex flex-row items-center gap-2" align="start">
       <Typography size="body-paragraph-m" variant="prominent-2">
         <FontAwesomeIcon icon={faCircle} className={statusIcon({ variant: status })} />
-        {t(STATUS_KEYS[status] as never)}
+        {t(`invitations.status.${status}`)}
       </Typography>
     </TableCell>
   );
