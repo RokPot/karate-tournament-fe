@@ -31,7 +31,7 @@ const CustomDialog = ({
             fullWidth
             disableEscapeKeyDown={disableDismiss}
             classes={{
-            paper: "!bg-primary-200 !text-secondary-500 dark:!bg-secondary-500 dark:!text-white",
+            paper: "!bg-secondary-200 !text-neutral-500 dark:!bg-neutral-500 dark:!text-white",
         }}>
             {children}
         </Dialog>

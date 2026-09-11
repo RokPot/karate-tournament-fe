@@ -33,9 +33,9 @@ export interface SeeAllData {
 }
 
 export const tableClasses = {
-  table: "min-h-[90px] w-full max-w-[1500px] overflow-x-auto rounded-xs border border-primary-300 bg-primary-200",
-  tableHeader: "border-b border-primary-300 bg-primary-75",
-  tableRow: "group border-b border-primary-300 transition-colors duration-150 hover:bg-primary-100",
+  table: "min-h-[90px] w-full max-w-[1500px] overflow-x-auto rounded-xs border border-secondary-300 bg-secondary-200",
+  tableHeader: "border-b border-secondary-300 bg-secondary-75",
+  tableRow: "group border-b border-secondary-300 transition-colors duration-150 hover:bg-secondary-100",
   tableCell: "min-w-11",
   tableNoData: "p-3 text-center",
   tableLoading: "flex w-full items-center justify-center",
@@ -136,7 +136,7 @@ export const Table = <TData,>({
                     rowClassname?.(row.original),
                     tableClasses.tableRow,
                     onRowClick && "cursor-pointer",
-                    row?.getIsSelected() && "bg-tertiary-75 hover:bg-tertiary-100!",
+                    row?.getIsSelected() && "bg-primary-75 hover:bg-primary-100!",
                   )}
                   onClick={() => {
                     if (onRowClick) {
@@ -170,7 +170,7 @@ export const Table = <TData,>({
             {!isLoading && table.getRowModel().rows.length === 0 && (
               <tr>
                 <td colSpan={columns.length} className={tableClasses.tableNoData}>
-                  <Typography size="body-paragraph-m" variant="default" className="text-secondary-300">
+                  <Typography size="body-paragraph-m" variant="default" className="text-neutral-300">
                     {t("table.noData")}
                   </Typography>
                 </td>

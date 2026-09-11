@@ -39,7 +39,7 @@ export function ParticipantsStep({
         {t("registrations.public.steps.participants")}
       </Typography>
       {clubMembersLoadedCount > 0 && (
-        <Typography size="body-paragraph-s" className="text-secondary-200">
+        <Typography size="body-paragraph-s" className="text-neutral-200">
           {t("registrations.public.clubMembersLoaded", {
             count: clubMembersLoadedCount,
           })}

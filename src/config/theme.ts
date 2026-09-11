@@ -3,26 +3,6 @@ import { createTheme } from "@mui/material/styles";
 // Unified color palette matching Tailwind config
 export const themeColors = {
   primary: {
-    main: "#FFFFFF",
-    50: "#FDFCFB",
-    75: "#F8F7F4",
-    100: "#F2F1ED",
-    200: "#FFFFFF",
-    300: "#EBEAE6",
-    400: "#D8D6D0",
-    500: "#C4C2BB",
-  },
-  secondary: {
-    main: "#1C1C1E",
-    50: "#F5F5F5",
-    75: "#D1D1D1",
-    100: "#9CA3AF",
-    200: "#6B7280",
-    300: "#3F3F46",
-    400: "#1C1C1E",
-    500: "#0A0A0B",
-  },
-  tertiary: {
     main: "#B8963E",
     50: "#FBF6EB",
     75: "#F3E6C8",
@@ -31,6 +11,16 @@ export const themeColors = {
     300: "#9A7B32",
     400: "#7D6328",
     500: "#5C481C",
+  },
+  secondary: {
+    main: "#FFFFFF",
+    50: "#FDFCFB",
+    75: "#F8F7F4",
+    100: "#F2F1ED",
+    200: "#FFFFFF",
+    300: "#EBEAE6",
+    400: "#D8D6D0",
+    500: "#C4C2BB",
   },
   belt: {
     white: "#FFFFFF",
@@ -83,14 +73,14 @@ export const themeColors = {
     500: "#112D79",
   },
   neutral: {
-    main: "#7A7A7A",
-    50: "#F7F7F7",
-    75: "#EBEBEB",
-    100: "#DCDCDC",
-    200: "#A0A0A0",
-    300: "#909090",
-    400: "#767676",
-    500: "#5C5C5C",
+    main: "#1C1C1E",
+    50: "#F5F5F5",
+    75: "#D1D1D1",
+    100: "#9CA3AF",
+    200: "#6B7280",
+    300: "#3F3F46",
+    400: "#1C1C1E",
+    500: "#0A0A0B",
   },
   black: "#141414",
   white: "#FFFFFF",
@@ -102,15 +92,15 @@ export const createUnifiedTheme = (isDarkMode: boolean = false) => {
     palette: {
       mode: isDarkMode ? "dark" : "light",
       primary: {
-        main: themeColors.tertiary.main,
-        light: themeColors.tertiary[100],
-        dark: themeColors.tertiary[400],
-        contrastText: themeColors.secondary[500],
+        main: themeColors.primary.main,
+        light: themeColors.primary[100],
+        dark: themeColors.primary[400],
+        contrastText: themeColors.neutral[500],
       },
       secondary: {
-        main: themeColors.secondary.main,
-        light: themeColors.secondary[50],
-        dark: themeColors.secondary[500],
+        main: themeColors.neutral.main,
+        light: themeColors.neutral[50],
+        dark: themeColors.neutral[500],
         contrastText: themeColors.white,
       },
       success: {
@@ -138,13 +128,13 @@ export const createUnifiedTheme = (isDarkMode: boolean = false) => {
         contrastText: themeColors.white,
       },
       background: {
-        default: isDarkMode ? themeColors.secondary[400] : themeColors.primary[50],
-        paper: isDarkMode ? themeColors.secondary[300] : themeColors.primary[200],
+        default: isDarkMode ? themeColors.neutral[400] : themeColors.secondary[50],
+        paper: isDarkMode ? themeColors.neutral[300] : themeColors.secondary[200],
       },
       text: {
         primary: isDarkMode ? themeColors.white : themeColors.black,
-        secondary: isDarkMode ? themeColors.secondary[75] : themeColors.secondary[200],
-        disabled: isDarkMode ? themeColors.secondary[100] : themeColors.neutral[200],
+        secondary: isDarkMode ? themeColors.neutral[75] : themeColors.neutral[200],
+        disabled: isDarkMode ? themeColors.neutral[100] : themeColors.neutral[200],
       },
     },
     typography: {
@@ -201,14 +191,14 @@ export const createUnifiedTheme = (isDarkMode: boolean = false) => {
             textTransform: "none", // Keep original text case
           },
           contained: {
-            backgroundColor: themeColors.tertiary[200],
-            color: themeColors.primary[100],
+            backgroundColor: themeColors.primary[200],
+            color: themeColors.secondary[100],
             "&:hover": {
-              backgroundColor: themeColors.tertiary[300],
+              backgroundColor: themeColors.primary[300],
             },
             "&.Mui-disabled": {
-              backgroundColor: themeColors.primary[400],
-              color: themeColors.secondary[100],
+              backgroundColor: themeColors.secondary[400],
+              color: themeColors.neutral[100],
             },
           },
         },

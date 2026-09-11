@@ -20,11 +20,11 @@ export function RegistrationPageHeader({
 
   return (
     <>
-      <div className="flex flex-col gap-3 border-b border-primary-300 bg-primary-75 px-6 py-5 md:px-10 lg:px-20">
+      <div className="flex flex-col gap-3 border-b border-secondary-300 bg-secondary-75 px-6 py-5 md:px-10 lg:px-20">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 flex-col gap-1">
             <Typography size="h2">{tournament.name}</Typography>
-            <Typography size="body-paragraph-m" className="text-secondary-200">
+            <Typography size="body-paragraph-m" className="text-neutral-200">
               {t("registrations.public.pageTitle")}
             </Typography>
           </div>
@@ -38,7 +38,7 @@ export function RegistrationPageHeader({
         </div>
         <div className="flex flex-row flex-wrap gap-2">
           <Pill>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("shared.location")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">
@@ -51,7 +51,7 @@ export function RegistrationPageHeader({
             </Typography>
           </Pill>
           <Pill>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("shared.registrationDeadline")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">

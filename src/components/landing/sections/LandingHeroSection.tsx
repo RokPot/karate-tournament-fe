@@ -60,10 +60,10 @@ export const LandingHeroSection = () => {
                 }
           }
         >
-          <Typography as="h1" size="display-d6" sizeMobile="h2" variant="prominent-1" className="text-secondary-500">
+          <Typography as="h1" size="display-d6" sizeMobile="h2" variant="prominent-1" className="text-neutral-500">
             {t("landing.hero.title")}
           </Typography>
-          <Typography size="body-paragraph-lg" className="max-w-[34rem] text-secondary-200">
+          <Typography size="body-paragraph-lg" className="max-w-[34rem] text-neutral-200">
             {t("landing.hero.subtitle")}
           </Typography>
           <div>

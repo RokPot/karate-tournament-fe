@@ -61,7 +61,7 @@ export const PageWrapper = ({ children, shell }: PageWrapperProps) => {
       style={{ height: "100dvh" }}
     >
       {showSidebar && (
-        <aside className="hidden min-h-0 t:col-start-1 t:row-span-2 t:row-start-1 t:flex t:flex-col t:border-r t:border-primary-300">
+        <aside className="hidden min-h-0 t:col-start-1 t:row-span-2 t:row-start-1 t:flex t:flex-col t:border-r t:border-secondary-300">
           <AppSidebar />
         </aside>
       )}

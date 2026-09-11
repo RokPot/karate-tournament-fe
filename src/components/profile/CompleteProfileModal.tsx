@@ -188,7 +188,7 @@ export const CompleteProfileModal = ({
             fullWidth
             required
           />
-          <Typography size="body-paragraph-s" className="text-secondary-200">
+          <Typography size="body-paragraph-s" className="text-neutral-200">
             {t("profile.complete.optionalHint")}
           </Typography>
           <FormControl fullWidth error={!!errors.gender}>

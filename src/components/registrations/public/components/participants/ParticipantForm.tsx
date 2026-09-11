@@ -117,7 +117,7 @@ export function ParticipantForm({
   return (
     <form
       onSubmit={handleSubmit(handleFormSubmit)}
-      className="flex flex-col gap-4 rounded-lg border border-primary-300 bg-primary-50 p-4"
+      className="flex flex-col gap-4 rounded-lg border border-secondary-300 bg-secondary-50 p-4"
     >
       <Typography size="h3">
         {isEditing

@@ -20,7 +20,7 @@ export function ParticipantList({
 
   if (participants.length === 0) {
     return (
-      <Typography size="body-paragraph-m" className="text-secondary-200 py-4">
+      <Typography size="body-paragraph-m" className="text-neutral-200 py-4">
         {t("registrations.public.noParticipants")}
       </Typography>
     );

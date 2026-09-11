@@ -38,7 +38,7 @@ export const CategoryRegistrationsAccordion = ({
   }
 
   return (
-    <div className="overflow-hidden rounded-xs border border-primary-300 bg-primary-200">
+    <div className="overflow-hidden rounded-xs border border-secondary-300 bg-secondary-200">
       {categories.map((category) => (
         <CategoryRegistrationsAccordionItem
           key={category.id}

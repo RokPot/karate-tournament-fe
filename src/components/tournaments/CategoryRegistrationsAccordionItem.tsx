@@ -71,13 +71,13 @@ export const CategoryRegistrationsAccordionItem = ({
   ]);
 
   return (
-    <div className="border-b border-primary-100 last:border-b-0">
+    <div className="border-b border-secondary-100 last:border-b-0">
       <button
         type="button"
         className={clsx(
-          "flex w-full items-center gap-3 bg-primary-50 px-4 py-3 text-left hover:bg-secondary-50 cursor-pointer transition duration-300",
+          "flex w-full items-center gap-3 bg-secondary-50 px-4 py-3 text-left hover:bg-neutral-50 cursor-pointer transition duration-300",
           uiOutlineClass,
-          isExpanded && "border-b border-primary-300",
+          isExpanded && "border-b border-secondary-300",
         )}
         aria-expanded={isExpanded}
         aria-label={t(
@@ -90,7 +90,7 @@ export const CategoryRegistrationsAccordionItem = ({
       >
         <ArrowDropUpIcon
           className={clsx(
-            "h-6 w-6 shrink-0 text-tertiary-300 transition-transform duration-200",
+            "h-6 w-6 shrink-0 text-primary-300 transition-transform duration-200",
             isExpanded ? "rotate-0" : "rotate-180",
           )}
         />
@@ -113,7 +113,7 @@ export const CategoryRegistrationsAccordionItem = ({
         <Pill>
           <Typography
             size="body-paragraph-s"
-            className="font-weight-500 text-tertiary-300"
+            className="font-weight-500 text-primary-300"
             as="span"
           >
             {t("registrations.registeredCount", { count: registrationCount })}
@@ -121,7 +121,7 @@ export const CategoryRegistrationsAccordionItem = ({
         </Pill>
       </button>
       {isExpanded && (
-        <div className="bg-primary-200 p-0">
+        <div className="bg-secondary-200 p-0">
           <AccordionRegistrationsPanel
             isLoading={isLoading}
             error={error}
@@ -197,12 +197,12 @@ const RegistrationRow = ({
   ].filter((label): label is string => Boolean(label) && label !== "-");
 
   return (
-    <li className="flex flex-col gap-1 border-b border-primary-100 px-4 py-3 last:border-b-0">
+    <li className="flex flex-col gap-1 border-b border-secondary-100 px-4 py-3 last:border-b-0">
       <Typography size="body-paragraph-m" variant="prominent-2">
         {name}
       </Typography>
       {details.length > 0 && (
-        <Typography size="body-paragraph-s" className="text-secondary-200">
+        <Typography size="body-paragraph-s" className="text-neutral-200">
           {details.join(" · ")}
         </Typography>
       )}

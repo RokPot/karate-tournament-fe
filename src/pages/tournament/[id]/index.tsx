@@ -109,8 +109,8 @@ const TournamentDetailPage = () => {
   };
 
   return (
-    <div className="flex flex-1 flex-col gap-6 bg-primary-75 p-6">
-      <section className="flex flex-col gap-3 rounded-m bg-primary-200 p-4 shadow-1">
+    <div className="flex flex-1 flex-col gap-6 bg-secondary-75 p-6">
+      <section className="flex flex-col gap-3 rounded-m bg-secondary-200 p-4 shadow-1">
         <div className="flex flex-row flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 flex-row items-center gap-2">
             <Button variant="outlined" onClick={() => router.back()}>
@@ -123,7 +123,7 @@ const TournamentDetailPage = () => {
               <IconButton className="h-10 w-10">
                 <FontAwesomeIcon
                   icon={faPencil}
-                  className="text-tertiary-300"
+                  className="text-primary-300"
                   size="xs"
                 />
               </IconButton>
@@ -192,7 +192,7 @@ const TournamentDetailPage = () => {
         </div>
         <div className="flex flex-row flex-wrap gap-1">
           <Pill>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("tournaments.status.label")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">
@@ -200,7 +200,7 @@ const TournamentDetailPage = () => {
             </Typography>
           </Pill>
           <Pill>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("shared.location")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">
@@ -213,7 +213,7 @@ const TournamentDetailPage = () => {
             </Typography>
           </Pill>
           <Pill>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("shared.registrationDeadline")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">
@@ -222,13 +222,13 @@ const TournamentDetailPage = () => {
           </Pill>
         </div>
         {!registrationOpen && (
-          <Typography size="body-paragraph-s" className="text-secondary-200">
+          <Typography size="body-paragraph-s" className="text-neutral-200">
             {registrationClosedCopy?.body ??
               t("tournaments.registration.locked")}
           </Typography>
         )}
         {isTournamentDeclined(tournament) && tournament.reviewNote && (
-          <Typography size="body-paragraph-s" className="text-secondary-200">
+          <Typography size="body-paragraph-s" className="text-neutral-200">
             {tournament.reviewNote}
           </Typography>
         )}

@@ -193,12 +193,12 @@ const AddOrCreateCategoryModal = ({ open, onClose, tournamentId, currentCategory
                                                 {...draggableProvided.draggableProps}
                                                 {...draggableProvided.dragHandleProps}
                                                 style={draggableProvided.draggableProps.style}
-                                                className={`flex cursor-grab flex-row items-center justify-between gap-2 rounded-m border border-primary-300 p-2 active:cursor-grabbing ${uiOutlineClass} focus-visible:outline-primary-300 ${draggableSnapshot.isDragging ? "bg-primary-100 shadow-sm" : "bg-elevation-surface-1 hover:bg-primary-75"}`}
+                                                className={`flex cursor-grab flex-row items-center justify-between gap-2 rounded-m border border-secondary-300 p-2 active:cursor-grabbing ${uiOutlineClass} focus-visible:outline-secondary-300 ${draggableSnapshot.isDragging ? "bg-secondary-100 shadow-sm" : "bg-elevation-surface-1 hover:bg-secondary-75"}`}
                                             >
                                                 <div className="flex min-w-0 flex-1 flex-row items-start gap-2">
                                                     <div
                                                         aria-hidden="true"
-                                                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-m text-tertiary-300"
+                                                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-m text-primary-300"
                                                     >
                                                         <FontAwesomeIcon icon={faGripVertical} size="xs" />
                                                     </div>
@@ -259,7 +259,7 @@ const AddOrCreateCategoryModal = ({ open, onClose, tournamentId, currentCategory
                                                         setSelectedCategoriesIds((prev) => prev.filter((id) => id !== category.id));
                                                     }}
                                                 >
-                                                    <FontAwesomeIcon icon={faTrash} className="text-tertiary-300" size="2xs" />
+                                                    <FontAwesomeIcon icon={faTrash} className="text-primary-300" size="2xs" />
                                                 </IconButton>
                                             </div>
                                         )}

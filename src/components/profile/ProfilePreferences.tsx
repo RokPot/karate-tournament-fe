@@ -71,7 +71,7 @@ export const ProfilePreferences = () => {
               control={<Switch checked />}
               label={t("profile.preferences.invitationEmails")}
             />
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("profile.preferences.notificationsHint")}
             </Typography>
           </div>

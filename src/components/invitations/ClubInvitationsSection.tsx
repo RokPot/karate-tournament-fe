@@ -137,7 +137,7 @@ export const ClubInvitationsSection = ({ clubId, titleSize = "h2" }: ClubInvitat
 const statusIcon = cva("h-6 w-6 shrink-0 mr-2", {
   variants: {
     variant: {
-      neutral: "text-secondary-200",
+      neutral: "text-neutral-200",
       pending: "stroke-warning text-warning",
       accepted: "stroke-success text-success",
       expired: "stroke-danger text-danger",

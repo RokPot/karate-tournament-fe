@@ -108,7 +108,7 @@ export function CategoryAssignmentStep({
     return (
       <div className="flex flex-1 flex-col">
         <div className="px-6 py-6">
-          <Typography size="body-paragraph-s" className="mb-2 text-secondary-200">
+          <Typography size="body-paragraph-s" className="mb-2 text-neutral-200">
             {t("registrations.public.categoriesLoading")}
           </Typography>
           <LoadingState />
@@ -138,7 +138,7 @@ export function CategoryAssignmentStep({
               <Typography size="h3">
                 {t("registrations.public.steps.categories")}
               </Typography>
-              <Typography size="body-paragraph-s" className="text-secondary-200">
+              <Typography size="body-paragraph-s" className="text-neutral-200">
                 {t("registrations.public.categoriesHint")}
               </Typography>
             </div>
@@ -159,7 +159,7 @@ export function CategoryAssignmentStep({
                   {currentItem && (
                     <Typography
                       size="body-paragraph-s"
-                      className="truncate text-secondary-200"
+                      className="truncate text-neutral-200"
                     >
                       {currentItem.category.name}
                     </Typography>
@@ -200,7 +200,7 @@ export function CategoryAssignmentStep({
                 {!canContinue && (
                   <Typography
                     size="body-paragraph-s"
-                    className="text-secondary-200"
+                    className="text-neutral-200"
                   >
                     {t("registrations.public.validation.assignAtLeastOne")}
                   </Typography>
@@ -304,7 +304,7 @@ function CategoryStepperNav({
   nextDisabled = false,
 }: CategoryStepperNavProps) {
   return (
-    <div className="mt-auto flex flex-row flex-wrap items-center justify-between gap-4 border-t border-primary-300 px-6 py-4">
+    <div className="mt-auto flex flex-row flex-wrap items-center justify-between gap-4 border-t border-secondary-300 px-6 py-4">
       <Button variant="outlined" onClick={onBack}>
         {backLabel}
       </Button>

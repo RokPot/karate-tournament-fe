@@ -51,7 +51,6 @@
   ::backdrop,
   ::file-selector-button {
     border-color: #ebeae6;
-    /* @apply border-neutral-300; */
   }
 
   /* Scrollbar defaults for light mode */

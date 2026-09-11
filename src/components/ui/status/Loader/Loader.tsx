@@ -13,7 +13,7 @@ const loaderWrapper = cva("flex items-center justify-center", {
   },
 });
 
-const loader = cva("animate-loader-spin text-tertiary-300", {
+const loader = cva("animate-loader-spin text-primary-300", {
   variants: {
     size: {
       default: "h-3-5 w-3-5",

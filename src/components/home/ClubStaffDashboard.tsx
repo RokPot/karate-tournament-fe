@@ -26,14 +26,14 @@ export const ClubStaffDashboard = ({ clubId }: ClubStaffDashboardProps) => {
 
   if (!clubId) {
     return (
-      <div className="bg-primary-75 p-6">
+      <div className="bg-secondary-75 p-6">
         <Typography size="body-paragraph-m">{t("dashboard.noClub")}</Typography>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6 bg-primary-75 p-6">
+    <div className="flex flex-col gap-6 bg-secondary-75 p-6">
       <div className="grid grid-cols-1 gap-4 t:grid-cols-2">
         <DashboardStatCard
           label={t("dashboard.stats.members")}

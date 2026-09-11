@@ -57,8 +57,8 @@ export const ProfileLayout = ({ children }: PropsWithChildren) => {
                 className={cx(
                   "flex shrink-0 flex-row items-center gap-2 rounded-m px-3 py-2 no-underline!",
                   isActive
-                    ? "bg-primary-100 font-weight-500 text-tertiary-300"
-                    : "text-secondary-500 hover:bg-primary-100 hover:text-tertiary-300! dark:text-white",
+                    ? "bg-secondary-100 font-weight-500 text-primary-300"
+                    : "text-neutral-500 hover:bg-secondary-100 hover:text-primary-300! dark:text-white",
                 )}
               >
                 <FontAwesomeIcon icon={item.icon} className="w-4" />

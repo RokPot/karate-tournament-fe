@@ -19,7 +19,7 @@ export const ClubProfileDashboard = ({ clubId }: ClubProfileDashboardProps) => {
 
   if (!clubId) {
     return (
-      <div className="bg-primary-75 p-6">
+      <div className="bg-secondary-75 p-6">
         <Typography size="body-paragraph-m">{t("dashboard.noClub")}</Typography>
       </div>
     );
@@ -34,11 +34,11 @@ export const ClubProfileDashboard = ({ clubId }: ClubProfileDashboardProps) => {
   }
 
   return (
-    <div className="bg-primary-75 p-6">
+    <div className="bg-secondary-75 p-6">
       <DashboardPanel title={club.name}>
         <div className="flex flex-row flex-wrap gap-1">
           <Pill>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("shared.location")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">
@@ -46,7 +46,7 @@ export const ClubProfileDashboard = ({ clubId }: ClubProfileDashboardProps) => {
             </Typography>
           </Pill>
           <Pill>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("shared.country")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">

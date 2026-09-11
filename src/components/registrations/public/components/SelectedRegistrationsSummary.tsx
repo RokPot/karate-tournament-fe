@@ -44,19 +44,19 @@ export function SelectedRegistrationsSummary({
       return null;
     }
     return (
-      <Typography size="body-paragraph-s" className="text-secondary-200">
+      <Typography size="body-paragraph-s" className="text-neutral-200">
         {emptyLabel}
       </Typography>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-primary-300 bg-primary-75 p-4">
+    <div className="flex flex-col gap-3 rounded-lg border border-secondary-300 bg-secondary-75 p-4">
       <Typography size="body-paragraph-m" variant="prominent-2">
         {t("registrations.public.selectedRegistrations.title")}
       </Typography>
       {!compact && (
-        <Typography size="body-paragraph-s" className="text-secondary-200">
+        <Typography size="body-paragraph-s" className="text-neutral-200">
           {t("registrations.public.selectedRegistrations.hint")}
         </Typography>
       )}

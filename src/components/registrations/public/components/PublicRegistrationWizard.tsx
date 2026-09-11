@@ -116,7 +116,7 @@ export function PublicRegistrationWizard({
             !canAdvanceFromStep(wizard.step, draft.participants) && (
               <Typography
                 size="body-paragraph-s"
-                className="px-6 text-secondary-200"
+                className="px-6 text-neutral-200"
               >
                 {t("registrations.public.validation.noParticipants")}
               </Typography>

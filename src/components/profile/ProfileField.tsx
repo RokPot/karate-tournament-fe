@@ -11,7 +11,7 @@ export const ProfileField = ({
 }: PropsWithChildren<ProfileFieldProps>) => {
   return (
     <div className="flex flex-col gap-1">
-      <Typography size="labels-s" className="text-secondary-200">
+      <Typography size="labels-s" className="text-neutral-200">
         {label}
       </Typography>
       <div>{children}</div>

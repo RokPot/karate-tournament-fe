@@ -38,7 +38,7 @@ export const Navbar = ({
   return (
     <header
       className={cx(
-        "z-20 flex h-[70px] items-center border-b border-primary-300 bg-primary-200 px-4 text-secondary-500 shadow-1 dark:border-secondary-300 dark:bg-secondary-400 dark:text-white dark:shadow-5",
+        "z-20 flex h-[70px] items-center border-b border-secondary-300 bg-secondary-200 px-4 text-neutral-500 shadow-1 dark:border-neutral-300 dark:bg-neutral-400 dark:text-white dark:shadow-5",
       )}
     >
       {showMenuButton && (
@@ -47,7 +47,7 @@ export const Navbar = ({
             aria-label={t("nav.openMenu")}
             onClick={onMenuClick}
           >
-            <FontAwesomeIcon icon={faBars} className="text-tertiary-200" />
+            <FontAwesomeIcon icon={faBars} className="text-primary-200" />
           </IconButton>
         </div>
       )}
@@ -81,7 +81,7 @@ export const Navbar = ({
           slotProps={{
             paper: {
               className:
-                "mt-2 w-40 rounded-m border border-primary-300 bg-primary-200 text-secondary-500 shadow-lg dark:border-secondary-300 dark:bg-secondary-500 dark:text-white",
+                "mt-2 w-40 rounded-m border border-secondary-300 bg-secondary-200 text-neutral-500 shadow-lg dark:border-neutral-300 dark:bg-neutral-500 dark:text-white",
             },
           }}
         >
@@ -89,7 +89,7 @@ export const Navbar = ({
             component={Link}
             href={RouteConfig.profile}
             onClick={handleProfileMenuClose}
-            className="no-underline! hover:bg-primary-75 dark:hover:bg-secondary-400 hover:text-tertiary-300!"
+            className="no-underline! hover:bg-secondary-75 dark:hover:bg-neutral-400 hover:text-primary-300!"
           >
             {t("profile.title")}
           </MenuItem>
@@ -98,7 +98,7 @@ export const Navbar = ({
               handleProfileMenuClose();
               useLogout.mutate();
             }}
-            className="hover:bg-primary-75 dark:hover:bg-secondary-400 hover:text-tertiary-300!"
+            className="hover:bg-secondary-75 dark:hover:bg-neutral-400 hover:text-primary-300!"
           >
             {t("profile.signOut")}
           </MenuItem>

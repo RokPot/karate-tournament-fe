@@ -22,7 +22,7 @@ export const ProfileClub = () => {
             <Pill>
               <Typography
                 size="body-paragraph-s"
-                className="text-secondary-200"
+                className="text-neutral-200"
               >
                 {t("shared.location")}:
               </Typography>
@@ -33,7 +33,7 @@ export const ProfileClub = () => {
             <Pill>
               <Typography
                 size="body-paragraph-s"
-                className="text-secondary-200"
+                className="text-neutral-200"
               >
                 {t("shared.country")}:
               </Typography>
@@ -44,7 +44,7 @@ export const ProfileClub = () => {
             <Pill>
               <Typography
                 size="body-paragraph-s"
-                className="text-secondary-200"
+                className="text-neutral-200"
               >
                 {t("shared.membersCount")}:
               </Typography>

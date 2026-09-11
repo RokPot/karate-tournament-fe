@@ -32,7 +32,7 @@ export const LandingHeader = () => {
       }}
       className={`sticky top-0 z-20 flex items-center justify-between px-4 transition-colors duration-300 t:px-10 m:px-16 ${
         isScrolled
-          ? "border-b border-primary-300/80 bg-primary-200/90 shadow-sm backdrop-blur-md"
+          ? "border-b border-secondary-300/80 bg-secondary-200/90 shadow-sm backdrop-blur-md"
           : "border-b border-transparent bg-transparent"
       }`}
     >

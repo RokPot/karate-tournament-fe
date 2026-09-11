@@ -235,12 +235,12 @@ export function CategoryTeamAssignmentSection({
     activeTeam.reserveIds.length >= reserveCap;
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border border-primary-200 bg-white p-4">
+    <div className="flex flex-col gap-4 rounded-lg border border-secondary-200 bg-white p-4">
       <div className="flex flex-col">
         <Typography size="body-paragraph-lg" variant="prominent-2">
           {category.name}
         </Typography>
-        <Typography size="body-paragraph-xs" className="text-secondary-200">
+        <Typography size="body-paragraph-xs" className="text-neutral-200">
           {t(`discipline.${category.discipline}`)}
           {" · "}
           {genderLabel}
@@ -294,12 +294,12 @@ export function CategoryTeamAssignmentSection({
           </Button>
         </div>
 
-        <div className="flex max-h-[min(80vh,640px)] h-fit flex-col gap-2 lg:sticky lg:top-4 flex-1 bg-primary-100/80 p-4 rounded-s">
+        <div className="flex max-h-[min(80vh,640px)] h-fit flex-col gap-2 lg:sticky lg:top-4 flex-1 bg-secondary-100/80 p-4 rounded-s">
           <Typography size="body-paragraph-s" variant="prominent-2">
             {t("registrations.public.teams.eligible")}
           </Typography>
           {eligibleParticipants.length === 0 ? (
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("registrations.public.noEligibleParticipantsForCategory")}
             </Typography>
           ) : (
@@ -317,7 +317,7 @@ export function CategoryTeamAssignmentSection({
                     type="button"
                     disabled={disabled}
                     onClick={() => handleSelect(participant.clientId)}
-                    className="flex cursor-pointer flex-row items-center justify-between rounded-m px-2 py-1 text-left hover:bg-primary-75 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="flex cursor-pointer flex-row items-center justify-between rounded-m px-2 py-1 text-left hover:bg-secondary-75 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     <Typography size="body-paragraph-m">
                       {getParticipantLabel(
@@ -327,7 +327,7 @@ export function CategoryTeamAssignmentSection({
                     </Typography>
                     <Typography
                       size="body-paragraph-xs"
-                      className="text-secondary-200"
+                      className="text-neutral-200"
                     >
                       {availability === "unused"
                         ? t("registrations.public.teams.available")
@@ -344,7 +344,7 @@ export function CategoryTeamAssignmentSection({
       </div>
 
       {isDuplicateRoster && (
-        <Typography size="body-paragraph-s" className="text-secondary-200">
+        <Typography size="body-paragraph-s" className="text-neutral-200">
           {t("registrations.public.teams.duplicateTeam")}
         </Typography>
       )}
@@ -386,8 +386,8 @@ function TeamCard({
       className={clsx(
         "flex cursor-pointer flex-col gap-2 rounded-m border p-3 text-left rounded-s transition ease-in-out duration-200",
         isActive
-          ? "border-tertiary-100  shadow-4 scale-105"
-          : "border-primary-200",
+          ? "border-primary-100  shadow-4 scale-105"
+          : "border-secondary-200",
       )}
     >
       <div className="flex flex-row items-start justify-between gap-3">
@@ -424,7 +424,7 @@ function TeamCard({
         />
       )}
       {isDuplicate && (
-        <Typography size="body-paragraph-xs" className="text-secondary-200">
+        <Typography size="body-paragraph-xs" className="text-neutral-200">
           {t("registrations.public.teams.duplicateTeam")}
         </Typography>
       )}
@@ -452,7 +452,7 @@ function SlotPlaceholders({
 
   return (
     <div className="flex flex-col gap-1">
-      <Typography size="body-paragraph-xs" className="text-secondary-200">
+      <Typography size="body-paragraph-xs" className="text-neutral-200">
         {label} ({ids.length}/{requiredCount}
         {optional ? ` ${t("registrations.public.teams.optional")}` : ""})
       </Typography>
@@ -470,10 +470,10 @@ function SlotPlaceholders({
                 event.stopPropagation();
                 onRemove(id);
               }}
-              className="flex h-10 cursor-pointer flex-row items-center justify-between rounded-m border border-primary-200 bg-white px-2 text-left"
+              className="flex h-10 cursor-pointer flex-row items-center justify-between rounded-m border border-secondary-200 bg-white px-2 text-left"
             >
               <Typography size="body-paragraph-s">{name}</Typography>
-              <Typography size="body-paragraph-s" className="text-secondary-200">
+              <Typography size="body-paragraph-s" className="text-neutral-200">
                 ×
               </Typography>
             </button>
@@ -482,9 +482,9 @@ function SlotPlaceholders({
         {Array.from({ length: emptyCount }).map((_, index) => (
           <div
             key={`empty-${index}`}
-            className="flex h-10 items-center justify-center rounded-m border border-dashed border-primary-300 bg-primary-50 px-2"
+            className="flex h-10 items-center justify-center rounded-m border border-dashed border-secondary-300 bg-secondary-50 px-2"
           >
-            <Typography size="body-paragraph-xs" className="text-secondary-200">
+            <Typography size="body-paragraph-xs" className="text-neutral-200">
               {t("registrations.public.teams.emptySlot")}
             </Typography>
           </div>

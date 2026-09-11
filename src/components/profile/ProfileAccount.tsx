@@ -25,7 +25,7 @@ export const ProfileAccount = () => {
             <Button variant="outlined" disabled>
               {t("profile.account.changePassword")}
             </Button>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("profile.account.passwordManagedByAuth0")}
             </Typography>
           </div>
@@ -35,7 +35,7 @@ export const ProfileAccount = () => {
             <Typography size="body-paragraph-m">
               {t("profile.account.currentSession")}
             </Typography>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("profile.account.sessionsPlaceholder")}
             </Typography>
           </div>

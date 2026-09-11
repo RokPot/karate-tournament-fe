@@ -52,10 +52,10 @@ export const Pagination = ({ pagination, table }: { pagination: PaginationState;
             {showEllipsis && (
               <Button
                 key={`ellipsis-${pageNum}`}
-                className="h-12 w-12 border border-primary-300 bg-primary-100"
+                className="h-12 w-12 border border-secondary-300 bg-secondary-100"
                 disabled
               >
-                <Typography size="body-paragraph-xs" variant="prominent-2" className="text-secondary-300">
+                <Typography size="body-paragraph-xs" variant="prominent-2" className="text-neutral-300">
                   ...
                 </Typography>
               </Button>
@@ -70,7 +70,7 @@ export const Pagination = ({ pagination, table }: { pagination: PaginationState;
                 table.setPageIndex(pageNum);
               }}
             >
-              <Typography size="body-paragraph-xs" variant="prominent-2" className="text-secondary-500">
+              <Typography size="body-paragraph-xs" variant="prominent-2" className="text-neutral-500">
                 {pageNum + 1}
               </Typography>
             </Button>

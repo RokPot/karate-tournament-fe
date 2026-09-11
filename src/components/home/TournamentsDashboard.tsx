@@ -22,7 +22,7 @@ const AllTournamentsDashboard = () => {
   const { data, isLoading, error, refetch } = TournamentsQueries.useFindAll({});
 
   return (
-    <div className="bg-primary-75 p-6">
+    <div className="bg-secondary-75 p-6">
       <DashboardPanel title={t("shared.tournaments")}>
         <TournamentsList
           tournaments={data}
@@ -45,7 +45,7 @@ const RegisteredTournamentsDashboard = () => {
     TournamentsQueries.useFindRegistered();
 
   return (
-    <div className="bg-primary-75 p-6">
+    <div className="bg-secondary-75 p-6">
       <DashboardPanel title={t("shared.tournaments")}>
         <TournamentsList
           tournaments={data}

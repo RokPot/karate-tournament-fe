@@ -24,18 +24,18 @@ export function CategoryParticipantsSection({
   const { category } = item;
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-primary-200 bg-white p-4">
+    <div className="flex flex-col gap-3 rounded-lg border border-secondary-200 bg-white p-4">
       <div className="flex flex-col">
         <Typography size="body-paragraph-lg" variant="prominent-2">
           {category.name}
         </Typography>
-        <Typography size="body-paragraph-xs" className="text-secondary-200">
+        <Typography size="body-paragraph-xs" className="text-neutral-200">
           {t(`discipline.${category.discipline}`)}
         </Typography>
       </div>
 
       {item.participants.length === 0 ? (
-        <Typography size="body-paragraph-s" className="text-secondary-200">
+        <Typography size="body-paragraph-s" className="text-neutral-200">
           {t("registrations.public.noEligibleParticipantsForCategory")}
         </Typography>
       ) : (

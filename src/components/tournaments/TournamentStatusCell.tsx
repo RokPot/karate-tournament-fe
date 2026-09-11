@@ -13,8 +13,8 @@ const statusIcon = cva("h-6 w-6 shrink-0 mr-2", {
       pending: "stroke-warning text-warning",
       approved: "stroke-success text-success",
       declined: "stroke-danger text-danger",
-      in_progress: "stroke-tertiary-300 text-tertiary-300",
-      ended: "stroke-secondary-200 text-secondary-200",
+      in_progress: "stroke-primary-300 text-primary-300",
+      ended: "stroke-neutral-200 text-neutral-200",
     },
   },
   defaultVariants: {

@@ -24,7 +24,7 @@ export function ParticipantListItem({
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-row items-center justify-between gap-4 rounded-lg border border-primary-200 bg-white px-4 py-3">
+    <div className="flex flex-row items-center justify-between gap-4 rounded-lg border border-secondary-200 bg-white px-4 py-3">
       <Typography size="body-paragraph-m">
         {getParticipantLabel(participant, index)}
       </Typography>

@@ -5,10 +5,10 @@ import { Loader } from "@/components/ui/status/Loader/Loader";
 import { statusIcon, StatusParams, statusSeparator } from "@/components/ui/status/shared/status";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 
-const alert = cva("min-h-0 overflow-hidden rounded-sm border bg-primary-200 p-0", {
+const alert = cva("min-h-0 overflow-hidden rounded-sm border bg-secondary-200 p-0", {
   variants: {
     variant: {
-      neutral: "border-primary-400",
+      neutral: "border-secondary-400",
       success: "border-success",
       warning: "border-warning",
       error: "border-danger",
@@ -33,7 +33,7 @@ export const Alert = ({ variant, text, isLoading = false, actions = [], icon: Ic
         <div className="py-3-5 flex w-full items-start gap-3 px-4">
           {isLoading && <Loader size="default" className="shrink-0" />}
           {!isLoading && Icon && <Icon className={statusIcon({ variant })} />}
-          <Typography size="labels-lg" className="text-secondary-500">
+          <Typography size="labels-lg" className="text-neutral-500">
             {text}
           </Typography>
         </div>

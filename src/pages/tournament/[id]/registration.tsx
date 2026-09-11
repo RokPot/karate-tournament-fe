@@ -29,7 +29,7 @@ const RegistrationClosedMessage = ({
 }) => (
   <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 p-10 text-center">
     <Typography size="h3">{copy.title}</Typography>
-    <Typography size="body-paragraph-m" className="text-secondary-200">
+    <Typography size="body-paragraph-m" className="text-neutral-200">
       {copy.body}
     </Typography>
   </div>

@@ -32,7 +32,7 @@ export const LandingFeaturesSection = () => {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section id="features" className="bg-primary-75 px-4 py-16 t:px-10 m:px-16 m:py-24">
+    <section id="features" className="bg-secondary-75 px-4 py-16 t:px-10 m:px-16 m:py-24">
       <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-10">
         <motion.div
           className="flex max-w-[40rem] flex-col gap-3"
@@ -44,7 +44,7 @@ export const LandingFeaturesSection = () => {
           <Typography as="h2" size="h2" sizeMobile="h3" variant="prominent-1">
             {t("landing.features.title")}
           </Typography>
-          <Typography size="body-paragraph-m" className="text-secondary-200">
+          <Typography size="body-paragraph-m" className="text-neutral-200">
             {t("landing.features.subtitle")}
           </Typography>
         </motion.div>
@@ -52,7 +52,7 @@ export const LandingFeaturesSection = () => {
           {FEATURES.map((feature, index) => (
             <motion.article
               key={feature.titleKey}
-              className="flex flex-col gap-4 rounded-2xl border border-primary-300 bg-primary-200 p-5"
+              className="flex flex-col gap-4 rounded-2xl border border-secondary-300 bg-secondary-200 p-5"
               initial={
                 shouldReduceMotion
                   ? false
@@ -74,7 +74,7 @@ export const LandingFeaturesSection = () => {
               <Typography as="h3" size="h5" variant="prominent-1">
                 {t(feature.titleKey)}
               </Typography>
-              <Typography size="body-paragraph-s" className="text-secondary-200">
+              <Typography size="body-paragraph-s" className="text-neutral-200">
                 {t(feature.descriptionKey)}
               </Typography>
             </motion.article>

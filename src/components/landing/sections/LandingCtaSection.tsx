@@ -36,10 +36,10 @@ export const LandingCtaSection = () => {
           className="flex flex-col gap-5"
           style={shouldReduceMotion ? undefined : { x: copyX }}
         >
-          <Typography as="h2" size="h2" sizeMobile="h3" variant="prominent-1" className="text-secondary-500">
+          <Typography as="h2" size="h2" sizeMobile="h3" variant="prominent-1" className="text-neutral-500">
             {t("landing.cta.title")}
           </Typography>
-          <Typography size="body-paragraph-m" className="max-w-[34rem] text-secondary-300">
+          <Typography size="body-paragraph-m" className="max-w-[34rem] text-neutral-300">
             {t("landing.cta.subtitle")}
           </Typography>
           <div className="flex flex-wrap gap-3">

@@ -143,7 +143,7 @@ export function VirtualizedTableWithStickyHeader<TData>({
             })}
           {!isLoading && table.getRowModel().rows.length === 0 && (
             <div>
-              <Typography size="body-paragraph-m" variant="default" className="text-secondary-300">
+              <Typography size="body-paragraph-m" variant="default" className="text-neutral-300">
                 {t("table.noData")}
               </Typography>
             </div>

@@ -23,7 +23,7 @@ export function WizardStepNav({
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-row justify-between gap-4 border-t border-primary-300 px-6 py-4">
+    <div className="flex flex-row justify-between gap-4 border-t border-secondary-300 px-6 py-4">
       <Button
         variant="outlined"
         onClick={onBack}

@@ -9,11 +9,11 @@ interface DashboardStatCardProps {
 
 export const DashboardStatCard = ({ label, value }: DashboardStatCardProps) => {
   return (
-    <div className="rounded-m bg-tertiary-100 p-4 shadow-2 bg-yellow-gradient-box border border-tertiary-75">
-      <Typography size="body-paragraph-s" className="text-secondary-200">
+    <div className="rounded-m bg-primary-100 p-4 shadow-2 bg-yellow-gradient-box border border-primary-75">
+      <Typography size="body-paragraph-s" className="text-neutral-200">
         {label}
       </Typography>
-      <Typography size="h2" className="text-tertiary-200">{value}</Typography>
+      <Typography size="h2" className="text-primary-200">{value}</Typography>
     </div>
   );
 };
@@ -25,7 +25,7 @@ interface DashboardPanelProps extends PropsWithChildren {
 
 export const DashboardPanel = ({ title, action, children }: DashboardPanelProps) => {
   return (
-    <section className="rounded-m 200 p-4 shadow-1 bg-linear-to-bl/oklab  from-primary-50 via-tertiary-50 to-tertiary-75">
+    <section className="rounded-m border border-secondary-300 bg-secondary-200 p-4 shadow-1">
       {(title || action) && (
         <div className="mb-3 flex items-center justify-between gap-3">
           {title ? (

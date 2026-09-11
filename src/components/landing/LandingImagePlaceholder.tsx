@@ -16,7 +16,7 @@ export const LandingImagePlaceholder = ({
   return (
     <div
       className={clsx(
-        "flex w-full items-center justify-center rounded-2xl border border-dashed border-primary-400 bg-primary-100 text-secondary-200",
+        "flex w-full items-center justify-center rounded-2xl border border-dashed border-secondary-400 bg-secondary-100 text-neutral-200",
         aspectRatio,
         className,
       )}

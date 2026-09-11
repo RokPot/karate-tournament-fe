@@ -37,8 +37,8 @@ export const ClubDetailView = ({
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-6 bg-primary-75 p-6">
-      <section className="flex flex-col gap-3 rounded-m bg-primary-200 p-4 shadow-1">
+    <div className="flex flex-1 flex-col gap-6 bg-secondary-75 p-6">
+      <section className="flex flex-col gap-3 rounded-m bg-secondary-200 p-4 shadow-1">
         <div className="flex min-w-0 flex-row flex-wrap items-center gap-2">
           <Button variant="outlined" onClick={() => router.back()}>
             {t("shared.back")}
@@ -49,14 +49,14 @@ export const ClubDetailView = ({
           <IconButton className="h-10 w-10">
             <FontAwesomeIcon
               icon={faPencil}
-              className="text-tertiary-300"
+              className="text-primary-300"
               size="xs"
             />
           </IconButton>
         </div>
         <div className="flex flex-row flex-wrap gap-1">
           <Pill>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("shared.location")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">
@@ -64,7 +64,7 @@ export const ClubDetailView = ({
             </Typography>
           </Pill>
           <Pill>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("shared.country")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">
@@ -72,7 +72,7 @@ export const ClubDetailView = ({
             </Typography>
           </Pill>
           <Pill>
-            <Typography size="body-paragraph-s" className="text-secondary-200">
+            <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("shared.membersCount")}:
             </Typography>
             <Typography size="body-paragraph-s" className="font-weight-500">
