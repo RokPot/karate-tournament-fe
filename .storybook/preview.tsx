@@ -3,8 +3,9 @@ import React, { Suspense } from "react";
 import { I18nextProvider } from "react-i18next";
 
 import i18n from "../src/config/i18n";
-import { Fonts, globalFontClass } from "../src/styles/font";
 import "../src/styles/globals.css";
+
+const storybookFontClass = "font-primary";
 
 // Wrap your stories in the I18nextProvider component
 const withI18next = (Story: any) => {
@@ -13,8 +14,13 @@ const withI18next = (Story: any) => {
     // Alternative: set useSuspense to false on i18next.options.react when initializing i18next
     <Suspense fallback={<div>loading translations...</div>}>
       <I18nextProvider i18n={i18n}>
-        <Fonts />
-        <div className={globalFontClass}>
+        <style>{`
+          :root {
+            --font-primary: Roboto, ui-sans-serif, system-ui, sans-serif;
+            --font-secondary: Sora, ui-sans-serif, system-ui, sans-serif;
+          }
+        `}</style>
+        <div className={storybookFontClass}>
           <Story />
         </div>
       </I18nextProvider>
