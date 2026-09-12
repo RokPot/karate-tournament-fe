@@ -1,9 +1,5 @@
-import {
-  generateSingleElimination,
-  getSeedOrder,
-  nextPowerOfTwo,
-} from "./generateSingleElimination";
-import { getMatchWinnerItem, getSlotItem } from "../types";
+import { generateSingleElimination, getSeedOrder, nextPowerOfTwo } from "./generateSingleElimination";
+import { getMatchWinnerItem, getSlotItem } from "./types";
 
 type Team = { id: string; name: string };
 
@@ -118,20 +114,21 @@ describe("generateSingleElimination", () => {
   });
 
   it("rejects sizes outside 2–256", () => {
-    expect(() => generateSingleElimination(teams(1), getId)).toThrow(
-      /at least 2/,
-    );
+    expect(() => generateSingleElimination(teams(1), getId)).toThrow(/at least 2/);
     expect(() => generateSingleElimination(teams(257), getId)).toThrow(
       /at most 256/,
     );
   });
 
-  it.each([2, 3])("omits third place for %i participants even when requested", (count) => {
-    const bracket = generateSingleElimination(teams(count), getId, {
-      includeThirdPlace: true,
-    });
-    expect(bracket.thirdPlace).toBeUndefined();
-  });
+  it.each([2, 3])(
+    "omits third place for %i participants even when requested",
+    (count) => {
+      const bracket = generateSingleElimination(teams(count), getId, {
+        includeThirdPlace: true,
+      });
+      expect(bracket.thirdPlace).toBeUndefined();
+    },
+  );
 
   it("omits third place by default", () => {
     const bracket = generateSingleElimination(teams(8), getId);
@@ -145,22 +142,25 @@ describe("generateSingleElimination", () => {
     expect(bracket.thirdPlace).toBeUndefined();
   });
 
-  it.each([4, 5, 8])("adds a third-place match for %i participants when requested", (count) => {
-    const bracket = generateSingleElimination(teams(count), getId, {
-      includeThirdPlace: true,
-    });
-    const semis = bracket.rounds[bracket.rounds.length - 2];
-    expect(bracket.thirdPlace).toBeDefined();
-    expect(bracket.thirdPlace?.id).toBe("third-place");
-    expect(bracket.thirdPlace?.item).toEqual({
-      kind: "tbd",
-      fromMatchId: semis.matches[0].id,
-      outcome: "loser",
-    });
-    expect(bracket.thirdPlace?.item2).toEqual({
-      kind: "tbd",
-      fromMatchId: semis.matches[1].id,
-      outcome: "loser",
-    });
-  });
+  it.each([4, 5, 8])(
+    "adds a third-place match for %i participants when requested",
+    (count) => {
+      const bracket = generateSingleElimination(teams(count), getId, {
+        includeThirdPlace: true,
+      });
+      const semis = bracket.rounds[bracket.rounds.length - 2];
+      expect(bracket.thirdPlace).toBeDefined();
+      expect(bracket.thirdPlace?.id).toBe("third-place");
+      expect(bracket.thirdPlace?.item).toEqual({
+        kind: "tbd",
+        fromMatchId: semis.matches[0].id,
+        outcome: "loser",
+      });
+      expect(bracket.thirdPlace?.item2).toEqual({
+        kind: "tbd",
+        fromMatchId: semis.matches[1].id,
+        outcome: "loser",
+      });
+    },
+  );
 });

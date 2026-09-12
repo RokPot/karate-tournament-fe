@@ -1,11 +1,12 @@
-import type { Bracket, BracketMatch } from "../types";
+import type { Bracket, BracketMatch } from "./types";
 
 export const BRACKET_LAYOUT = {
-  slotWidth: 168,
+  slotWidth: 196,
   slotHeight: 40,
   slotGap: 20,
   roundGap: 72,
   padding: 16,
+  roundTitleHeight: 32,
 } as const;
 
 export type LayoutRect = {
@@ -30,15 +31,23 @@ export type LayoutConnector = {
   d: string;
 };
 
+export type LayoutHeader = {
+  id: string;
+  columnIndex: number;
+  rect: LayoutRect;
+};
+
 export type SingleEliminationLayout = {
   width: number;
   height: number;
   nodes: LayoutNode[];
   connectors: LayoutConnector[];
+  headers: LayoutHeader[];
 };
 
 const slotY = (slotIndex: number) =>
   BRACKET_LAYOUT.padding +
+  BRACKET_LAYOUT.roundTitleHeight +
   slotIndex * (BRACKET_LAYOUT.slotHeight + BRACKET_LAYOUT.slotGap);
 
 const columnX = (columnIndex: number) =>
@@ -254,6 +263,7 @@ export const computeSingleEliminationLayout = <T,>(
 
   const paddedHeight =
     BRACKET_LAYOUT.padding * 2 +
+    BRACKET_LAYOUT.roundTitleHeight +
     paddedSize * BRACKET_LAYOUT.slotHeight +
     (paddedSize - 1) * BRACKET_LAYOUT.slotGap;
   const bronzeBottom = bracket.thirdPlace
@@ -262,6 +272,19 @@ export const computeSingleEliminationLayout = <T,>(
       BRACKET_LAYOUT.padding
     : 0;
   const columnCount = bracket.rounds.length + 1;
+  const headers: LayoutHeader[] = Array.from(
+    { length: columnCount },
+    (_, columnIndex) => ({
+      id: `round-${columnIndex}`,
+      columnIndex,
+      rect: {
+        x: columnX(columnIndex),
+        y: BRACKET_LAYOUT.padding,
+        width: BRACKET_LAYOUT.slotWidth,
+        height: BRACKET_LAYOUT.roundTitleHeight,
+      },
+    }),
+  );
 
   return {
     width:
@@ -271,5 +294,6 @@ export const computeSingleEliminationLayout = <T,>(
     height: Math.max(paddedHeight, bronzeBottom),
     nodes,
     connectors,
+    headers,
   };
 };

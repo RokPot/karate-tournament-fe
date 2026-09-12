@@ -1,9 +1,4 @@
-import type {
-  Bracket,
-  BracketMatch,
-  BracketRound,
-  BracketSlot,
-} from "../types";
+import type { Bracket, BracketMatch, BracketRound, BracketSlot } from "./types";
 
 const MIN_PARTICIPANTS = 2;
 const MAX_PARTICIPANTS = 256;
@@ -30,10 +25,7 @@ const matchId = (roundIndex: number, matchIndex: number) =>
 
 const roundId = (roundIndex: number) => `r${roundIndex}`;
 
-const slotFromSeed = <T,>(
-  seed: number,
-  participants: T[],
-): BracketSlot<T> => {
+const slotFromSeed = <T,>(seed: number, participants: T[]): BracketSlot<T> => {
   if (seed > participants.length) {
     return { kind: "bye" };
   }

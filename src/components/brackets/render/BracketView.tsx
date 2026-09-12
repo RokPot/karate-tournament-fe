@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
-import type { Bracket } from "../types";
+import type { Bracket } from "@/components/brackets/core";
+import type { BracketColors } from "./bracketColors";
 import { BracketViewport, type BracketWindow } from "./BracketViewport";
 import { SingleEliminationBracket } from "./SingleEliminationBracket";
 
@@ -11,11 +12,14 @@ export type BracketViewProps<T> = {
   renderItem?: (item: T) => ReactNode;
   className?: string;
   window?: BracketWindow;
+  colors: BracketColors;
+  getRoundLabel?: (columnIndex: number) => string;
 };
 
 export const BracketView = <T,>({
   window: viewportWindow,
   className,
+  getId: _getId,
   ...props
 }: BracketViewProps<T>) => {
   let canvas: ReactNode;

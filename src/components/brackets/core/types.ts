@@ -17,6 +17,8 @@ export type BracketMatch<T> = {
     winner: BracketMatchWinner;
     metadata?: Record<string, unknown>;
     isBye: boolean;
+    score?: number | string | null;
+    score2?: number | string | null;
   };
 };
 

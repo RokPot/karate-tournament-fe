@@ -1,9 +1,10 @@
-import type { LayoutConnector } from "../layout/computeSingleEliminationLayout";
+import type { LayoutConnector } from "@/components/brackets/core";
 
 interface BracketConnectorsProps {
   width: number;
   height: number;
   connectors: LayoutConnector[];
+  color: string;
   className?: string;
 }
 
@@ -11,6 +12,7 @@ export const BracketConnectors = ({
   width,
   height,
   connectors,
+  color,
   className = "bracket-connector",
 }: BracketConnectorsProps) => {
   return (
@@ -26,7 +28,7 @@ export const BracketConnectors = ({
         <path
           key={connector.id}
           d={connector.d}
-          stroke="currentColor"
+          stroke={color}
           strokeWidth="2"
           strokeLinecap="square"
           strokeLinejoin="miter"

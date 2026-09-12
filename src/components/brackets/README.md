@@ -9,7 +9,9 @@ This README is the working context. Do the numbered extraction steps in order; d
 - Builds a full single-elimination tree from a participant list (`T`).
 - Pads non-powers of two with **byes** (standard seed pairing), size **2–256**.
 - Optional **third-place** match (two semi losers), under 1st place.
-- Renders left-to-right cards + SVG elbow connectors.
+- Renders left-to-right cards + SVG elbow connectors, with **Round 1, Round 2, …** above each column.
+- Hosts pass **colors** (`card`, `border`, `line`, `shadow`, `text`, `highlight`, `score`, `scoreText`); the canvas is transparent.
+- Each card is **name on the left, colored score well on the right**. Scores live on `match.data.score` / `score2` (empty well shows —).
 - Optional **window**: `{ width, height }` clips the canvas, xy-scroll on overflow, **grab/drag** to pan.
 
 Visualization only: it does not pick winners or call the API. The tree JSON is meant to be saved/loaded later.
@@ -18,11 +20,14 @@ Visualization only: it does not pick winners or call the API. The tree JSON is m
 
 ```
 src/components/brackets/
-  types.ts                              data contract
-  generate/generateSingleElimination.ts tree builder (pure TS)
-  layout/computeSingleEliminationLayout.ts  positions + SVG paths (pure TS)
-  render/                               React + this app's UI
-    BracketView.tsx                     kind switch + viewport
+  core/                                 copy this folder to the BE
+    types.ts
+    generateSingleElimination.ts        tree builder (pure TS)
+    generateSingleElimination.test.ts
+    computeSingleEliminationLayout.ts   positions + SVG paths (pure TS)
+    index.ts
+  render/                               React + this app's UI — FE only
+    BracketView.tsx
     SingleEliminationBracket.tsx
     BracketViewport.tsx / useBracketPan.ts
     MatchCard.tsx / BracketConnectors.tsx
@@ -30,9 +35,9 @@ src/components/brackets/
   index.ts
 ```
 
-**Portable (keep this as the future package core):** `types.ts`, `generate/`, `layout/`.
+**Portable:** copy `core/` as a folder. Same-folder imports only (`./types`); no React, DOM, or `@/` aliases. Call `generateSingleElimination(registrations, (r) => r.id, { includeThirdPlace })` and persist/return the `Bracket<T>` JSON. The BE can ignore layout until it needs pixel positions.
 
-**App-specific (do not copy into a public package as-is):** `render/` uses React, `Typography`, Tailwind tokens (`bg-secondary-200`, `text-neutral-200`, `cursor-grab`).
+**App-specific (do not copy):** `render/` uses React, `Typography`, Tailwind layout classes. Colors are CSS strings from the host.
 
 ## Use in this app
 
@@ -50,15 +55,26 @@ const bracket = generateSingleElimination(teams, (team) => team.id, {
   bracket={bracket}
   getId={(team) => team.id}
   getLabel={(team) => team.name}
+  colors={{
+    card: "#F3E6C8",
+    border: "#B8963E",
+    line: "#9A7B32",
+    shadow: "#B8963E",
+    text: "#1C1C1E",
+    highlight: "#9A7B32",
+    score: "#B8963E",
+    scoreText: "#FDFCFB",
+  }}
+  // getRoundLabel={(columnIndex) => `Round ${columnIndex + 1}`}
   // window={{ width: 640, height: 360 }}  // optional clip + pan
 />
 ```
 
-`T` can be a team, person, or registration. Optional `renderItem` replaces the default label.
+`T` can be a team, person, or registration. Optional `renderItem` replaces the default label. Optional `getRoundLabel` replaces `Round N`.
 
-Storybook: `yarn storybook` → **Brackets**. **Windowed** is 8 teams in a 640×360 box. Controls: `count`, `includeThirdPlace`, `windowWidth` / `windowHeight` (`0` = no window).
+Storybook: `yarn storybook` → **Brackets**. **Windowed** is 8 teams in a 640×360 box. **Dark** uses the dark gold palette. **WithScores** fills first-round scores. Controls: `count`, `includeThirdPlace`, `showScores`, `windowWidth` / `windowHeight` (`0` = no window), plus the color fields.
 
-Tests: `yarn jest src/components/brackets/generate/generateSingleElimination.test.ts`
+Tests: `yarn jest src/components/brackets/core/generateSingleElimination.test.ts`
 
 ## Data contract
 
@@ -76,6 +92,8 @@ type BracketMatch<T> = {
     winner: "item" | "item2" | null;
     metadata?: Record<string, unknown>;
     isBye: boolean;     // hide first-round fork; auto-advance
+    score?: number | string | null;   // item
+    score2?: number | string | null;  // item2
   };
 };
 
@@ -121,9 +139,9 @@ Treat generate + layout as the public surface:
 
 - Input: `T[]`, `getId`, options (`includeThirdPlace`)
 - Output: `Bracket<T>`
-- Layout: `{ width, height, nodes, connectors }` with no DOM types
+- Layout: `{ width, height, nodes, connectors, headers }` with no DOM types
 
-Do not add React or CSS into `generate/` or `layout/`.
+Do not add React or CSS into `core/`.
 
 ### Step 2 — Strip app UI from the renderer (still in-repo)
 
@@ -138,12 +156,7 @@ After this, the React renderer is generic; this app only supplies CSS variables 
 
 ### Step 3 — Split files by dependency
 
-```
-core/     types, generate, layout     → zero imports from react / @/
-react/    BracketView, viewport       → depends on core only
-```
-
-This app imports from `react/` until a package exists.
+`core/` is already isolated (copy that folder). Later, `render/` can become a thin adapter over a published core package.
 
 ### Step 4 — Publish `brackets-core`
 
