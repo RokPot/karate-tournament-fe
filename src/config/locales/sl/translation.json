@@ -253,6 +253,31 @@
       "endSuccess": "Turnir je zaključen.",
       "endError": "Zaključek turnirja ni uspel"
     },
+    "detail": {
+      "tabs": {
+        "label": "Razdelki turnirja",
+        "overview": "Pregled",
+        "registrations": "Prijave",
+        "brackets": "Žrebi"
+      }
+    },
+    "brackets": {
+      "locked": "Začni turnir, da ustvariš žrebe.",
+      "generate": "Ustvari",
+      "selectCategory": "Izberi kategorijo za ogled žreba.",
+      "notGenerated": "Ta kategorija še nima žreba.",
+      "tooFewToGenerate": "Za žreb sta potrebni vsaj dve prijavi.",
+      "generateError": "Žreba ni bilo mogoče ustvariti.",
+      "noCategories": "Pred žrebom dodaj kategorije na zavihku Pregled.",
+      "categoryRail": "Kategorije turnirja",
+      "entries": "{{count}} prijav",
+      "round": "Krog {{number}}",
+      "status": {
+        "tooFew": "Premalo",
+        "ready": "Pripravljeno",
+        "generated": "Ustvarjeno"
+      }
+    },
     "registration": {
       "locked": "Prijava se odpre, ko je turnir odobren.",
       "closedTitle": "Prijava ni odprta",

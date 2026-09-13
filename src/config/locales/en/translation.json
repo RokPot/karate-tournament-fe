@@ -400,6 +400,31 @@
       "endSuccess": "Tournament ended.",
       "endError": "Failed to end tournament"
     },
+    "detail": {
+      "tabs": {
+        "label": "Tournament sections",
+        "overview": "Overview",
+        "registrations": "Registrations",
+        "brackets": "Brackets"
+      }
+    },
+    "brackets": {
+      "locked": "Start the tournament to generate brackets.",
+      "generate": "Generate",
+      "selectCategory": "Select a category to view its bracket.",
+      "notGenerated": "This category does not have a bracket yet.",
+      "tooFewToGenerate": "At least two registrations are needed to generate a bracket.",
+      "generateError": "Failed to generate bracket.",
+      "noCategories": "Add categories on the Overview tab before generating brackets.",
+      "categoryRail": "Tournament categories",
+      "entries": "{{count}} entries",
+      "round": "Round {{number}}",
+      "status": {
+        "tooFew": "Too few",
+        "ready": "Ready",
+        "generated": "Generated"
+      }
+    },
     "registration": {
       "locked": "Registration opens after the tournament is approved.",
       "closedTitle": "Registration is not open",

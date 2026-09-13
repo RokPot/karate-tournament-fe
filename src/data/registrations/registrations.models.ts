@@ -20,7 +20,7 @@ export namespace RegistrationsModels {
   /**
    * TeamRoleEnumSchema
    * @type { enum }
-   * @description Role on the team roster,E,x,a,m,p,l,e,:, ,`,s,t,a,r,t,e,r,`
+   * @description Role on the first team roster,E,x,a,m,p,l,e,:, ,`,s,t,a,r,t,e,r,`
    */
   export const TeamRoleEnumSchema = z.enum(["starter", "reserve"]);
   export type TeamRoleEnum = z.infer<typeof TeamRoleEnumSchema>;
@@ -85,7 +85,7 @@ export namespace RegistrationsModels {
    * @property { string } clubName Club name (free text). If a matching club exists in the system, it is linked; otherwise registrations proceed without a club.. Min Length: `1`. Max Length: `255`. Example: `Dragon Karate Club`
    * @property { string } tournamentId Tournament ID for all registrations in this request. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { BulkParticipantDto[] } participants Participants to register. Min Items: `1`
-   * @property { BulkTeamDto[] } teams Team rosters (kata-team / kumite-team). Participant indexes refer to participants[].
+   * @property { BulkTeamDto[] } teams Team rosters (kata-team / kumite-team). Participant indexes refer to participants[]. The same person may be on multiple teams; two teams in a category may not have the same set of people.
    */
   export const BulkPublicRegistrationDtoSchema = z.object({
     email: z.string().email(),
@@ -199,6 +199,18 @@ export namespace RegistrationsModels {
   >;
 
   /**
+   * TeamMembershipDtoSchema
+   * @type { object }
+   * @property { string } teamId Team ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } teamRole Role on this team roster. Example: `starter`
+   */
+  export const TeamMembershipDtoSchema = z.object({
+    teamId: z.string(),
+    teamRole: TeamRoleEnumSchema,
+  });
+  export type TeamMembershipDto = z.infer<typeof TeamMembershipDtoSchema>;
+
+  /**
    * RegistrationResponseDtoSchema
    * @type { object }
    * @property { string } id Registration ID. Example: `123e4567-e89b-12d3-a456-426614174000`
@@ -208,8 +220,9 @@ export namespace RegistrationsModels {
    * @property { string } categoryId Category ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { string } status Registration status. Example: `pending`
    * @property { number } finalWeight Final weight in kg. Example: `75.5`
-   * @property { string } teamId Team ID when this registration is part of a team roster. Example: `123e4567-e89b-12d3-a456-426614174000`
-   * @property { string } teamRole Role on the team roster. Example: `starter`
+   * @property { string } teamId First team ID when this registration is on one or more team rosters. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } teamRole Role on the first team roster. Example: `starter`
+   * @property { TeamMembershipDto[] } teamMemberships All team roster memberships for this registration (a person may be on overlapping teams)
    * @property { CommonModels.UserResponseDto } user User information
    * @property { CommonModels.ClubResponseDto } club Club information
    * @property { string } createdAt Creation timestamp. Example: `2024-01-01T00:00:00.000Z`
@@ -225,6 +238,7 @@ export namespace RegistrationsModels {
     finalWeight: z.number().nullish(),
     teamId: z.string().nullish(),
     teamRole: TeamRoleEnumSchema.nullish(),
+    teamMemberships: z.array(TeamMembershipDtoSchema).optional(),
     user: CommonModels.UserResponseDtoSchema.nullish(),
     club: CommonModels.ClubResponseDtoSchema.nullish(),
     createdAt: z.string().datetime({ offset: true }),

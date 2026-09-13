@@ -85,4 +85,4 @@ const RegistrationPage = () => {
   );
 };
 
-export default Object.assign(RegistrationPage, { shell: { sidebar: false } });
+export default RegistrationPage;

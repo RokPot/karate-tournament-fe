@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 
 import { LoadingState } from "@/components/shared/layout/LoadingState";
-import { AuthContext } from "@/data/auth/auth.context";
 import { markPendingProfileSetup } from "@/data/auth/auth-onboarding";
+import { AuthContext } from "@/data/auth/auth.context";
 
 const SignUpPage = () => {
   const { useRegister } = AuthContext.useAuth();
@@ -14,6 +14,7 @@ const SignUpPage = () => {
       markPendingProfileSetup();
       useRegister.mutate();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <LoadingState />;

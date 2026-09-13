@@ -225,7 +225,7 @@ export namespace AuthContext {
           }
 
           if (attempt < maxAttempts - 1) {
-            await new Promise((resolve) => setTimeout(resolve, delayMs));
+            await new Promise((resolve) => { setTimeout(resolve, delayMs) });
           }
         }
 
