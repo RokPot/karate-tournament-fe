@@ -6,6 +6,7 @@ export const enum QueryModule {
   Clubs = "ClubsQueries",
   Invitations = "InvitationsQueries",
   Registrations = "RegistrationsQueries",
+  Schedules = "SchedulesQueries",
   Tournaments = "TournamentsQueries",
   Categories = "CategoriesQueries",
   Test = "TestQueries",

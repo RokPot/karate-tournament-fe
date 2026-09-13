@@ -411,9 +411,8 @@
     "brackets": {
       "locked": "Start the tournament to generate brackets.",
       "generate": "Generate",
-      "regenerate": "Regenerate",
-      "includeThirdPlace": "Include third-place match",
-      "selectCategory": "Select a category to generate a bracket.",
+      "selectCategory": "Select a category to view its bracket.",
+      "notGenerated": "This category does not have a bracket yet.",
       "tooFewToGenerate": "At least two registrations are needed to generate a bracket.",
       "generateError": "Failed to generate bracket.",
       "noCategories": "Add categories on the Overview tab before generating brackets.",

@@ -264,9 +264,8 @@
     "brackets": {
       "locked": "Začni turnir, da ustvariš žrebe.",
       "generate": "Ustvari",
-      "regenerate": "Ponovno ustvari",
-      "includeThirdPlace": "Vključi tekmo za tretje mesto",
-      "selectCategory": "Izberi kategorijo za žreb.",
+      "selectCategory": "Izberi kategorijo za ogled žreba.",
+      "notGenerated": "Ta kategorija še nima žreba.",
       "tooFewToGenerate": "Za žreb sta potrebni vsaj dve prijavi.",
       "generateError": "Žreba ni bilo mogoče ustvariti.",
       "noCategories": "Pred žrebom dodaj kategorije na zavihku Pregled.",

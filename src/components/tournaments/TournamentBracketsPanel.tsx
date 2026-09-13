@@ -1,4 +1,4 @@
-import { Button, Checkbox, FormControlLabel } from "@mui/material";
+import { Button } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { cx } from "class-variance-authority";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -6,10 +6,14 @@ import { useTranslation } from "react-i18next";
 
 import {
   BracketView,
-  generateSingleElimination,
   type Bracket,
   type BracketColors,
 } from "@/components/brackets";
+import { ErrorState } from "@/components/shared/layout/ErrorState";
+import {
+  type BracketCompetitor,
+  mapScheduleToBracket,
+} from "@/components/tournaments/mapScheduleToBracket";
 import { uiOutlineClass } from "@/components/ui/global/outline";
 import Pill from "@/components/ui/Pill";
 import { Loader } from "@/components/ui/status/Loader/Loader";
@@ -17,17 +21,16 @@ import { useToast } from "@/components/ui/status/Toast/useToast";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { themeColors } from "@/config/theme";
 import { CommonModels } from "@/data/common/common.models";
-import { RegistrationsApi } from "@/data/registrations/registrations.api";
-import { RegistrationsModels } from "@/data/registrations/registrations.models";
 import { RegistrationsQueries } from "@/data/registrations/registrations.queries";
+import { SchedulesModels } from "@/data/schedules/schedules.models";
+import { SchedulesQueries } from "@/data/schedules/schedules.queries";
 import { useThemeStore } from "@/providers/ThemeModeContext";
-
-type BracketCompetitor = {
-  id: string;
-  name: string;
-};
+import { ApplicationException } from "@/util/vendor/error-handling";
 
 type CategoryBracketStatus = "tooFew" | "ready" | "generated";
+
+const isMissingScheduleError = (error: unknown) =>
+  error instanceof ApplicationException && error.code === "UNKNOWN_ERROR";
 
 const LIGHT_BRACKET_COLORS: BracketColors = {
   card: themeColors.primary[75],
@@ -61,36 +64,36 @@ type TournamentBracketsPanelProps = {
   isUnlocked: boolean;
 };
 
-const mapRegistrationToCompetitor = (
-  registration: RegistrationsModels.RegistrationResponseDto,
-): BracketCompetitor => ({
-  id: registration.id,
-  name:
-    [registration.user?.firstName, registration.user?.lastName]
-      .filter(Boolean)
-      .join(" ") || "—",
-});
-
 const BracketPaneBody = ({
-  isGenerating,
+  isLoading,
+  error,
+  onRetry,
   bracket,
   paneSize,
   emptyMessage,
   colors,
   getRoundLabel,
 }: {
-  isGenerating: boolean;
+  isLoading: boolean;
+  error?: unknown;
+  onRetry?: () => void;
   bracket?: Bracket<BracketCompetitor>;
   paneSize?: { width: number; height: number };
   emptyMessage: string;
   colors: BracketColors;
   getRoundLabel: (columnIndex: number) => string;
 }) => {
-  if (isGenerating) {
+  if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <Loader size="m" />
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <ErrorState error={error} onRetry={onRetry} className="h-full p-6" />
     );
   }
 
@@ -132,11 +135,6 @@ export const TournamentBracketsPanel = ({
   const paneRef = useRef<HTMLDivElement>(null);
   const [paneSize, setPaneSize] = useState<{ width: number; height: number }>();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>();
-  const [includeThirdPlace, setIncludeThirdPlace] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [bracketsByCategoryId, setBracketsByCategoryId] = useState<
-    Record<string, Bracket<BracketCompetitor>>
-  >({});
 
   const { data: counts } = RegistrationsQueries.useFindCountsByTournament(
     { tournamentId },
@@ -191,63 +189,62 @@ export const TournamentBracketsPanel = ({
   const selectedCount = selectedCategory
     ? (countsByCategoryId.get(selectedCategory.id) ?? 0)
     : 0;
-  const selectedBracket = selectedCategoryId
-    ? bracketsByCategoryId[selectedCategoryId]
-    : undefined;
-  const canGenerate =
-    canManageSetup &&
-    !!selectedCategory &&
-    selectedCount >= 2 &&
-    !isGenerating;
+
+  const {
+    data: schedule,
+    isLoading: isScheduleLoading,
+    isFetching: isScheduleFetching,
+    error: scheduleError,
+    refetch: refetchSchedule,
+  } = SchedulesQueries.useFindOne(
+    { tournamentId, categoryId: selectedCategoryId ?? "" },
+    { enabled: isUnlocked && !!tournamentId && !!selectedCategoryId },
+  );
+
+  const createSchedule = SchedulesQueries.useCreate({
+    invalidateCurrentModule: true,
+    onError: (error) => {
+      errorToast({
+        text: error?.message || t("tournaments.brackets.generateError"),
+      });
+    },
+  });
+
+  const selectedBracket = useMemo(
+    () => (schedule ? mapScheduleToBracket(schedule) : undefined),
+    [schedule],
+  );
+
+  const isBusy =
+    isScheduleLoading ||
+    createSchedule.isPending ||
+    (isScheduleFetching && !schedule);
+  const isNotGenerated = isMissingScheduleError(scheduleError);
+  const paneError = isNotGenerated ? undefined : scheduleError;
+  const showGenerate =
+    canManageSetup && isNotGenerated && selectedCount >= 2;
 
   const getCategoryStatus = (categoryId: string): CategoryBracketStatus => {
-    if (bracketsByCategoryId[categoryId]) {
+    const cached = queryClient.getQueryData<
+      SchedulesModels.ScheduleResponseDto
+    >(SchedulesQueries.keys.findOne(tournamentId, categoryId));
+    if (cached) {
       return "generated";
     }
     return (countsByCategoryId.get(categoryId) ?? 0) < 2 ? "tooFew" : "ready";
   };
 
-  const handleGenerate = async () => {
-    if (!selectedCategory || !canGenerate) {
-      return;
+  const getEmptyMessage = () => {
+    if (!selectedCategory) {
+      return t("tournaments.brackets.selectCategory");
     }
-    setIsGenerating(true);
-    try {
-      const registrations = await queryClient.fetchQuery({
-        queryKey: RegistrationsQueries.keys.findByTournament(
-          tournamentId,
-          selectedCategory.id,
-        ),
-        queryFn: () =>
-          RegistrationsApi.findByTournament(
-            tournamentId,
-            selectedCategory.id,
-          ),
-      });
-      const competitors = registrations.map(mapRegistrationToCompetitor);
-      if (competitors.length < 2) {
-        errorToast({ text: t("tournaments.brackets.tooFewToGenerate") });
-        return;
-      }
-      const bracket = generateSingleElimination(
-        competitors,
-        (item) => item.id,
-        { includeThirdPlace },
-      );
-      setBracketsByCategoryId((current) => ({
-        ...current,
-        [selectedCategory.id]: bracket,
-      }));
-    } catch (error) {
-      errorToast({
-        text:
-          error instanceof Error
-            ? error.message
-            : t("tournaments.brackets.generateError"),
-      });
-    } finally {
-      setIsGenerating(false);
+    if (selectedCount < 2) {
+      return t("tournaments.brackets.tooFewToGenerate");
     }
+    if (isNotGenerated) {
+      return t("tournaments.brackets.notGenerated");
+    }
+    return t("tournaments.brackets.selectCategory");
   };
 
   if (!isUnlocked) {
@@ -321,38 +318,23 @@ export const TournamentBracketsPanel = ({
       </nav>
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
-        {canManageSetup && (
+        {showGenerate && (
           <div className="flex flex-wrap items-center gap-3">
             <Button
               variant="contained"
-              disabled={!canGenerate}
+              disabled={isBusy}
               onClick={() => {
-                handleGenerate().then(
-                  () => undefined,
-                  () => undefined,
-                );
+                if (!selectedCategory) {
+                  return;
+                }
+                createSchedule.mutate({
+                  tournamentId,
+                  categoryId: selectedCategory.id,
+                });
               }}
             >
-              {selectedBracket
-                ? t("tournaments.brackets.regenerate")
-                : t("tournaments.brackets.generate")}
+              {t("tournaments.brackets.generate")}
             </Button>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={includeThirdPlace}
-                  onChange={(event) =>
-                    setIncludeThirdPlace(event.target.checked)
-                  }
-                  size="small"
-                />
-              }
-              label={
-                <Typography size="body-paragraph-s" as="span">
-                  {t("tournaments.brackets.includeThirdPlace")}
-                </Typography>
-              }
-            />
           </div>
         )}
 
@@ -364,18 +346,21 @@ export const TournamentBracketsPanel = ({
           )}
         >
           <BracketPaneBody
-            isGenerating={isGenerating}
+            isLoading={isBusy}
+            error={paneError}
+            onRetry={() => {
+              refetchSchedule().then(
+                () => undefined,
+                () => undefined,
+              );
+            }}
             bracket={selectedBracket}
             paneSize={paneSize}
             colors={getBracketColors(!!isDarkMode)}
             getRoundLabel={(columnIndex) =>
               t("tournaments.brackets.round", { number: columnIndex + 1 })
             }
-            emptyMessage={
-              selectedCount < 2
-                ? t("tournaments.brackets.tooFewToGenerate")
-                : t("tournaments.brackets.selectCategory")
-            }
+            emptyMessage={getEmptyMessage()}
           />
         </div>
       </div>

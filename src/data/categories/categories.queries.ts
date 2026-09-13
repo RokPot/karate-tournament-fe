@@ -131,7 +131,7 @@ export namespace CategoriesQueries {
   /**
    * Mutation `useDuplicate`
    * @summary Duplicate categories
-   * @description Creates standalone copies of the specified categories. Copies scalar fields only; tournament assignments, registrations, and brackets are not duplicated.
+   * @description Creates standalone copies of the specified categories. Copies scalar fields only; tournament assignments, registrations, and schedules are not duplicated.
    * @param { CategoriesModels.DuplicateCategoriesDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<CategoriesModels.DuplicateResponse> } Categories duplicated successfully
