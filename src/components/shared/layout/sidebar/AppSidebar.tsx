@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import logo from "src/assets/images/logo-4.png";
 
-import { useAppNavLinks } from "../useAppNavLinks";
+import { useAppNavLinks } from "src/components/shared/layout/useAppNavLinks";
 
 interface AppSidebarProps {
   onNavigate?: () => void;

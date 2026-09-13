@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   Button,
   DialogActions,
@@ -12,6 +11,7 @@ import {
   Select,
   TextField,
 } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -241,8 +241,8 @@ export const CompleteProfileModal = ({
                 endAdornment: (
                   <InputAdornment position="end">kg</InputAdornment>
                 ),
+                inputProps: { min: 0, max: 999.99, step: 0.1 },
               }}
-              inputProps={{ min: 0, max: 999.99, step: 0.1 }}
             />
           </div>
           <BeltLevelSelect
