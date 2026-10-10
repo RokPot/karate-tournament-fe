@@ -1,15 +1,18 @@
-import { Tab, Tabs } from "@mui/material";
+import { Button, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { CreateTournamentModal } from "@/components/tournaments/CreateTournamentModal";
 import { TournamentsList } from "@/components/tournaments/TournamentsList";
-import { RouteConfig } from "@/config/route.config";
+import { Typography } from "@/components/ui/text/Typography/Typography";
+import { getTournamentDetailRoute, RouteConfig } from "@/config/route.config";
 import { AuthGuard } from "@/data/auth/AuthGuard";
 import { ClubsQueries } from "@/data/clubs/clubs.queries";
 import { TournamentsModels } from "@/data/tournaments/tournaments.models";
 import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
 import { useAuthRoles } from "@/hooks/useAuthRoles";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { useRouter } from "next/router";
 
 const TournamentsPage = () => {
   const { isClubOwner, isClubCoach, isAdmin } = useAuthRoles();
@@ -37,9 +40,17 @@ const AdminTournamentsView = () => {
   const { data, isLoading, error, refetch } = TournamentsQueries.useFindAll({
     status: tab,
   });
+  const router = useRouter();
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   return (
     <div className="mx-auto w-full max-w-7xl p-6">
+      <div className="mb-3 flex items-center justify-between">
+        <Typography size="h2">{t("shared.tournaments")}</Typography>
+        <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>
+          {t("tournaments.addTournament")}
+        </Button>
+      </div>
       <Tabs
         value={tab}
         onChange={(_event, value: AdminTournamentTab) => setTab(value)}
@@ -55,14 +66,22 @@ const AdminTournamentsView = () => {
         isLoading={isLoading}
         error={error}
         onRetry={refetch}
-        showCreateButton={tab === "approved"}
-        titleSize="h2"
         showApprovalActions={tab === "pending"}
         showStatusColumn={tab === "pending"}
         showClubColumn
         emptyLabel={
           tab === "approved" ? undefined : t(`tournaments.empty.${tab}`)
         }
+        hideHeader
+      />
+      <CreateTournamentModal
+        open={createDialogOpen}
+        onClose={(newTournament) => {
+          setCreateDialogOpen(false);
+          if (newTournament) {
+            router.push(getTournamentDetailRoute(newTournament.id));
+          }
+        }}
       />
     </div>
   );

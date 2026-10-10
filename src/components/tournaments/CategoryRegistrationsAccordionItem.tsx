@@ -1,31 +1,47 @@
+import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button, IconButton } from "@mui/material";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ArrowDropUpIcon } from "@/assets/icons/general/ArrowDropUp";
 import { useCategoryFormatters } from "@/components/categories/category-formatters";
+import { isTeamCategory } from "@/components/registrations/public/utils/teamOverlap";
 import { ErrorState } from "@/components/shared/layout/ErrorState";
+import { StaffRegistrationModal } from "@/components/tournaments/registrations/StaffRegistrationModal";
+import { ConfirmRemoveRegistrationDialog } from "@/components/tournaments/registrations/ConfirmRemoveRegistrationDialog";
 import { uiOutlineClass } from "@/components/ui/global/outline";
 import Pill from "@/components/ui/Pill";
 import { Loader } from "@/components/ui/status/Loader/Loader";
+import { useToast } from "@/components/ui/status/Toast/useToast";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { CommonModels } from "@/data/common/common.models";
 import { RegistrationsModels } from "@/data/registrations/registrations.models";
 import { RegistrationsQueries } from "@/data/registrations/registrations.queries";
+import {
+  RegistrationsStaffQueries,
+  type StaffParticipantPayload,
+} from "@/data/registrations/registrations.staff";
 import { DateUtils } from "@/util/date.utils";
 
 interface IProps {
   category: CommonModels.CategoryResponseDto;
   tournamentId: string;
+  clubId?: string;
   registrationCount: number;
+  canEdit?: boolean;
 }
 
 export const CategoryRegistrationsAccordionItem = ({
   category,
   tournamentId,
+  clubId,
   registrationCount,
+  canEdit = false,
 }: IProps) => {
   const { t } = useTranslation();
+  const { successToast, errorToast } = useToast();
   const {
     emptyLabel,
     formatAgeRange,
@@ -34,12 +50,62 @@ export const CategoryRegistrationsAccordionItem = ({
     formatWeightRange,
   } = useCategoryFormatters();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [modalMode, setModalMode] = useState<"create" | "edit" | null>(null);
+  const [editingRegistration, setEditingRegistration] =
+    useState<RegistrationsModels.RegistrationResponseDto | null>(null);
+  const [removingRegistration, setRemovingRegistration] =
+    useState<RegistrationsModels.RegistrationResponseDto | null>(null);
+
+  const teamCategory = isTeamCategory(category);
+  const canAdd = canEdit && !teamCategory;
 
   const { data, isLoading, error, refetch } =
     RegistrationsQueries.useFindByTournament(
       { tournamentId, categoryId: category.id },
       { enabled: isExpanded && !!tournamentId },
     );
+
+  const createMutation = RegistrationsStaffQueries.useStaffCreate({
+    onSuccess: () => {
+      successToast({ text: t("registrations.staff.addSuccess") });
+      setModalMode(null);
+    },
+    onError: (mutationError) => {
+      errorToast({
+        text: mutationError?.message || t("registrations.staff.addError"),
+      });
+    },
+  });
+
+  const updateMutation = RegistrationsStaffQueries.useStaffUpdate({
+    onSuccess: () => {
+      successToast({ text: t("registrations.staff.editSuccess") });
+      setModalMode(null);
+      setEditingRegistration(null);
+    },
+    onError: (mutationError) => {
+      errorToast({
+        text: mutationError?.message || t("registrations.staff.editError"),
+      });
+    },
+  });
+
+  const removeMutation = RegistrationsStaffQueries.useStaffRemove({
+    onSuccess: () => {
+      successToast({ text: t("registrations.staff.removeSuccess") });
+      setRemovingRegistration(null);
+    },
+    onError: (mutationError) => {
+      errorToast({
+        text: mutationError?.message || t("registrations.staff.removeError"),
+      });
+    },
+  });
+
+  const isMutating =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    removeMutation.isPending;
 
   const metadataPills = useMemo(() => {
     const age = formatAgeRange(category);
@@ -69,6 +135,33 @@ export const CategoryRegistrationsAccordionItem = ({
     formatWeightRange,
     t,
   ]);
+
+  const handleRemove = (
+    registration: RegistrationsModels.RegistrationResponseDto,
+  ) => {
+    setRemovingRegistration(registration);
+  };
+
+  const handleSubmit = ({
+    participant,
+  }: {
+    participant: StaffParticipantPayload;
+    categoryId?: string;
+  }) => {
+    if (modalMode === "edit" && editingRegistration) {
+      updateMutation.mutate({
+        registrationId: editingRegistration.id,
+        participant,
+      });
+      return;
+    }
+    createMutation.mutate({
+      tournamentId,
+      categoryId: category.id,
+      clubId,
+      participant,
+    });
+  };
 
   return (
     <div className="border-b border-secondary-100 last:border-b-0">
@@ -122,14 +215,95 @@ export const CategoryRegistrationsAccordionItem = ({
       </button>
       {isExpanded && (
         <div className="bg-secondary-200 p-0">
+          {canAdd && (
+            <div className="flex justify-end border-b border-secondary-100 px-4 py-2">
+              <Button
+                size="small"
+                variant="outlined"
+                disabled={isMutating}
+                onClick={() => {
+                  setEditingRegistration(null);
+                  setModalMode("create");
+                }}
+              >
+                {t("registrations.staff.addParticipant")}
+              </Button>
+            </div>
+          )}
+          {teamCategory && canEdit && (
+            <div className="border-b border-secondary-100 px-4 py-2">
+              <Typography size="body-paragraph-s" className="text-neutral-200">
+                {t("registrations.staff.teamAddUnavailable")}
+              </Typography>
+            </div>
+          )}
           <AccordionRegistrationsPanel
             isLoading={isLoading}
             error={error}
             onRetry={() => refetch()}
             registrations={data ?? []}
+            canEdit={canEdit}
+            isMutating={isMutating}
+            onEdit={(registration) => {
+              setEditingRegistration(registration);
+              setModalMode("edit");
+            }}
+            onRemove={handleRemove}
           />
         </div>
       )}
+
+      <StaffRegistrationModal
+        open={modalMode != null}
+        mode={modalMode === "edit" ? "edit" : "create"}
+        fixedCategoryId={category.id}
+        isPending={isMutating}
+        initialValues={
+          editingRegistration?.user
+            ? {
+                firstName: editingRegistration.user.firstName ?? "",
+                lastName: editingRegistration.user.lastName ?? "",
+                gender:
+                  editingRegistration.user.gender ??
+                  CommonModels.ParticipantGenderEnum.male,
+                dateOfBirth:
+                  editingRegistration.user.dateOfBirth ??
+                  DateUtils.dateOfBirthFromBirthYear(
+                    new Date().getFullYear() - 18,
+                  ),
+                weight: editingRegistration.user.weight ?? 0,
+                beltLevel:
+                  editingRegistration.user.beltLevel ??
+                  CommonModels.BeltEnum["10-kyu"],
+              }
+            : undefined
+        }
+        onClose={() => {
+          setModalMode(null);
+          setEditingRegistration(null);
+        }}
+        onSubmit={handleSubmit}
+      />
+      <ConfirmRemoveRegistrationDialog
+        open={!!removingRegistration}
+        name={
+          [
+            removingRegistration?.user?.firstName,
+            removingRegistration?.user?.lastName,
+          ]
+            .filter(Boolean)
+            .join(" ") || "—"
+        }
+        categoryName={category.name}
+        isPending={removeMutation.isPending}
+        onClose={() => setRemovingRegistration(null)}
+        onConfirm={() => {
+          if (!removingRegistration) {
+            return;
+          }
+          removeMutation.mutate({ registrationId: removingRegistration.id });
+        }}
+      />
     </div>
   );
 };
@@ -139,11 +313,19 @@ const AccordionRegistrationsPanel = ({
   error,
   onRetry,
   registrations,
+  canEdit,
+  isMutating,
+  onEdit,
+  onRemove,
 }: {
   isLoading: boolean;
   error: unknown;
   onRetry: () => void;
   registrations: RegistrationsModels.RegistrationResponseDto[];
+  canEdit: boolean;
+  isMutating: boolean;
+  onEdit: (registration: RegistrationsModels.RegistrationResponseDto) => void;
+  onRemove: (registration: RegistrationsModels.RegistrationResponseDto) => void;
 }) => {
   const { t } = useTranslation();
   if (isLoading) {
@@ -171,7 +353,14 @@ const AccordionRegistrationsPanel = ({
   return (
     <ul className="flex flex-col">
       {registrations.map((registration) => (
-        <RegistrationRow key={registration.id} registration={registration} />
+        <RegistrationRow
+          key={registration.id}
+          registration={registration}
+          canEdit={canEdit}
+          isMutating={isMutating}
+          onEdit={() => onEdit(registration)}
+          onRemove={() => onRemove(registration)}
+        />
       ))}
     </ul>
   );
@@ -179,8 +368,16 @@ const AccordionRegistrationsPanel = ({
 
 const RegistrationRow = ({
   registration,
+  canEdit,
+  isMutating,
+  onEdit,
+  onRemove,
 }: {
   registration: RegistrationsModels.RegistrationResponseDto;
+  canEdit: boolean;
+  isMutating: boolean;
+  onEdit: () => void;
+  onRemove: () => void;
 }) => {
   const { t } = useTranslation();
   const { user, club, teamRole } = registration;
@@ -197,14 +394,36 @@ const RegistrationRow = ({
   ].filter((label): label is string => Boolean(label) && label !== "-");
 
   return (
-    <li className="flex flex-col gap-1 border-b border-secondary-100 px-4 py-3 last:border-b-0">
-      <Typography size="body-paragraph-m" variant="prominent-2">
-        {name}
-      </Typography>
-      {details.length > 0 && (
-        <Typography size="body-paragraph-s" className="text-neutral-200">
-          {details.join(" · ")}
+    <li className="flex items-start justify-between gap-3 border-b border-secondary-100 px-4 py-3 last:border-b-0">
+      <div className="flex min-w-0 flex-col gap-1">
+        <Typography size="body-paragraph-m" variant="prominent-2">
+          {name}
         </Typography>
+        {details.length > 0 && (
+          <Typography size="body-paragraph-s" className="text-neutral-200">
+            {details.join(" · ")}
+          </Typography>
+        )}
+      </div>
+      {canEdit && (
+        <div className="flex shrink-0 items-center gap-0-5">
+          <IconButton
+            size="small"
+            aria-label={t("shared.edit")}
+            disabled={isMutating}
+            onClick={onEdit}
+          >
+            <FontAwesomeIcon icon={faPencil} className="text-primary-300" size="xs" />
+          </IconButton>
+          <IconButton
+            size="small"
+            aria-label={t("shared.delete")}
+            disabled={isMutating}
+            onClick={onRemove}
+          >
+            <FontAwesomeIcon icon={faTrash} className="text-danger" size="xs" />
+          </IconButton>
+        </div>
       )}
     </li>
   );

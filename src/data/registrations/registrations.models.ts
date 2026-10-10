@@ -5,7 +5,7 @@ export namespace RegistrationsModels {
   /**
    * RegistrationStatusEnumSchema
    * @type { enum }
-   * @description Registration status,E,x,a,m,p,l,e,:, ,`,p,e,n,d,i,n,g,`
+   * @description Registration status,E,x,a,m,p,l,e,:, ,`,a,p,p,r,o,v,e,d,`
    */
   export const RegistrationStatusEnumSchema = z.enum([
     "pending",
@@ -351,6 +351,24 @@ export namespace RegistrationsModels {
   >;
 
   /**
+   * UpdateRegistrationDtoSchema
+   * @type { object }
+   * @property { string } categoryId Category ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { number } finalWeight Final weight in kg. Example: `75.5`
+   * @property { string } status Registration status. Example: `approved`
+   */
+  export const UpdateRegistrationDtoSchema = z
+    .object({
+      categoryId: z.string(),
+      finalWeight: z.number().gte(0),
+      status: RegistrationStatusEnumSchema,
+    })
+    .partial();
+  export type UpdateRegistrationDto = z.infer<
+    typeof UpdateRegistrationDtoSchema
+  >;
+
+  /**
    * GetPublicSuitableCategoriesBeltLevelParamSchema
    * @type { string }
    * @description E,x,a,m,p,l,e,:, ,`,7,-,k,y,u,`
@@ -426,6 +444,26 @@ export namespace RegistrationsModels {
   export type FindByTournamentResponse = z.infer<
     typeof FindByTournamentResponseSchema
   >;
+
+  /**
+   * FindByUserStatusParamSchema
+   * @type { string }
+   * @description E,x,a,m,p,l,e,:, ,`,p,e,n,d,i,n,g,`
+   */
+  export const FindByUserStatusParamSchema =
+    RegistrationStatusEnumSchema.optional();
+  export type FindByUserStatusParam = z.infer<
+    typeof FindByUserStatusParamSchema
+  >;
+
+  /**
+   * FindByUserResponseSchema
+   * @type { array }
+   */
+  export const FindByUserResponseSchema = z.array(
+    RegistrationResponseDtoSchema,
+  );
+  export type FindByUserResponse = z.infer<typeof FindByUserResponseSchema>;
 
   /**
    * GetSuitableCategoriesResponseSchema

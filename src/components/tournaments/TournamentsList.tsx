@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, SortingState } from "@tanstack/react-table";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -54,6 +54,7 @@ export const TournamentsList = ({
     null,
   );
   const { approve, decline, isReviewPending } = useTournamentReview();
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const columns: ColumnDef<CommonModels.TournamentResponseDto>[] = useMemo(
     () => {
@@ -62,6 +63,7 @@ export const TournamentsList = ({
           header: ({ header }) => HeaderCell(header, t("shared.name")),
           accessorKey: "name",
           cell: ({ row }) => TextCell(row.original.name),
+          enableSorting: false,
         },
       ];
 
@@ -70,6 +72,7 @@ export const TournamentsList = ({
           header: ({ header }) => HeaderCell(header, t("shared.club")),
           accessorKey: "club",
           cell: ({ row }) => TextCell(row.original.club?.name || "—"),
+          enableSorting: false,
         });
       }
 
@@ -78,22 +81,28 @@ export const TournamentsList = ({
           header: ({ header }) => HeaderCell(header, t("shared.location")),
           accessorKey: "location",
           cell: ({ row }) => TextCell(row.original.location || "—"),
+          enableSorting: false,
         },
         {
           header: ({ header }) => HeaderCell(header, t("shared.registrationDeadline")),
           accessorKey: "registrationDeadline",
           cell: ({ row }) =>
             TextCell(DateUtils.parseAndFormatDateTimeToLocaleShort(row.original.registrationDeadline)),
+          enableSorting: true,
+          sortingFn: "datetime",
         },
         {
           header: ({ header }) => HeaderCell(header, t("shared.startDate")),
           accessorKey: "startDate",
           cell: ({ row }) => TextCell(DateUtils.parseAndFormatDateTimeToLocaleShort(row.original.startDate)),
+          enableSorting: true,
+          sortingFn: "datetime",
         },
         {
           header: ({ header }) => HeaderCell(header, t("shared.categories")),
           accessorKey: "categoryIds",
           cell: ({ row }) => TextCell(String(row.original.categoryIds.length)),
+          enableSorting: false,
         },
       );
 
@@ -102,6 +111,7 @@ export const TournamentsList = ({
           header: ({ header }) => HeaderCell(header, t("tournaments.status.label")),
           accessorKey: "status",
           cell: ({ row }) => TournamentStatusCellComponent({ status: row.original.status }),
+          enableSorting: false,
         });
       }
 
@@ -110,6 +120,7 @@ export const TournamentsList = ({
           id: "actions",
           header: ({ header }) => HeaderCell(header, ""),
           cell: ({ row }) => TournamentActionsCell({ onApprove: () => approve.mutate({ id: row.original.id }), onDecline: () => setDeclineTournamentId(row.original.id), isReviewPending }),
+          enableSorting: false,
         });
       }
 
@@ -157,6 +168,9 @@ export const TournamentsList = ({
           data={tournaments}
           columns={columns}
           tableLayout="auto"
+          sorting={sorting}
+          onSortingChange={setSorting}
+          manualSorting={false}
           onRowClick={(row) => router.push(getTournamentDetailRoute(row.id))}
         />
       )}

@@ -124,7 +124,7 @@ export namespace ClubsQueries {
    * @param { string } mutation.id Path parameter. Club ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { ClubsModels.CreateClubInvitationDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
-   * @returns { UseMutationResult<ClubsModels.InvitationCreatedResponseDto> } Invitation created
+   * @returns { UseMutationResult<CommonModels.InvitationCreatedResponseDto> } Invitation created
    * @statusCodes [201, 400, 401, 403, 404, 409]
    */
   export const useCreateInvitation = (
@@ -138,6 +138,66 @@ export namespace ClubsQueries {
 
     return useMutation({
       mutationFn: ({ id, data }) => ClubsApi.createInvitation(id, data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
+   * Mutation `useUpdateMember`
+   * @summary Update a club member
+   * @description Updates a member of the club. Admin or club owner/coach of this club.
+   * @param { string } mutation.id Path parameter. Club ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { string } mutation.userId Path parameter. Member user ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { ClubsModels.UpdateMemberDto } mutation.data Body parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<CommonModels.UserResponseDto> } Member updated
+   * @statusCodes [200, 400, 401, 403, 404]
+   */
+  export const useUpdateMember = (
+    options?: AppMutationOptions<
+      typeof ClubsApi.updateMember,
+      { id: string; userId: string; data: ClubsModels.UpdateMemberDto }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id, userId, data }) =>
+        ClubsApi.updateMember(id, userId, data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
+   * Mutation `useRemoveMember`
+   * @summary Remove a member from the club
+   * @description Unlinks the user from the club without deleting them. Registrations are kept. Admin or club owner/coach of this club.
+   * @param { string } mutation.id Path parameter. Club ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { string } mutation.userId Path parameter. Member user ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<void> } Member removed from club
+   * @statusCodes [204, 400, 401, 403, 404]
+   */
+  export const useRemoveMember = (
+    options?: AppMutationOptions<
+      typeof ClubsApi.removeMember,
+      { id: string; userId: string }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id, userId }) => ClubsApi.removeMember(id, userId),
       ...options,
       onSuccess: (...args) => {
         invalidateQueries(queryClient, moduleName, options);

@@ -47,9 +47,28 @@ export namespace ClubsApi {
     data: ClubsModels.CreateClubInvitationDto,
   ) => {
     return AppRestClient.post(
-      { resSchema: ClubsModels.InvitationCreatedResponseDtoSchema },
+      { resSchema: CommonModels.InvitationCreatedResponseDtoSchema },
       `/clubs/${id}/invitations`,
       data,
+    );
+  };
+
+  export const updateMember = (
+    id: string,
+    userId: string,
+    data: ClubsModels.UpdateMemberDto,
+  ) => {
+    return AppRestClient.put(
+      { resSchema: CommonModels.UserResponseDtoSchema },
+      `/clubs/${id}/members/${userId}`,
+      data,
+    );
+  };
+
+  export const removeMember = (id: string, userId: string) => {
+    return AppRestClient.delete(
+      { resSchema: z.void() },
+      `/clubs/${id}/members/${userId}`,
     );
   };
 

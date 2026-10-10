@@ -1,6 +1,7 @@
 import { AppRestClient } from "@/util/rest/clients/app-rest-client";
 import { z } from "zod";
 import { InvitationsModels } from "./invitations.models";
+import { CommonModels } from "@/data/common/common.models";
 
 export namespace InvitationsApi {
   export const findAll = (clubId?: string) => {
@@ -17,6 +18,13 @@ export namespace InvitationsApi {
 
   export const cancel = (id: string) => {
     return AppRestClient.delete({ resSchema: z.void() }, `/invitations/${id}`);
+  };
+
+  export const resend = (id: string) => {
+    return AppRestClient.post(
+      { resSchema: CommonModels.InvitationCreatedResponseDtoSchema },
+      `/invitations/${id}/resend`,
+    );
   };
 
   export const getByToken = (token: string) => {

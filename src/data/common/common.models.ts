@@ -280,4 +280,38 @@ export namespace CommonModels {
     updatedAt: z.string().datetime({ offset: true }),
   });
   export type CategoryResponseDto = z.infer<typeof CategoryResponseDtoSchema>;
+
+  /**
+   * InvitationCreatedResponseDtoSchema
+   * @type { object }
+   * @property { string } id Invitation ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } clubId Club ID. Example: `123e4567-e89b-12d3-a456-426614174001`
+   * @property { string } clubName Club name the user is invited to join. Example: `Tokyo Karate Club`
+   * @property { string } token Invitation token; use to build invite link (e.g. /invite/:token). Example: `abc12345-e89b-12d3-a456-426614174000`
+   * @property { string } email Invitee email. Example: `owner@example.com`
+   * @property { string } firstName Invitee first name. Example: `Jane`
+   * @property { string } lastName Invitee last name. Example: `Doe`
+   * @property { string } status Invitation status. Example: `pending`
+   * @property { string } createdAt When the invitation was created. Example: `2024-02-01T12:00:00.000Z`
+   * @property { string } expiresAt Invitation expiry timestamp. Example: `2024-02-08T12:00:00.000Z`
+   * @property { string } acceptedAt When the invitation was accepted (if accepted). Example: `2024-02-05T14:00:00.000Z`
+   * @property { string } inviteUrl Invite URL for the invitee. Example: `http://localhost:8000/invite/abc123`
+   */
+  export const InvitationCreatedResponseDtoSchema = z.object({
+    id: z.string(),
+    clubId: z.string(),
+    clubName: z.string(),
+    token: z.string(),
+    email: z.string(),
+    firstName: z.string().nullable(),
+    lastName: z.string().nullable(),
+    status: CommonModels.InvitationStatusEnumSchema,
+    createdAt: z.string().datetime({ offset: true }),
+    expiresAt: z.string().datetime({ offset: true }),
+    acceptedAt: z.string().datetime({ offset: true }).nullish(),
+    inviteUrl: z.string(),
+  });
+  export type InvitationCreatedResponseDto = z.infer<
+    typeof InvitationCreatedResponseDtoSchema
+  >;
 }

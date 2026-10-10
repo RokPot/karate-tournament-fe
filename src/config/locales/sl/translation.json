@@ -5,6 +5,7 @@
     "edit": "Uredi",
     "duplicate": "Podvoji",
     "delete": "Izbriši",
+    "actions": "Dejanja",
     "updatedAt": "Posodobljeno",
     "status": "Status",
     "club": "Klub"
@@ -53,6 +54,25 @@
     "registeredCount": "{{count}} prijavljenih",
     "expandCategory": "Prikaži prijave za {{name}}",
     "collapseCategory": "Skrij prijave za {{name}}",
+    "views": {
+      "label": "Pogledi prijav",
+      "category": "Po kategoriji",
+      "participants": "Po udeležencu"
+    },
+    "staff": {
+      "addTitle": "Dodaj udeleženca",
+      "editTitle": "Uredi udeleženca",
+      "addParticipant": "Dodaj udeleženca",
+      "categoryRequired": "Izberi kategorijo",
+      "teamAddUnavailable": "Ekipnih kategorij tukaj še ni mogoče urejati. Upravljanje sestave ekip v tem pogledu ni na voljo.",
+      "addSuccess": "Udeleženec dodan (mock — čaka na API).",
+      "addError": "Dodajanje udeleženca ni uspelo.",
+      "editSuccess": "Udeleženec posodobljen (mock — čaka na API).",
+      "editError": "Posodobitev udeleženca ni uspela.",
+      "removeSuccess": "Prijava odstranjena (mock — čaka na API).",
+      "removeError": "Odstranitev prijave ni uspela.",
+      "removeConfirm": "Odstranim {{name}} iz {{category}}?"
+    },
     "public": {
       "pageTitle": "Prijava na turnir",
       "showCategories": "Prikaži kategorije",
@@ -392,6 +412,13 @@
       "success": "Vabilo je bilo ustvarjeno",
       "error": "Vabila ni bilo mogoče ustvariti",
       "inviteSuccessMessage": "Delite to povezavo, da se lahko pridružijo klubu."
+    },
+    "resend": {
+      "submit": "Pošlji znova",
+      "sending": "Pošiljanje...",
+      "success": "Vabilo je bilo znova poslano",
+      "successCopied": "Vabilo je bilo znova poslano. Nova povezava je kopirana.",
+      "error": "Ponovno pošiljanje vabila ni uspelo"
     }
   }
 }

@@ -37,7 +37,7 @@ export const ClubDetailView = ({
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-6 bg-secondary-75 p-6">
+    <div className="flex flex-1 flex-col gap-6 bg-secondary-50 p-6">
       <section className="flex flex-col gap-3 rounded-m bg-secondary-200 p-4 shadow-1">
         <div className="flex min-w-0 flex-row flex-wrap items-center gap-2">
           <Button variant="outlined" onClick={() => router.back()}>
@@ -59,7 +59,7 @@ export const ClubDetailView = ({
             <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("shared.location")}:
             </Typography>
-            <Typography size="body-paragraph-s" className="font-weight-500">
+            <Typography size="body-paragraph-s" className="font-weight-500 text-primary-300">
               {club.address}
             </Typography>
           </Pill>
@@ -67,7 +67,7 @@ export const ClubDetailView = ({
             <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("shared.country")}:
             </Typography>
-            <Typography size="body-paragraph-s" className="font-weight-500">
+            <Typography size="body-paragraph-s" className="font-weight-500 text-primary-300">
               {club.country}
             </Typography>
           </Pill>
@@ -75,14 +75,14 @@ export const ClubDetailView = ({
             <Typography size="body-paragraph-s" className="text-neutral-200">
               {t("shared.membersCount")}:
             </Typography>
-            <Typography size="body-paragraph-s" className="font-weight-500">
+            <Typography size="body-paragraph-s" className="font-weight-500 text-primary-300">
               {club.membersCount}
             </Typography>
           </Pill>
         </div>
       </section>
 
-      <div className="flex flex-1 flex-col gap-5">
+      <div className="flex flex-1 grow-0 flex-col gap-5 rounded-m bg-secondary-200 p-4 shadow-1 h-fit">
         <ClubMembersSection clubId={clubId} />
         <ClubInvitationsSection clubId={clubId} />
         {showTournaments && <ClubTournamentSection clubId={clubId} />}

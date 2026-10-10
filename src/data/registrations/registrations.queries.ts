@@ -42,6 +42,18 @@ export namespace RegistrationsQueries {
         tournamentId,
         categoryId,
       ] as const,
+    findByUser: (
+      userId: string,
+      tournamentId?: string,
+      status?: RegistrationsModels.FindByUserStatusParam,
+    ) =>
+      [
+        ...keys.all,
+        "/registrations/by-user",
+        userId,
+        tournamentId,
+        status,
+      ] as const,
     getSuitableCategories: (userId: string, tournamentId: string) =>
       [
         ...keys.all,
@@ -296,6 +308,36 @@ export namespace RegistrationsQueries {
   };
 
   /**
+   * Query `useFindByUser`
+   * @summary List registrations for a user
+   * @description Returns registrations for the given user. Caller must be the user, an admin, or club staff of the user&#x27;s current club. Optionally filter by tournamentId and status.
+   * @param { string } object.userId Query parameter. User ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { string } object.tournamentId Query parameter. Filter by tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { RegistrationsModels.FindByUserStatusParam } object.status Query parameter. Filter by registration status. Example: `pending`
+   * @param { AppQueryOptions } options Query options
+   * @returns { UseQueryResult<RegistrationsModels.FindByUserResponse> } Registrations list
+   * @statusCodes [200, 401, 403, 404]
+   */
+  export const useFindByUser = <TData>(
+    {
+      userId,
+      tournamentId,
+      status,
+    }: {
+      userId: string;
+      tournamentId?: string;
+      status?: RegistrationsModels.FindByUserStatusParam;
+    },
+    options?: AppQueryOptions<typeof RegistrationsApi.findByUser, TData>,
+  ) => {
+    return useQuery({
+      queryKey: keys.findByUser(userId, tournamentId, status),
+      queryFn: () => RegistrationsApi.findByUser(userId, tournamentId, status),
+      ...options,
+    });
+  };
+
+  /**
    * Query `useGetSuitableCategories`
    * @summary Get categories suitable for a user in a tournament
    * @description Returns tournament categories for which the user meets weight, age, belt, and gender requirements.
@@ -364,6 +406,63 @@ export namespace RegistrationsQueries {
       queryKey: keys.findOne(id),
       queryFn: () => RegistrationsApi.findOne(id),
       ...options,
+    });
+  };
+
+  /**
+   * Mutation `useUpdate`
+   * @summary Update a registration
+   * @description Updates category, final weight, and/or status. Admin, staff of the registering club, or staff of the hosting club. Tournament must be approved or in progress. Category schedule is not updated automatically.
+   * @param { string } mutation.id Path parameter
+   * @param { RegistrationsModels.UpdateRegistrationDto } mutation.data Body parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<RegistrationsModels.RegistrationResponseDto> } Registration updated
+   * @statusCodes [200, 400, 401, 403, 404, 409]
+   */
+  export const useUpdate = (
+    options?: AppMutationOptions<
+      typeof RegistrationsApi.update,
+      { id: string; data: RegistrationsModels.UpdateRegistrationDto }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id, data }) => RegistrationsApi.update(id, data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
+   * Mutation `useRemove`
+   * @summary Delete a registration
+   * @description Removes a registration. Admin, staff of the registering club, or staff of the hosting club. Tournament must be approved or in progress. Team roster rows for this registration are removed. Category schedule is not updated automatically.
+   * @param { string } mutation.id Path parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<void> } Registration deleted
+   * @statusCodes [204, 400, 401, 403, 404]
+   */
+  export const useRemove = (
+    options?: AppMutationOptions<
+      typeof RegistrationsApi.remove,
+      { id: string }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id }) => RegistrationsApi.remove(id),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
     });
   };
 }

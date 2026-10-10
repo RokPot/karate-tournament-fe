@@ -71,4 +71,34 @@ export namespace SchedulesQueries {
       ...options,
     });
   };
+
+  /**
+   * Mutation `useRegenerate`
+   * @summary Regenerate the single-elimination schedule
+   * @description Admin or owning club staff. Tournament must be in_progress. Deletes the existing schedule (games, matches, and scores) and rebuilds from current participants. 409 if no schedule exists yet.
+   * @param { string } mutation.tournamentId Path parameter. Tournament ID
+   * @param { string } mutation.categoryId Path parameter. Category ID
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<SchedulesModels.ScheduleResponseDto> } Schedule regenerated
+   * @statusCodes [200, 201, 400, 401, 403, 404, 409]
+   */
+  export const useRegenerate = (
+    options?: AppMutationOptions<
+      typeof SchedulesApi.regenerate,
+      { tournamentId: string; categoryId: string }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ tournamentId, categoryId }) =>
+        SchedulesApi.regenerate(tournamentId, categoryId),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
 }

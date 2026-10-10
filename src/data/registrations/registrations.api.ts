@@ -1,4 +1,5 @@
 import { AppRestClient } from "@/util/rest/clients/app-rest-client";
+import { z } from "zod";
 import { RegistrationsModels } from "./registrations.models";
 
 export namespace RegistrationsApi {
@@ -111,6 +112,24 @@ export namespace RegistrationsApi {
     );
   };
 
+  export const findByUser = (
+    userId: string,
+    tournamentId?: string,
+    status?: RegistrationsModels.FindByUserStatusParam,
+  ) => {
+    return AppRestClient.get(
+      { resSchema: RegistrationsModels.FindByUserResponseSchema },
+      `/registrations/by-user`,
+      {
+        params: {
+          userId,
+          tournamentId,
+          status,
+        },
+      },
+    );
+  };
+
   export const getSuitableCategories = (
     userId: string,
     tournamentId: string,
@@ -146,6 +165,24 @@ export namespace RegistrationsApi {
   export const findOne = (id: string) => {
     return AppRestClient.get(
       { resSchema: RegistrationsModels.RegistrationResponseDtoSchema },
+      `/registrations/${id}`,
+    );
+  };
+
+  export const update = (
+    id: string,
+    data: RegistrationsModels.UpdateRegistrationDto,
+  ) => {
+    return AppRestClient.put(
+      { resSchema: RegistrationsModels.RegistrationResponseDtoSchema },
+      `/registrations/${id}`,
+      data,
+    );
+  };
+
+  export const remove = (id: string) => {
+    return AppRestClient.delete(
+      { resSchema: z.void() },
       `/registrations/${id}`,
     );
   };

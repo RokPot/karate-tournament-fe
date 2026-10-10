@@ -1,7 +1,7 @@
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { CategoryCreateEditModal } from "@/components/categories/CategoryCreateEditModal";
@@ -69,12 +69,6 @@ const CategoriesPage = () => {
   });
 
   const isMutating = duplicateMutation.isPending || deleteMutation.isPending;
-  const selectedCategory = useMemo(
-    () =>
-      categories?.find((category) => category.id === selectedCategoryIds[0]) ??
-      null,
-    [categories, selectedCategoryIds],
-  );
 
   const handleDuplicate = () => {
     if (selectedCategoryIds.length === 0) {
@@ -86,14 +80,6 @@ const CategoriesPage = () => {
         categoryIds: selectedCategoryIds,
       },
     });
-  };
-
-  const handleEdit = () => {
-    if (!selectedCategory) {
-      return;
-    }
-
-    setEditingCategoryId(selectedCategory.id);
   };
 
   const handleCloseCategoryModal = () => {
@@ -122,9 +108,9 @@ const CategoriesPage = () => {
   }
 
   return (
-    <div className="mx-auto w-full max-w-7xl p-6">
-      <div className="mb-6 flex items-center justify-between gap-4">
-        <Typography size="h2">
+    <div className="w-full max-w-full p-5">
+      <div className="mb-3 flex items-center justify-between gap-4 h-14">
+        <Typography size="h3">
           {t("categories.title")} ({categories?.length ?? 0})
         </Typography>
 
@@ -141,13 +127,9 @@ const CategoriesPage = () => {
             </Button>
             {selectedCategoryIds.length > 0 && (
               <>
-                {selectedCategoryIds.length === 1 && (
-                  <Button variant="outlined" onClick={handleEdit}>
-                    {t("shared.edit")}
-                  </Button>
-                )}
                 <Button
                   variant="outlined"
+                  color="secondary"
                   onClick={handleDuplicate}
                   disabled={isMutating}
                 >
@@ -172,13 +154,25 @@ const CategoriesPage = () => {
         mode="edit"
         selectedCategoryIds={selectedCategoryIds}
         onSelectedCategoryIdsChange={setSelectedCategoryIds}
+        onEdit={(category) => setEditingCategoryId(category.id)}
+        onDuplicate={(category) =>
+          duplicateMutation.mutate({
+            data: { categoryIds: [category.id] },
+          })
+        }
+        onDelete={(category) =>
+          deleteMutation.mutate({
+            data: { categoryIds: [category.id] },
+          })
+        }
+        actionsDisabled={isMutating}
+        initialPagination={undefined}
       />
 
       <CategoryCreateEditModal
         open={createCategoryDialogOpen || !!editingCategoryId}
         category={
           categories?.find((category) => category.id === editingCategoryId)
-
         }
         onClose={handleCloseCategoryModal}
       />

@@ -33,7 +33,7 @@ export const ClubStaffDashboard = ({ clubId }: ClubStaffDashboardProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-6 bg-secondary-75 p-6">
+    <div className="flex flex-col gap-6 bg-secondary-50 p-6">
       <div className="grid grid-cols-1 gap-4 t:grid-cols-2">
         <DashboardStatCard
           label={t("dashboard.stats.members")}

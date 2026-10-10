@@ -1,4 +1,6 @@
-import { Checkbox } from "@mui/material";
+import { faCopy, faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Checkbox, IconButton } from "@mui/material";
 import {
   ColumnDef,
   Header,
@@ -6,7 +8,7 @@ import {
   RowSelectionState,
   Updater,
 } from "@tanstack/react-table";
-import { ReactNode, useMemo, useState } from "react";
+import { MouseEvent, ReactNode, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useCategoryFormatters } from "@/components/categories/category-formatters";
@@ -17,11 +19,18 @@ import { Typography } from "@/components/ui/text/Typography/Typography";
 import { CommonModels } from "@/data/common/common.models";
 import { DateUtils } from "@/util/date.utils";
 
+type Category = CommonModels.CategoryResponseDto;
+
 interface IProps {
-  categories: CommonModels.CategoryResponseDto[];
+  categories: Category[];
   mode?: "view" | "edit";
   selectedCategoryIds?: string[];
   onSelectedCategoryIdsChange?: (categoryIds: string[]) => void;
+  onEdit?: (category: Category) => void;
+  onDuplicate?: (category: Category) => void;
+  onDelete?: (category: Category) => void;
+  actionsDisabled?: boolean;
+  initialPagination?: PaginationState;
 }
 
 const SelectionHeaderCell = ({ table }: { table: any }) => (
@@ -46,11 +55,69 @@ const SelectionTableCell = ({ row }: { row: any }) => (
   </TableCell>
 );
 
+const stopRowToggle = (event: MouseEvent) => {
+  event.stopPropagation();
+};
+
+const renderCategoryActionsCell = ({
+  category,
+  disabled,
+  onEdit,
+  onDuplicate,
+  onDelete,
+  editLabel,
+  duplicateLabel,
+  deleteLabel,
+}: {
+  category: Category;
+  disabled?: boolean;
+  onEdit?: (category: Category) => void;
+  onDuplicate?: (category: Category) => void;
+  onDelete?: (category: Category) => void;
+  editLabel: string;
+  duplicateLabel: string;
+  deleteLabel: string;
+}) => (
+  <TableCell align="end">
+    <div className="flex items-center gap-0-5" onClick={stopRowToggle}>
+      <IconButton
+        size="small"
+        disabled={disabled}
+        aria-label={editLabel}
+        onClick={() => onEdit?.(category)}
+      >
+        <FontAwesomeIcon icon={faPencil} className="text-primary-300" size="xs" />
+      </IconButton>
+      <IconButton
+        size="small"
+        disabled={disabled}
+        aria-label={duplicateLabel}
+        onClick={() => onDuplicate?.(category)}
+      >
+        <FontAwesomeIcon icon={faCopy} className="text-primary-300" size="xs" />
+      </IconButton>
+      <IconButton
+        size="small"
+        disabled={disabled}
+        aria-label={deleteLabel}
+        onClick={() => onDelete?.(category)}
+      >
+        <FontAwesomeIcon icon={faTrash} className="text-danger" size="xs" />
+      </IconButton>
+    </div>
+  </TableCell>
+);
+
 export const CategoryList = ({
   categories,
   mode = "view",
   selectedCategoryIds = [],
   onSelectedCategoryIdsChange,
+  onEdit,
+  onDuplicate,
+  onDelete,
+  actionsDisabled,
+  initialPagination,
 }: IProps) => {
   const { t } = useTranslation();
   const { formatAgeRange, formatBeltRange, formatTeamSize, formatWeightRange } =
@@ -72,8 +139,8 @@ export const CategoryList = ({
 
   const rowSelection = mode === "edit" ? managementRowSelection : {};
 
-  const columns = useMemo<ColumnDef<CommonModels.CategoryResponseDto>[]>(() => {
-    const categoryColumns: ColumnDef<CommonModels.CategoryResponseDto>[] = [
+  const columns = useMemo<ColumnDef<Category>[]>(() => {
+    const categoryColumns: ColumnDef<Category>[] = [
       {
         header: ({ header }) => HeaderCell(header, t("categories.create.name")),
         accessorKey: "name",
@@ -155,6 +222,23 @@ export const CategoryList = ({
             ),
           size: 180,
         },
+        {
+          id: "actions",
+          header: ({ header }) => HeaderCell(header, t("shared.actions")),
+          cell: ({ row }) =>
+            renderCategoryActionsCell({
+              category: row.original,
+              disabled: actionsDisabled,
+              onEdit,
+              onDuplicate,
+              onDelete,
+              editLabel: t("shared.edit"),
+              duplicateLabel: t("shared.duplicate"),
+              deleteLabel: t("shared.delete"),
+            }),
+          enableSorting: false,
+          size: 140,
+        },
       ];
     }
 
@@ -165,6 +249,10 @@ export const CategoryList = ({
     formatTeamSize,
     formatWeightRange,
     mode,
+    onDelete,
+    onDuplicate,
+    onEdit,
+    actionsDisabled,
     t,
   ]);
 
@@ -182,16 +270,24 @@ export const CategoryList = ({
         .map((category) => category.id),
     );
   };
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 6
-  });
+  const [pagination, setPagination] = useState<PaginationState | undefined>(initialPagination);
   const totalItemsCount = categories.length;
   const currentItems = useMemo(() => {
+    if (!pagination) {
+      return categories;
+    }
     return categories.slice(pagination.pageIndex * pagination.pageSize, (pagination.pageIndex + 1) * pagination.pageSize);
   }, [categories, pagination])
 
-
+  const paginationOptions = useMemo(() => {
+    if (!pagination) {
+      return undefined;
+    }
+    return {
+      rowCount: totalItemsCount,
+      pageCount: Math.ceil(totalItemsCount / pagination.pageSize)
+    }
+  }, [pagination, totalItemsCount])
 
 
   if (categories.length === 0) {
@@ -207,7 +303,7 @@ export const CategoryList = ({
 
 
   return (
-    <div className="flex h-fit min-h-[450px] w-full flex-[1_1_0]">
+    <div className="flex h-fit">
       <Table
         data={currentItems}
         columns={columns}
@@ -217,19 +313,15 @@ export const CategoryList = ({
           mode === "edit" ? handleRowSelectionChange : undefined
         }
         rowSelection={rowSelection}
-        pagination={{
-          pageIndex: 0,
-          pageSize: 6
-
-        }}
+        pagination={pagination}
         onPaginationChange={(newPagination) => {
-          setPagination(newPagination);
+          if (!pagination) {
+            return;
+          }
+          setPagination(typeof newPagination === "function" ? newPagination(pagination) : newPagination);
         }}
         tableLayout="auto"
-        paginationOptions={{
-          rowCount: totalItemsCount,
-          pageCount: Math.ceil(totalItemsCount / pagination.pageSize)
-        }}
+        paginationOptions={paginationOptions}
 
 
       />

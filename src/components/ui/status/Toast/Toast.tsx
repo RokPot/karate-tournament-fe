@@ -26,7 +26,7 @@ const toastWrapper = cva("max-w-toast min-h-0 w-auto overflow-hidden rounded-sm 
       neutral: "border-secondary-400",
       success: "border-success bg-success-75!",
       warning: "border-warning",
-      error: "border-danger",
+      error: "border-danger-50000",
     },
     position: {
       "bottom-right": "mt-8",
@@ -58,7 +58,7 @@ export const Toast = ({ variant, text, isLoading = false, actions = [], icon: Ic
           size="labels-s"
           className={clsx(
             "font-weight-500",
-            variant === "error" ? "text-danger" : "text-neutral-500",
+            variant === "error" ? "text-danger-400" : "text-neutral-500",
           )}
         >
           {text}

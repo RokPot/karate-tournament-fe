@@ -2,8 +2,8 @@ import { Header } from "@tanstack/react-table";
 import { cx } from "class-variance-authority";
 import { PropsWithChildren } from "react";
 
-import { Typography } from "@/components/ui/text/Typography/Typography";
 import { ArrowDropUpIcon } from "@/assets/icons/general/ArrowDropUp";
+import { Typography } from "@/components/ui/text/Typography/Typography";
 
 interface IProps extends PropsWithChildren {
   header?: Header<any, unknown>;
@@ -35,10 +35,11 @@ const TableHeaderCell = ({ header, label, align = "start" }: IProps) => {
       <Typography
         size="body-paragraph-m"
         className={cx(
-          "text-text-default-primary relative",
-          header?.column.getIsSorted() ? "font-body-prominent-2!" : "font-weight-500!",
+          "text-neutral-300 relative",
+          header?.column.getIsSorted() ? "font-weight-500! text-primary-400!" : "font-weight-500!",
         )}
         as="span"
+        variant="default"
       >
         {label}
         {header?.column.getCanSort() && (
@@ -52,7 +53,7 @@ const TableHeaderCell = ({ header, label, align = "start" }: IProps) => {
           </div>
         )}
       </Typography>
-    </div>
+    </div >
   );
 };
 

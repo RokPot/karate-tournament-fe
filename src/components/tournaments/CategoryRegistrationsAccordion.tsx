@@ -9,11 +9,15 @@ import { RegistrationsQueries } from "@/data/registrations/registrations.queries
 interface IProps {
   categories: CommonModels.CategoryResponseDto[];
   tournamentId: string;
+  clubId?: string;
+  canEdit?: boolean;
 }
 
 export const CategoryRegistrationsAccordion = ({
   categories,
   tournamentId,
+  clubId,
+  canEdit = false,
 }: IProps) => {
   const { t } = useTranslation();
   const { data: counts } = RegistrationsQueries.useFindCountsByTournament(
@@ -44,7 +48,9 @@ export const CategoryRegistrationsAccordion = ({
           key={category.id}
           category={category}
           tournamentId={tournamentId}
+          clubId={clubId}
           registrationCount={countsByCategoryId.get(category.id) ?? 0}
+          canEdit={canEdit}
         />
       ))}
     </div>

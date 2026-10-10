@@ -31,14 +31,14 @@ export const AppSidebar = ({ onNavigate }: AppSidebarProps) => {
               href={link.href}
               onClick={onNavigate}
               className={cx(
-                "flex flex-row items-center gap-3 rounded-m px-3 py-2 no-underline!",
+                "flex flex-row items-center gap-3 rounded-m px-3 py-2 no-underline! transition duration-200",
                 isActive
-                  ? "bg-secondary-200 text-primary-300 shadow-1"
-                  : "text-neutral-400 hover:bg-secondary-100 hover:text-primary-300!",
+                  ? " text-primary-400 "
+                  : "text-primary-200 hover:bg-secondary-100 hover:text-primary-300!",
               )}
             >
-              <FontAwesomeIcon icon={link.icon} className="w-4" />
-              <Typography size="body-paragraph-s" as="span">
+              <FontAwesomeIcon icon={link.icon} className={cx("w-4", isActive ? "text-primary-400" : "text-primary-200")} />
+              <Typography size="body-paragraph-s" as="span" variant={isActive ? "prominent-1" : "default"}>
                 {link.label}
               </Typography>
             </Link>

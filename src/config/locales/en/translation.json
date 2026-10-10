@@ -47,6 +47,7 @@
     "edit": "Edit",
     "duplicate": "Duplicate",
     "delete": "Delete",
+    "actions": "Actions",
     "location": "Location",
     "startDate": "Start Date",
     "registrationDeadline": "Registration Deadline",
@@ -226,6 +227,25 @@
     "registeredCount": "{{count}} registered",
     "expandCategory": "Show registrations for {{name}}",
     "collapseCategory": "Hide registrations for {{name}}",
+    "views": {
+      "label": "Registration views",
+      "category": "By category",
+      "participants": "By participant"
+    },
+    "staff": {
+      "addTitle": "Add participant",
+      "editTitle": "Edit participant",
+      "addParticipant": "Add participant",
+      "categoryRequired": "Select a category",
+      "teamAddUnavailable": "Team categories cannot be edited here yet. Roster management is not available in this view.",
+      "addSuccess": "Participant added (mock — waiting on API).",
+      "addError": "Failed to add participant.",
+      "editSuccess": "Participant updated (mock — waiting on API).",
+      "editError": "Failed to update participant.",
+      "removeSuccess": "Registration removed (mock — waiting on API).",
+      "removeError": "Failed to remove registration.",
+      "removeConfirm": "Remove {{name}} from {{category}}?"
+    },
     "public": {
       "pageTitle": "Tournament registration",
       "showCategories": "Show categories",
@@ -478,6 +498,13 @@
       "success": "Invitation created",
       "error": "Failed to create invitation",
       "inviteSuccessMessage": "Share this link so they can join the club."
+    },
+    "resend": {
+      "submit": "Resend",
+      "sending": "Resending...",
+      "success": "Invitation resent",
+      "successCopied": "Invitation resent. New invite link copied to clipboard.",
+      "error": "Failed to resend invitation"
     }
   },
   "landing": {

@@ -11645,6 +11645,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"i18next-browser-languagedetector@npm:^8.2.1":
+  version: 8.2.1
+  resolution: "i18next-browser-languagedetector@npm:8.2.1"
+  dependencies:
+    "@babel/runtime": "npm:^7.23.2"
+  checksum: 10/3410c839285f70f04546b6d5960e3fe263cbefb3098afa17e4254677af8e2149f287968d4e4fb3bcbf76a0e2300761e56e0315e41f1b5ed5c1c78a2d037cc64f
+  languageName: node
+  linkType: hard
+
 "i18next@npm:^24.2.2":
   version: 24.2.2
   resolution: "i18next@npm:24.2.2"
@@ -13288,6 +13297,7 @@ __metadata:
     eslint-plugin-tailwind-v4: "npm:^1.0.15"
     eslint-plugin-unused-imports: "npm:^3.2.0"
     i18next: "npm:^24.2.2"
+    i18next-browser-languagedetector: "npm:^8.2.1"
     immer: "npm:^10.1.1"
     jest: "npm:^29.7.0"
     jest-environment-jsdom: "npm:^29.7.0"

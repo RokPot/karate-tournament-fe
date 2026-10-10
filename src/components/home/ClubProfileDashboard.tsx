@@ -19,7 +19,7 @@ export const ClubProfileDashboard = ({ clubId }: ClubProfileDashboardProps) => {
 
   if (!clubId) {
     return (
-      <div className="bg-secondary-75 p-6">
+      <div className="bg-secondary-50 p-6">
         <Typography size="body-paragraph-m">{t("dashboard.noClub")}</Typography>
       </div>
     );

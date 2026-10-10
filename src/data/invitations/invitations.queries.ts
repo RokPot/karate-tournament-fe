@@ -64,6 +64,31 @@ export namespace InvitationsQueries {
   };
 
   /**
+   * Mutation `useResend`
+   * @summary Resend invitation
+   * @description Issues a new token and expiry for a pending invitation (including time-expired). Admin or owner/coach of the invitation club. The previous invite URL stops working.
+   * @param { string } mutation.id Path parameter. Invitation ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<CommonModels.InvitationCreatedResponseDto> } Invitation resent
+   * @statusCodes [200, 400, 401, 403, 404]
+   */
+  export const useResend = (
+    options?: AppMutationOptions<typeof InvitationsApi.resend, { id: string }> &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id }) => InvitationsApi.resend(id),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
    * Query `useGetByToken`
    * @summary Get invitation by token
    * @description Returns invitation details for the given token, including invitee identity. Public. Expired, cancelled, and accepted invites still return 200 with status.

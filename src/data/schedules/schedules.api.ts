@@ -15,4 +15,11 @@ export namespace SchedulesApi {
       `/tournaments/${tournamentId}/categories/${categoryId}/schedule`,
     );
   };
+
+  export const regenerate = (tournamentId: string, categoryId: string) => {
+    return AppRestClient.post(
+      { resSchema: SchedulesModels.ScheduleResponseDtoSchema },
+      `/tournaments/${tournamentId}/categories/${categoryId}/schedule/regenerate`,
+    );
+  };
 }

@@ -6,10 +6,10 @@ import AddOrCreateCategoryModal from "@/components/categories/AddOrCreateCategor
 import { CategoryList } from "@/components/categories/CategoryList";
 import { ErrorState } from "@/components/shared/layout/ErrorState";
 import { LoadingState } from "@/components/shared/layout/LoadingState";
-import { CategoryRegistrationsAccordion } from "@/components/tournaments/CategoryRegistrationsAccordion";
 import { DeclineTournamentDialog } from "@/components/tournaments/DeclineTournamentDialog";
 import { TournamentBracketsPanel } from "@/components/tournaments/TournamentBracketsPanel";
 import { TournamentDetailShell } from "@/components/tournaments/TournamentDetailShell";
+import { TournamentRegistrationsPanel } from "@/components/tournaments/registrations/TournamentRegistrationsPanel";
 import {
   getTournamentRegistrationClosedCopy,
   isTournamentApproved,
@@ -122,6 +122,12 @@ const TournamentDetailPage = () => {
     !!authUser?.clubId &&
     authUser.clubId === tournament.clubId;
   const canManageSetup = Boolean(isAdmin || isOwningClubStaff);
+  const canEditRegistrations = Boolean(
+    isAdmin ||
+      (isClubOwner &&
+        !!authUser?.clubId &&
+        authUser.clubId === tournament.clubId),
+  );
   const registrationOpen = isTournamentRegistrationOpen(tournament);
   const registrationClosedCopy = getTournamentRegistrationClosedCopy(
     tournament,
@@ -320,13 +326,20 @@ const TournamentDetailPage = () => {
             </Button>
           )}
         </div>
-        <CategoryList categories={tournamentCategories} />
+        <CategoryList
+          categories={tournamentCategories}
+          initialPagination={{
+            pageIndex: 0,
+            pageSize: 6
+          }} />
       </div>
 
       <div className={cx(activeTab !== "registrations" && "hidden")}>
-        <CategoryRegistrationsAccordion
+        <TournamentRegistrationsPanel
           categories={tournamentCategories}
           tournamentId={tournamentId}
+          clubId={tournament.clubId ?? undefined}
+          canEditRegistrations={canEditRegistrations}
         />
       </div>
 
