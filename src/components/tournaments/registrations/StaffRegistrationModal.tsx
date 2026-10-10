@@ -120,8 +120,8 @@ export const StaffRegistrationModal = ({
     () =>
       showCategorySelect
         ? StaffParticipantFormSchema.extend({
-            categoryId: z.string().min(1),
-          })
+          categoryId: z.string().min(1),
+        })
         : StaffParticipantFormSchema,
     [showCategorySelect],
   );
@@ -285,6 +285,7 @@ export const StaffRegistrationModal = ({
               InputProps={{
                 endAdornment: <InputAdornment position="end">kg</InputAdornment>,
               }}
+              // eslint-disable-next-line react/jsx-no-duplicate-props
               inputProps={{ min: 0, step: 0.1 }}
             />
           </div>

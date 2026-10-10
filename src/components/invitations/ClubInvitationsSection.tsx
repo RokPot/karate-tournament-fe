@@ -1,5 +1,5 @@
-import { CreateInvitationModal } from "@/components/invitations/CreateInvitationModal";
 import { HeaderCell, TextCell } from "@/components/categories/CategoryList";
+import { CreateInvitationModal } from "@/components/invitations/CreateInvitationModal";
 import { ErrorState } from "@/components/shared/layout/ErrorState";
 import { LoadingState } from "@/components/shared/layout/LoadingState";
 import { useToast } from "@/components/ui/status/Toast/useToast";
@@ -51,38 +51,15 @@ export const ClubInvitationsSection = ({
   titleSize = "h2",
 }: ClubInvitationsSectionProps) => {
   const { t } = useTranslation();
-  const { successToast, errorToast } = useToast();
+  const { successToast, } = useToast();
   const { isAdmin, isClubOwner, isClubCoach } = useAuthRoles();
   const canResendInvitations = Boolean(isAdmin || isClubOwner || isClubCoach);
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [resendingId, setResendingId] = useState<string | null>(null);
 
   const { data: invitations, isError, isLoading, error, refetch } =
     InvitationsQueries.useFindAll({ clubId });
 
-  const resendMutation = InvitationsQueries.useResend({
-    invalidateCurrentModule: true,
-    onSuccess: (response) => {
-      const url = resolveInviteUrl(response.inviteUrl, response.token);
-      navigator.clipboard.writeText(url).then(
-        () =>
-          successToast({
-            text: t("invitations.resend.successCopied"),
-          }),
-        () =>
-          successToast({
-            text: t("invitations.resend.success"),
-          }),
-      );
-      setResendingId(null);
-    },
-    onError: (mutationError) => {
-      errorToast({
-        text: mutationError?.message || t("invitations.resend.error"),
-      });
-      setResendingId(null);
-    },
-  });
+
 
   const columns: ColumnDef<InvitationsModels.InvitationListItemDto>[] =
     useMemo(() => {
@@ -158,42 +135,14 @@ export const ClubInvitationsSection = ({
         baseColumns.push({
           id: "actions",
           header: ({ header }) => HeaderCell(header, t("shared.actions")),
-          cell: ({ row }) => {
-            if (!canResendStatus(row.original.status)) {
-              return TextCell("—");
-            }
-            const isThisResending =
-              resendMutation.isPending && resendingId === row.original.id;
-            return (
-              <TableCell align="end">
-                <div
-                  className="flex items-center justify-end"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    disabled={resendMutation.isPending}
-                    onClick={() => {
-                      setResendingId(row.original.id);
-                      resendMutation.mutate({ id: row.original.id });
-                    }}
-                  >
-                    {isThisResending
-                      ? t("invitations.resend.sending")
-                      : t("invitations.resend.submit")}
-                  </Button>
-                </div>
-              </TableCell>
-            );
-          },
+          cell: ({ row }) => ActionsCell({ row: row.original, canResend: canResendStatus(row.original.status) }),
           enableSorting: false,
           size: 140,
         });
       }
 
       return baseColumns;
-    }, [canResendInvitations, clubId, resendMutation, resendingId, t]);
+    }, [canResendInvitations, clubId, t]);
 
   if (isLoading) {
     return <LoadingState />;
@@ -222,7 +171,7 @@ export const ClubInvitationsSection = ({
           data={invitations ?? []}
           columns={columns}
           sorting={[]}
-          onSortingChange={() => {}}
+          onSortingChange={() => { }}
           rowSelection={{}}
           onRowClick={(row) => {
             navigator.clipboard.writeText(
@@ -242,6 +191,63 @@ export const ClubInvitationsSection = ({
     </div>
   );
 };
+
+const ActionsCell = ({
+  row,
+  canResend,
+}: {
+  row: InvitationsModels.InvitationListItemDto;
+  canResend: boolean;
+
+}) => {
+  const { t } = useTranslation();
+  const { successToast, errorToast } = useToast();
+  const { mutate: resendInvitation, isPending: isResending } = InvitationsQueries.useResend({
+    invalidateCurrentModule: true,
+    onSuccess: (response) => {
+      const url = resolveInviteUrl(response.inviteUrl, response.token);
+      navigator.clipboard.writeText(url).then(
+        () =>
+          successToast({
+            text: t("invitations.resend.successCopied"),
+          }),
+        () =>
+          successToast({
+            text: t("invitations.resend.success"),
+          }),
+      );
+    },
+    onError: (mutationError) => {
+      errorToast({
+        text: mutationError?.message || t("invitations.resend.error"),
+      });
+    },
+  });
+  if (!canResend) {
+    return TextCell("—");
+  }
+  const isThisResending = isResending;
+  return (
+    <TableCell align="end">
+      <div
+        className="flex items-center justify-end"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <Button
+          size="small"
+          variant="outlined"
+          disabled={isResending}
+          onClick={() => resendInvitation({ id: row.id })}
+        >
+          {isThisResending
+            ? t("invitations.resend.sending")
+            : t("invitations.resend.submit")}
+        </Button>
+      </div>
+    </TableCell>
+  );
+
+}
 
 const statusIcon = cva("h-6 w-6 shrink-0 mr-2", {
   variants: {
