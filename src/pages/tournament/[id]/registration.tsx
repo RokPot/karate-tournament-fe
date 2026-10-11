@@ -9,13 +9,13 @@ import {
 } from "@/components/registrations/public";
 import { useRegistrationDraft } from "@/components/registrations/public/hooks/useRegistrationDraft";
 import type { RegistrantMode } from "@/components/registrations/public/types";
+import { loadRegistrationDraft } from "@/components/registrations/public/utils/registrationDraftStorage";
 import {
   clearRegistrationUrl,
   parseRegistrationUrlQuery,
   pushRegistrationStep,
   replaceRegistrationStep,
 } from "@/components/registrations/public/utils/registrationUrl";
-import { loadRegistrationDraft } from "@/components/registrations/public/utils/registrationDraftStorage";
 import { ErrorState } from "@/components/shared/layout/ErrorState";
 import { LoadingState } from "@/components/shared/layout/LoadingState";
 import {
@@ -69,14 +69,13 @@ const RegistrationPage = () => {
     if (!router.isReady || !tournamentId) {
       return;
     }
-    const modeRaw = router.query.mode;
     const stepRaw = router.query.step;
     if (stepRaw && !urlState.mode) {
-      void clearRegistrationUrl(router, tournamentId);
+      clearRegistrationUrl(router, tournamentId);
       return;
     }
     if (urlState.mode && !stepRaw) {
-      void replaceRegistrationStep(
+      replaceRegistrationStep(
         router,
         tournamentId,
         urlState.mode,
@@ -124,7 +123,7 @@ const RegistrationPage = () => {
       // Switching path: keep contact/participants if any; update mode
     }
     draftBag.persistMode(mode);
-    void pushRegistrationStep(router, tournamentId, mode, "contact");
+    pushRegistrationStep(router, tournamentId, mode, "contact");
   };
 
   if (!urlState.mode || !urlState.step) {
