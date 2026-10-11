@@ -6,7 +6,11 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 import { mapMemberToDraftParticipant } from "../utils/mapMemberToDraftParticipant";
 import type { UseDraftParticipantsReturn } from "./useDraftParticipants";
 
-export function useSeedClubParticipants(draft: UseDraftParticipantsReturn) {
+export function useSeedClubParticipants(
+  draft: UseDraftParticipantsReturn,
+  options?: { enabled?: boolean },
+) {
+  const enabled = options?.enabled ?? true;
   const authUser = useAuthUser();
   const clubId = authUser?.clubId ?? "";
   const hasSeededRef = useRef(false);
@@ -16,11 +20,11 @@ export function useSeedClubParticipants(draft: UseDraftParticipantsReturn) {
 
   const { data: members } = ClubsQueries.useGetMembers(
     { id: clubId },
-    { enabled: !!clubId },
+    { enabled: enabled && !!clubId },
   );
 
   useEffect(() => {
-    if (hasSeededRef.current || !members) {
+    if (!enabled || hasSeededRef.current || !members) {
       return;
     }
 

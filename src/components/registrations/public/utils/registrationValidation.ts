@@ -44,9 +44,7 @@ export function canAdvanceFromCategories(
 
 export function isCoachFormValid(coach: CoachDetails): boolean {
   return (
-    !!coach.email &&
-    !!coach.firstName.trim() &&
-    !!coach.lastName.trim()
+    !!coach.email && !!coach.firstName.trim() && !!coach.lastName.trim()
   );
 }
 
@@ -55,6 +53,9 @@ export function canAdvanceFromStep(
   participants: DraftParticipant[],
 ): boolean {
   switch (step) {
+    case "contact":
+      // Validated via form submit on Next; nav stays enabled.
+      return true;
     case "participants":
       return canAdvanceFromParticipants(participants);
     case "categories":

@@ -50,6 +50,12 @@ interface CategoryAssignmentStepProps {
   tournamentCategories: CommonModels.CategoryResponseDto[];
   onWizardBack: () => void;
   onWizardNext: () => void;
+  /** When true, show review overview (URL step=review). */
+  reviewMode?: boolean;
+  onEnterReview?: () => void;
+  onLeaveReview?: () => void;
+  overviewNextLabel?: string;
+  isSubmitting?: boolean;
 }
 
 export function CategoryAssignmentStep({
@@ -60,6 +66,11 @@ export function CategoryAssignmentStep({
   tournamentCategories,
   onWizardBack,
   onWizardNext,
+  reviewMode = false,
+  onEnterReview,
+  onLeaveReview,
+  overviewNextLabel,
+  isSubmitting = false,
 }: CategoryAssignmentStepProps) {
   const { t } = useTranslation();
   const shouldReduceMotion = useReducedMotion();
@@ -76,6 +87,7 @@ export function CategoryAssignmentStep({
     categoryKey,
   );
 
+  const phase = reviewMode ? "overview" : "assign";
   const currentItem = suitable.categoryItems[stepper.categoryIndex];
   const totalCategories = suitable.categoryItems.length;
   const progressValue =
@@ -85,8 +97,8 @@ export function CategoryAssignmentStep({
   const canContinue = canAdvanceFromCategories(participants);
 
   const handleBack = () => {
-    if (stepper.phase === "overview") {
-      stepper.goBackFromOverview();
+    if (phase === "overview") {
+      onLeaveReview?.();
       return;
     }
     if (stepper.isFirstCategory) {
@@ -98,7 +110,7 @@ export function CategoryAssignmentStep({
 
   const handleNext = () => {
     if (stepper.isLastCategory) {
-      stepper.goOverview();
+      onEnterReview?.();
       return;
     }
     stepper.goNext();
@@ -132,7 +144,7 @@ export function CategoryAssignmentStep({
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex flex-col gap-6 px-6 py-6">
-        {stepper.phase === "assign" && (
+        {phase === "assign" && (
           <>
             <div className="flex flex-col gap-1">
               <Typography size="h3">
@@ -173,7 +185,7 @@ export function CategoryAssignmentStep({
 
         <div className="overflow-x-clip">
           <AnimatePresence mode="wait" custom={stepper.direction}>
-            {stepper.phase === "overview" ? (
+            {phase === "overview" ? (
               <motion.div
                 key="overview"
                 custom={stepper.direction}
@@ -251,8 +263,9 @@ export function CategoryAssignmentStep({
       <CategoryStepperNav
         backLabel={t("registrations.public.back")}
         nextLabel={
-          stepper.phase === "overview"
-            ? t("registrations.public.stepper.continue")
+          phase === "overview"
+            ? (overviewNextLabel ??
+              t("registrations.public.stepper.continue"))
             : stepper.isLastCategory
               ? t("registrations.public.stepper.confirm")
               : t("registrations.public.next")
@@ -262,12 +275,14 @@ export function CategoryAssignmentStep({
         )}
         onBack={handleBack}
         onNext={
-          stepper.phase === "overview" ? onWizardNext : handleNext
+          phase === "overview" ? onWizardNext : handleNext
         }
         onViewRegistrations={() => setIsRegistrationsModalOpen(true)}
-        showViewRegistrations={stepper.phase === "assign"}
+        showViewRegistrations={phase === "assign"}
         nextDisabled={
-          stepper.phase === "overview" ? !canContinue : totalCategories === 0
+          phase === "overview"
+            ? !canContinue || isSubmitting
+            : totalCategories === 0
         }
       />
 

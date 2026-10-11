@@ -26,12 +26,13 @@ export interface CoachDetailsFormHandle {
 
 interface CoachDetailsFormProps {
   disabled?: boolean;
+  initialValues?: Partial<CoachDetails> | null;
 }
 
 export const CoachDetailsForm = forwardRef<
   CoachDetailsFormHandle,
   CoachDetailsFormProps
->(function CoachDetailsForm({ disabled = false }, ref) {
+>(function CoachDetailsForm({ disabled = false, initialValues }, ref) {
   const { t } = useTranslation();
   const authUser = useAuthUser();
 
@@ -42,10 +43,20 @@ export const CoachDetailsForm = forwardRef<
   } = useForm<CoachDetailsFormValues>({
     resolver: zodResolver(CoachDetailsSchema),
     defaultValues: {
-      email: authUser?.email ?? COACH_FORM_DEFAULTS.email,
-      firstName: authUser?.firstName ?? COACH_FORM_DEFAULTS.firstName,
-      lastName: authUser?.lastName ?? COACH_FORM_DEFAULTS.lastName,
-      clubName: authUser?.club?.name ?? COACH_FORM_DEFAULTS.clubName,
+      email:
+        initialValues?.email ?? authUser?.email ?? COACH_FORM_DEFAULTS.email,
+      firstName:
+        initialValues?.firstName ??
+        authUser?.firstName ??
+        COACH_FORM_DEFAULTS.firstName,
+      lastName:
+        initialValues?.lastName ??
+        authUser?.lastName ??
+        COACH_FORM_DEFAULTS.lastName,
+      clubName:
+        initialValues?.clubName ??
+        authUser?.club?.name ??
+        COACH_FORM_DEFAULTS.clubName,
     },
   });
 
@@ -69,7 +80,10 @@ export const CoachDetailsForm = forwardRef<
   return (
     <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
       <Typography size="h3">
-        {t("registrations.public.coachSectionTitle")}
+        {t("registrations.public.contactSectionTitle")}
+      </Typography>
+      <Typography size="body-paragraph-s" className="text-neutral-200">
+        {t("registrations.public.contactSectionHint")}
       </Typography>
 
       <TextField

@@ -3,15 +3,16 @@ import { useMutation } from "@tanstack/react-query";
 import { useCallback } from "react";
 
 import { AppConfig } from "@/config/app.config";
-import { AuthContext } from "@/data/auth/auth.context";
 import {
   clearPendingInviteToken,
   markPendingProfileSetup,
   setPendingInviteToken,
 } from "@/data/auth/auth-onboarding";
+import { AuthContext } from "@/data/auth/auth.context";
 import { logger } from "@/util/logger";
 
 export const AuthAuth0Provider = ({ children }: React.PropsWithChildren) => {
+  console.log("AuthAuth0Provider", AppConfig.authAuth0);
   return (
     <Auth0Provider
       domain={AppConfig.authAuth0.domain}

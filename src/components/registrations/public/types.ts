@@ -1,7 +1,46 @@
 import { CommonModels } from "@/data/common/common.models";
 import { RegistrationsModels } from "@/data/registrations/registrations.models";
 
-export type WizardStep = "participants" | "categories" | "coach" | "results";
+export type RegistrantMode = "single" | "club";
+
+/** Form steps used by validation / legacy wizard helpers. */
+export type WizardStep =
+  | "contact"
+  | "participants"
+  | "categories"
+  | "results";
+
+/** URL `step` query values (includes review overview). */
+export type RegistrationFlowStep =
+  | "contact"
+  | "participants"
+  | "categories"
+  | "review"
+  | "results";
+
+export const REGISTRATION_FLOW_STEPS: RegistrationFlowStep[] = [
+  "contact",
+  "participants",
+  "categories",
+  "review",
+  "results",
+];
+
+export function isRegistrantMode(value: unknown): value is RegistrantMode {
+  return value === "single" || value === "club";
+}
+
+export function isRegistrationFlowStep(
+  value: unknown,
+): value is RegistrationFlowStep {
+  return (
+    value === "contact" ||
+    value === "participants" ||
+    value === "categories" ||
+    value === "review" ||
+    value === "results"
+  );
+}
 
 export interface DraftTeam {
   clientId: string;

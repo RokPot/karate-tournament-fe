@@ -10,18 +10,18 @@ const SIDEBAR_HIDDEN_PATHNAMES = new Set([
   "/tournament/[id]/registration",
 ]);
 
-export const normalizePathname = (pathname: string) =>
-  pathname.replace(/\/+$/, "") || "/";
+const DARK_NAVBAR_PATHNAMES = new Set(["/tournament/[id]/registration"]);
 
-export const shouldShowAppSidebar = (
-  pathname: string,
-  override?: AppShellConfig,
-) => {
+export const normalizePathname = (pathname: string) => pathname.replace(/\/+$/, "") || "/";
+
+export const shouldShowAppSidebar = (pathname: string, override?: AppShellConfig) => {
   if (override?.sidebar !== undefined) {
     return override.sidebar;
   }
   return !SIDEBAR_HIDDEN_PATHNAMES.has(normalizePathname(pathname));
 };
+
+export const shouldUseDarkNavbar = (pathname: string) => DARK_NAVBAR_PATHNAMES.has(normalizePathname(pathname));
 
 export const isAppNavLinkActive = (href: string, pathname: string) => {
   const current = normalizePathname(pathname);

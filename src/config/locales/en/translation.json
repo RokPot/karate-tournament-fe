@@ -250,11 +250,75 @@
       "pageTitle": "Tournament registration",
       "showCategories": "Show categories",
       "tournamentCategoriesTitle": "Tournament categories",
+      "intro": {
+        "statusOpen": "Registration open",
+        "statusClosed": "Registration closed",
+        "hostedBy": "Hosted by {{club}}",
+        "daysLeft_one": "{{count}} day left to register",
+        "daysLeft_other": "{{count}} days left to register",
+        "whoTitle": "Who are you registering?",
+        "noAccount": "No account needed.",
+        "paths": {
+          "single": {
+            "title": "Myself or my child",
+            "description": "One athlete, about 3 minutes."
+          },
+          "club": {
+            "title": "My club's athletes",
+            "description": "Any number of athletes, about 5 minutes."
+          }
+        },
+        "stepper": {
+          "contact": "Club and contact",
+          "athletes": "Athletes",
+          "categories": "Categories",
+          "review": "Review and submit"
+        },
+        "readyTitle": "Have this ready",
+        "ready": {
+          "dob": "Each athlete's date of birth",
+          "weight": "Current weight (needed for kumite)",
+          "belt": "Belt grade",
+          "contact": "A contact email and phone number"
+        },
+        "categoryCheckTitle": "Not sure which category? Check before you start",
+        "categoryCheckHint": "Age counts on competition day.",
+        "categoryCheckEmpty": "Enter a date of birth and gender to see categories.",
+        "categoryCheckNone": "No matching categories for these details.",
+        "dateOfBirth": "Date of birth",
+        "weightOptional": "Weight (kg) (optional)",
+        "faqTitle": "Questions",
+        "faq": {
+          "account": {
+            "q": "Do I need an account?",
+            "a": "No. You can register without signing in."
+          },
+          "changes": {
+            "q": "Can I change entries after submitting?",
+            "a": "Contact the hosting club if you need to correct an entry after you submit."
+          },
+          "categories": {
+            "q": "How are categories decided?",
+            "a": "Categories are suggested from age on competition day, gender, weight, and belt. You confirm the selection before submitting."
+          }
+        },
+        "eyebrow": "Tournament registration",
+        "subtitle": "Review the tournament details below, then continue when you are ready to register participants.",
+        "detailsTitle": "Tournament details",
+        "categoriesTitle": "Categories",
+        "categoriesCount": "{{count}} categories",
+        "moreCategories": "+{{count}} more",
+        "participate": "Participate in tournament"
+      },
       "steps": {
-        "participants": "Participants",
+        "contact": "Club and contact",
+        "participants": "Athletes",
         "categories": "Categories",
         "coach": "Coach details"
       },
+      "contactSectionTitle": "Club and contact",
+      "contactSectionHint": "Who we should contact about entries and the schedule.",
+      "singleAthleteHint": "Add the athlete you are registering.",
       "participantFirstName": "First name",
       "participantLastName": "Last name",
       "birthYear": "Birth year",

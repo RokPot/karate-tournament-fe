@@ -10,6 +10,7 @@ import Footer from "@/components/shared/layout/footer/Footer";
 import {
   AppShellConfig,
   shouldShowAppSidebar,
+  shouldUseDarkNavbar,
 } from "@/config/app-shell";
 
 import { Navbar } from "./navbar/Navbar";
@@ -24,6 +25,8 @@ export const PageWrapper = ({ children, shell }: PageWrapperProps) => {
   const isLandingPage = router.pathname === "/";
   const showSidebar =
     !isLandingPage && shouldShowAppSidebar(router.pathname, shell);
+  const darkNavbar =
+    !isLandingPage && shouldUseDarkNavbar(router.pathname);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const isLoggedIn = true;
   const isCheckingAuth = false;
@@ -72,6 +75,7 @@ export const PageWrapper = ({ children, shell }: PageWrapperProps) => {
         )}
       >
         <Navbar
+          variant={darkNavbar ? "dark" : "solid"}
           showLogo={!showSidebar}
           showMenuButton={showSidebar}
           onMenuClick={() => setMobileNavOpen(true)}

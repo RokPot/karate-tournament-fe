@@ -98,4 +98,24 @@ export namespace DateUtils {
     const parsed = parseDate(dateOfBirth ?? undefined);
     return parsed?.getFullYear();
   }
+
+  /** Whole calendar days from today until `deadline` (0 if past). */
+  export function daysUntil(deadline?: string | null): number | undefined {
+    const end = parseDate(deadline ?? undefined);
+    if (!end) return undefined;
+
+    const today = new Date();
+    const startOfToday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+    );
+    const startOfEnd = new Date(
+      end.getFullYear(),
+      end.getMonth(),
+      end.getDate(),
+    );
+    const ms = startOfEnd.getTime() - startOfToday.getTime();
+    return Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
+  }
 }

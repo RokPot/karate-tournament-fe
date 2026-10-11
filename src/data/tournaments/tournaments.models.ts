@@ -31,6 +31,14 @@ export namespace TournamentsModels {
    * @property { string } endedAt When the tournament was marked ended. Example: `2024-06-16T18:00:00.000Z`
    * @property { CommonModels.CategoryResponseDto[] } categories Categories assigned to this tournament
    */
+  export const TournamentPublicLiteClubSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+  });
+  export type TournamentPublicLiteClub = z.infer<
+    typeof TournamentPublicLiteClubSchema
+  >;
+
   export const TournamentPublicLiteResponseDtoSchema = z.object({
     id: z.string(),
     name: z.string(),
@@ -40,6 +48,8 @@ export namespace TournamentsModels {
     status: TournamentPublicLiteStatusEnumSchema,
     startedAt: z.string().datetime({ offset: true }).nullish(),
     endedAt: z.string().datetime({ offset: true }).nullish(),
+    /** Hosting club when exposed by the public API. */
+    club: TournamentPublicLiteClubSchema.nullish(),
     categories: z.array(CommonModels.CategoryResponseDtoSchema),
   });
   export type TournamentPublicLiteResponseDto = z.infer<

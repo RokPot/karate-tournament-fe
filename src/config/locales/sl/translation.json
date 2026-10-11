@@ -77,11 +77,76 @@
       "pageTitle": "Prijava na turnir",
       "showCategories": "Prikaži kategorije",
       "tournamentCategoriesTitle": "Kategorije turnirja",
+      "intro": {
+        "statusOpen": "Prijava odprta",
+        "statusClosed": "Prijava zaprta",
+        "hostedBy": "Gostitelj: {{club}}",
+        "daysLeft_one": "Za prijavo je še {{count}} dan",
+        "daysLeft_other": "Za prijavo je še {{count}} dni",
+        "daysLeft_few": "Za prijavo so še {{count}} dnevi",
+        "whoTitle": "Koga prijavljate?",
+        "noAccount": "Račun ni potreben.",
+        "paths": {
+          "single": {
+            "title": "Seboj ali svojega otroka",
+            "description": "En tekmovalec, približno 3 minute."
+          },
+          "club": {
+            "title": "Tekmovalce svojega kluba",
+            "description": "Poljubno število tekmovalcev, približno 5 minut."
+          }
+        },
+        "stepper": {
+          "contact": "Klub in kontakt",
+          "athletes": "Tekmovalci",
+          "categories": "Kategorije",
+          "review": "Pregled in oddaja"
+        },
+        "readyTitle": "Pripravite si",
+        "ready": {
+          "dob": "Datum rojstva vsakega tekmovalca",
+          "weight": "Trenutna teža (potrebna za kumite)",
+          "belt": "Stopnja pasu",
+          "contact": "Kontaktni e-poštni naslov in telefonska številka"
+        },
+        "categoryCheckTitle": "Niste prepričani o kategoriji? Preverite pred začetkom",
+        "categoryCheckHint": "Starost se šteje na dan tekmovanja.",
+        "categoryCheckEmpty": "Vnesite datum rojstva in spol za prikaz kategorij.",
+        "categoryCheckNone": "Za te podatke ni ustreznih kategorij.",
+        "dateOfBirth": "Datum rojstva",
+        "weightOptional": "Teža (kg) (neobvezno)",
+        "faqTitle": "Vprašanja",
+        "faq": {
+          "account": {
+            "q": "Ali potrebujem račun?",
+            "a": "Ne. Prijavite se lahko brez prijave v sistem."
+          },
+          "changes": {
+            "q": "Ali lahko spremenim prijavo po oddaji?",
+            "a": "Za popravke po oddaji se obrnite na gostujoči klub."
+          },
+          "categories": {
+            "q": "Kako se določijo kategorije?",
+            "a": "Kategorije predlagamo glede na starost na dan tekmovanja, spol, težo in pas. Pred oddajo jih potrdite."
+          }
+        },
+        "eyebrow": "Prijava na turnir",
+        "subtitle": "Preglejte podrobnosti turnirja spodaj, nato nadaljujte, ko ste pripravljeni prijaviti udeležence.",
+        "detailsTitle": "Podrobnosti turnirja",
+        "categoriesTitle": "Kategorije",
+        "categoriesCount": "{{count}} kategorij",
+        "moreCategories": "+{{count}} več",
+        "participate": "Sodeluj na turnirju"
+      },
       "steps": {
-        "participants": "Udeleženci",
+        "contact": "Klub in kontakt",
+        "participants": "Tekmovalci",
         "categories": "Kategorije",
         "coach": "Podatki trenerja"
       },
+      "contactSectionTitle": "Klub in kontakt",
+      "contactSectionHint": "Koga naj kontaktiramo glede prijav in urnika.",
+      "singleAthleteHint": "Dodajte tekmovalca, ki ga prijavljate.",
       "participantFirstName": "Ime",
       "participantLastName": "Priimek",
       "addParticipant": "Dodaj udeleženca",

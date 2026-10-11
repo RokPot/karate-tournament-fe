@@ -1,64 +1,132 @@
+import { useRouter } from "next/router";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Typography } from "@/components/ui/text/Typography/Typography";
+
+import { isSingleAthleteMode } from "../constants";
 import { useCategoryAssignments } from "../hooks/useCategoryAssignments";
-import { useDraftParticipants } from "../hooks/useDraftParticipants";
-import { useDraftTeams } from "../hooks/useDraftTeams";
+import type { UseRegistrationDraftReturn } from "../hooks/useRegistrationDraft";
 import { usePublicRegistrationSubmit } from "../hooks/usePublicRegistrationSubmit";
-import { useRegistrationWizard } from "../hooks/useRegistrationWizard";
 import { useSeedClubParticipants } from "../hooks/useSeedClubParticipants";
 import { useSuitableParticipantsByCategory } from "../hooks/useSuitableParticipantsByCategory";
 import { useTournamentCategories } from "../hooks/useTournamentCategories";
+import type {
+  RegistrantMode,
+  RegistrationFlowStep,
+} from "../types";
 import { canAdvanceFromStep } from "../utils/registrationValidation";
+import {
+  progressIndexForStep,
+  pushRegistrationStep,
+  wizardStepForFlowStep,
+} from "../utils/registrationUrl";
 import { CategoryAssignmentStep } from "./categories/CategoryAssignmentStep";
 import type { CoachDetailsFormHandle } from "./coach/CoachDetailsForm";
 import { CoachDetailsStep } from "./coach/CoachDetailsStep";
 import { ParticipantsStep } from "./participants/ParticipantsStep";
 import { RegistrationResults } from "./results/RegistrationResults";
+import { WizardProgress } from "./WizardProgress";
 import { WizardStepNav } from "./WizardStepNav";
 
 interface PublicRegistrationWizardProps {
   tournamentId: string;
+  registrantMode: RegistrantMode;
+  step: RegistrationFlowStep;
+  draftBag: UseRegistrationDraftReturn;
 }
 
 export function PublicRegistrationWizard({
   tournamentId,
+  registrantMode,
+  step,
+  draftBag,
 }: PublicRegistrationWizardProps) {
   const { t } = useTranslation();
-  const coachFormRef = useRef<CoachDetailsFormHandle>(null);
+  const router = useRouter();
+  const contactFormRef = useRef<CoachDetailsFormHandle>(null);
 
-  const draft = useDraftParticipants();
-  const { seededCount, resetSeed } = useSeedClubParticipants(draft);
-  const teamsDraft = useDraftTeams(draft);
-  const wizard = useRegistrationWizard({
-    participants: draft.participants,
+  const {
+    contactDetails,
+    setContactDetails,
+    draft,
+    teamsDraft,
+    clearDraft,
+    clearStoredDraft,
+    persistMode,
+  } = draftBag;
+
+  const singleAthlete = isSingleAthleteMode(registrantMode);
+  const maxParticipants = singleAthlete ? 1 : undefined;
+
+  const { seededCount, resetSeed } = useSeedClubParticipants(draft, {
+    enabled: !singleAthlete,
   });
+
+  const formStep = wizardStepForFlowStep(step);
   const suitable = useSuitableParticipantsByCategory({
     tournamentId,
     participants: draft.participants,
-    enabled: wizard.step === "categories" || wizard.step === "coach",
+    enabled: step === "categories" || step === "review",
   });
   const { categories } = useTournamentCategories(tournamentId);
   const assignments = useCategoryAssignments(draft);
+
+  const goToStep = (next: RegistrationFlowStep) =>
+    pushRegistrationStep(router, tournamentId, registrantMode, next);
+
   const submitState = usePublicRegistrationSubmit(tournamentId, {
-    onSuccess: () => wizard.goToResults(),
+    onSuccess: () => {
+      clearStoredDraft();
+      void goToStep("results");
+    },
   });
 
-  const handleNext = () => {
-    if (!canAdvanceFromStep(wizard.step, draft.participants)) {
+  const progressLabels = [
+    t("registrations.public.intro.stepper.contact"),
+    t("registrations.public.intro.stepper.athletes"),
+    t("registrations.public.intro.stepper.categories"),
+    t("registrations.public.intro.stepper.review"),
+  ];
+
+  const handleNext = async () => {
+    if (step === "contact") {
+      const contact = await contactFormRef.current?.submit();
+      if (!contact) {
+        return;
+      }
+      setContactDetails(contact);
+      void goToStep("participants");
       return;
     }
-    wizard.goNext();
+
+    if (step === "participants") {
+      if (!canAdvanceFromStep("participants", draft.participants)) {
+        return;
+      }
+      void goToStep("categories");
+    }
   };
 
-  const handleSubmit = async () => {
-    const coach = await coachFormRef.current?.submit();
-    if (!coach) {
+  const handleBack = () => {
+    if (step === "participants") {
+      void goToStep("contact");
+      return;
+    }
+    if (step === "categories") {
+      void goToStep("participants");
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!contactDetails) {
+      return;
+    }
+    if (!canAdvanceFromStep("categories", draft.participants)) {
       return;
     }
     submitState.submit(
-      coach,
+      contactDetails,
       draft.participants,
       teamsDraft.teams,
       categories,
@@ -66,14 +134,21 @@ export function PublicRegistrationWizard({
   };
 
   const handleStartOver = () => {
-    draft.setParticipants([]);
+    clearDraft();
     resetSeed();
-    teamsDraft.resetTeams();
     submitState.resetResults();
-    wizard.resetToStart();
+    persistMode(null);
+    void router.replace(
+      {
+        pathname: router.pathname,
+        query: { id: tournamentId },
+      },
+      undefined,
+      { shallow: true },
+    );
   };
 
-  if (wizard.isResultsStep && submitState.results) {
+  if (step === "results" && submitState.results) {
     return (
       <RegistrationResults
         results={submitState.results}
@@ -84,54 +159,95 @@ export function PublicRegistrationWizard({
     );
   }
 
-  return (
-    <div className="flex flex-1 flex-col md:px-10 lg:px-20">
-      {wizard.step === "participants" && (
-        <ParticipantsStep draft={draft} clubMembersLoadedCount={seededCount} />
-      )}
-      {wizard.step === "categories" && (
-        <CategoryAssignmentStep
-          draft={draft}
-          suitable={suitable}
-          assignments={assignments}
-          teamsDraft={teamsDraft}
-          tournamentCategories={categories}
-          onWizardBack={wizard.goBack}
-          onWizardNext={handleNext}
-        />
-      )}
-      {wizard.step === "coach" && (
-        <CoachDetailsStep
-          formRef={coachFormRef}
-          participants={draft.participants}
-          tournamentCategories={categories}
-          teams={teamsDraft.teams}
-          disabled={submitState.isSubmitting}
-        />
-      )}
+  if (step === "results") {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 p-10">
+        <Typography size="body-paragraph-m" className="text-neutral-200">
+          {t("registrations.public.results.startOver")}
+        </Typography>
+        <button
+          type="button"
+          className="text-primary-300 underline"
+          onClick={handleStartOver}
+        >
+          {t("registrations.public.results.startOver")}
+        </button>
+      </div>
+    );
+  }
 
-      {wizard.step !== "categories" && (
-        <>
-          {wizard.step !== "coach" &&
-            !canAdvanceFromStep(wizard.step, draft.participants) && (
-              <Typography
-                size="body-paragraph-s"
-                className="px-6 text-neutral-200"
-              >
-                {t("registrations.public.validation.noParticipants")}
-              </Typography>
-            )}
-          <WizardStepNav
-            isFirstStep={wizard.isFirstStep}
-            isLastFormStep={wizard.isLastFormStep}
-            canGoNext={wizard.canGoNext}
-            isSubmitting={submitState.isSubmitting}
-            onBack={wizard.goBack}
-            onNext={handleNext}
-            onSubmit={handleSubmit}
+  const isFirstStep = step === "contact";
+  const showStepNav = step === "contact" || step === "participants";
+
+  return (
+    <div className="flex flex-1 flex-col">
+      <WizardProgress
+        currentIndex={progressIndexForStep(step)}
+        labels={progressLabels}
+      />
+
+      <div className="flex flex-1 flex-col md:px-10 lg:px-20">
+        {step === "contact" && (
+          <CoachDetailsStep
+            formRef={contactFormRef}
+            initialValues={contactDetails}
+            disabled={submitState.isSubmitting}
           />
-        </>
-      )}
+        )}
+        {step === "participants" && (
+          <ParticipantsStep
+            draft={draft}
+            clubMembersLoadedCount={seededCount}
+            maxParticipants={maxParticipants}
+          />
+        )}
+        {(step === "categories" || step === "review") && (
+          <CategoryAssignmentStep
+            draft={draft}
+            suitable={suitable}
+            assignments={assignments}
+            teamsDraft={teamsDraft}
+            tournamentCategories={categories}
+            reviewMode={step === "review"}
+            onEnterReview={() => void goToStep("review")}
+            onLeaveReview={() => void goToStep("categories")}
+            onWizardBack={() => void goToStep("participants")}
+            onWizardNext={handleSubmit}
+            overviewNextLabel={
+              submitState.isSubmitting
+                ? t("registrations.public.submitting")
+                : t("registrations.public.submit")
+            }
+            isSubmitting={submitState.isSubmitting}
+          />
+        )}
+
+        {showStepNav && (
+          <>
+            {step === "participants" &&
+              !canAdvanceFromStep(formStep, draft.participants) && (
+                <Typography
+                  size="body-paragraph-s"
+                  className="px-6 text-neutral-200"
+                >
+                  {t("registrations.public.validation.noParticipants")}
+                </Typography>
+              )}
+            <WizardStepNav
+              isFirstStep={isFirstStep}
+              isLastFormStep={false}
+              canGoNext={
+                step === "contact"
+                  ? true
+                  : canAdvanceFromStep("participants", draft.participants)
+              }
+              isSubmitting={submitState.isSubmitting}
+              onBack={handleBack}
+              onNext={handleNext}
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 }

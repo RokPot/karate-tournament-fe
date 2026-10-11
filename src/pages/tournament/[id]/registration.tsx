@@ -1,10 +1,21 @@
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
   PublicRegistrationWizard,
+  RegistrationIntro,
   RegistrationPageHeader,
 } from "@/components/registrations/public";
+import { useRegistrationDraft } from "@/components/registrations/public/hooks/useRegistrationDraft";
+import type { RegistrantMode } from "@/components/registrations/public/types";
+import {
+  clearRegistrationUrl,
+  parseRegistrationUrlQuery,
+  pushRegistrationStep,
+  replaceRegistrationStep,
+} from "@/components/registrations/public/utils/registrationUrl";
+import { loadRegistrationDraft } from "@/components/registrations/public/utils/registrationDraftStorage";
 import { ErrorState } from "@/components/shared/layout/ErrorState";
 import { LoadingState } from "@/components/shared/layout/LoadingState";
 import {
@@ -38,7 +49,10 @@ const RegistrationClosedMessage = ({
 const RegistrationPage = () => {
   const router = useRouter();
   const { t } = useTranslation();
-  const tournamentId = router.query.id as string;
+  const tournamentId =
+    typeof router.query.id === "string" ? router.query.id : "";
+  const urlState = parseRegistrationUrlQuery(router.query);
+  const draftBag = useRegistrationDraft(tournamentId);
 
   const {
     data: tournament,
@@ -50,7 +64,40 @@ const RegistrationPage = () => {
     { enabled: !!tournamentId },
   );
 
-  if (!tournamentId || isLoading) {
+  // Normalize: step without mode → intro; mode without step → contact
+  useEffect(() => {
+    if (!router.isReady || !tournamentId) {
+      return;
+    }
+    const modeRaw = router.query.mode;
+    const stepRaw = router.query.step;
+    if (stepRaw && !urlState.mode) {
+      void clearRegistrationUrl(router, tournamentId);
+      return;
+    }
+    if (urlState.mode && !stepRaw) {
+      void replaceRegistrationStep(
+        router,
+        tournamentId,
+        urlState.mode,
+        "contact",
+      );
+    }
+    // Persist mode when in an active wizard step (not results)
+    if (urlState.mode && urlState.step && urlState.step !== "results") {
+      draftBag.persistMode(urlState.mode);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sync to query only
+  }, [
+    router.isReady,
+    tournamentId,
+    router.query.mode,
+    router.query.step,
+    urlState.mode,
+    urlState.step,
+  ]);
+
+  if (!tournamentId || isLoading || !router.isReady || !draftBag.hydrated) {
     return <LoadingState />;
   }
 
@@ -67,20 +114,43 @@ const RegistrationPage = () => {
     return <RegistrationClosedMessage copy={notOpenCopy} />;
   }
 
-  if (!isTournamentRegistrationOpen(tournament)) {
+  const canRegister = isTournamentRegistrationOpen(tournament);
+  const closedCopy =
+    getTournamentRegistrationClosedCopy(tournament, t) ?? notOpenCopy;
+
+  const handleStartRegistration = (mode: RegistrantMode) => {
+    const stored = loadRegistrationDraft(tournamentId);
+    if (stored?.mode && stored.mode !== mode) {
+      // Switching path: keep contact/participants if any; update mode
+    }
+    draftBag.persistMode(mode);
+    void pushRegistrationStep(router, tournamentId, mode, "contact");
+  };
+
+  if (!urlState.mode || !urlState.step) {
     return (
-      <RegistrationClosedMessage
-        copy={
-          getTournamentRegistrationClosedCopy(tournament, t) ?? notOpenCopy
-        }
+      <RegistrationIntro
+        tournament={tournament}
+        canRegister={canRegister}
+        closedCopy={canRegister ? null : closedCopy}
+        onStartRegistration={handleStartRegistration}
       />
     );
   }
 
+  if (!canRegister) {
+    return <RegistrationClosedMessage copy={closedCopy} />;
+  }
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col ">
+    <div className="flex min-h-0 flex-1 flex-col">
       <RegistrationPageHeader tournament={tournament} />
-      <PublicRegistrationWizard tournamentId={tournamentId} />
+      <PublicRegistrationWizard
+        tournamentId={tournamentId}
+        registrantMode={urlState.mode}
+        step={urlState.step}
+        draftBag={draftBag}
+      />
     </div>
   );
 };

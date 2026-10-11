@@ -11,10 +11,10 @@ interface UseRegistrationWizardParams {
 export function useRegistrationWizard({
   participants,
 }: UseRegistrationWizardParams) {
-  const [step, setStep] = useState<WizardStep>("participants");
+  const [step, setStep] = useState<WizardStep>("contact");
 
   const stepIndex = WIZARD_STEPS.indexOf(
-    step === "results" ? "coach" : step,
+    step === "results" ? "categories" : step,
   );
 
   const canGoNext = canAdvanceFromStep(step, participants);
@@ -22,7 +22,7 @@ export function useRegistrationWizard({
   const goNext = useCallback(() => {
     setStep((current) => {
       const currentIndex = WIZARD_STEPS.indexOf(
-        current === "results" ? "coach" : current,
+        current === "results" ? "categories" : current,
       );
       if (currentIndex < 0 || currentIndex >= WIZARD_STEPS.length - 1) {
         return current;
@@ -37,7 +37,7 @@ export function useRegistrationWizard({
   const goBack = useCallback(() => {
     setStep((current) => {
       if (current === "results") {
-        return "coach";
+        return "categories";
       }
       const currentIndex = WIZARD_STEPS.indexOf(current);
       if (currentIndex <= 0) {
@@ -52,11 +52,11 @@ export function useRegistrationWizard({
   }, []);
 
   const resetToStart = useCallback(() => {
-    setStep("participants");
+    setStep("contact");
   }, []);
 
   const isFirstStep = stepIndex <= 0;
-  const isLastFormStep = step === "coach";
+  const isLastFormStep = step === "categories";
 
   return {
     step,

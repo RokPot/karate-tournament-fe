@@ -8,11 +8,13 @@ import { ParticipantList } from "./ParticipantList";
 interface ParticipantsStepProps {
   draft: UseDraftParticipantsReturn;
   clubMembersLoadedCount?: number;
+  maxParticipants?: number;
 }
 
 export function ParticipantsStep({
   draft,
   clubMembersLoadedCount = 0,
+  maxParticipants,
 }: ParticipantsStepProps) {
   const { t } = useTranslation();
   const {
@@ -25,11 +27,16 @@ export function ParticipantsStep({
     cancelEditing,
   } = draft;
 
+  const atMax =
+    maxParticipants != null &&
+    participants.length >= maxParticipants &&
+    !editingParticipant;
+
   const handleSubmit = (attributes: Parameters<typeof addParticipant>[0]) => {
     if (editingParticipant) {
       updateParticipant(editingParticipant.clientId, attributes);
     } else {
-      addParticipant(attributes);
+      addParticipant(attributes, maxParticipants);
     }
   };
 
@@ -38,6 +45,11 @@ export function ParticipantsStep({
       <Typography size="h3">
         {t("registrations.public.steps.participants")}
       </Typography>
+      {maxParticipants === 1 && (
+        <Typography size="body-paragraph-s" className="text-neutral-200">
+          {t("registrations.public.singleAthleteHint")}
+        </Typography>
+      )}
       {clubMembersLoadedCount > 0 && (
         <Typography size="body-paragraph-s" className="text-neutral-200">
           {t("registrations.public.clubMembersLoaded", {
@@ -45,11 +57,13 @@ export function ParticipantsStep({
           })}
         </Typography>
       )}
-      <ParticipantForm
-        editingParticipant={editingParticipant}
-        onSubmit={handleSubmit}
-        onCancelEdit={cancelEditing}
-      />
+      {!atMax && (
+        <ParticipantForm
+          editingParticipant={editingParticipant}
+          onSubmit={handleSubmit}
+          onCancelEdit={cancelEditing}
+        />
+      )}
       <ParticipantList
         participants={participants}
         onEdit={startEditing}

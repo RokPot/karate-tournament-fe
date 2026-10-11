@@ -14,17 +14,20 @@ interface NavbarProps {
   showLogo?: boolean;
   showMenuButton?: boolean;
   onMenuClick?: () => void;
+  variant?: "solid" | "dark";
 }
 
 export const Navbar = ({
   showLogo = false,
   showMenuButton = false,
   onMenuClick,
+  variant = "solid",
 }: NavbarProps) => {
   const { t } = useTranslation();
   const { useLogout } = AuthContext.useAuth();
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const isProfileMenuOpen = Boolean(menuAnchorEl);
+  const isDark = variant === "dark";
   const handleProfileMenuOpen = (
     event: React.MouseEvent<HTMLButtonElement>,
   ) => {
@@ -38,7 +41,10 @@ export const Navbar = ({
   return (
     <header
       className={cx(
-        "z-20 flex h-[70px] items-center border-b border-secondary-300 bg-secondary-200 px-4 text-neutral-500 shadow-1 dark:border-neutral-300 dark:bg-neutral-400 dark:text-white dark:shadow-5",
+        "z-20 flex h-[70px] items-center px-4",
+        isDark
+          ? "border-b border-white/10 bg-primary-500 text-white"
+          : "border-b border-secondary-300 bg-secondary-200 text-neutral-500 shadow-1 dark:border-neutral-300 dark:bg-neutral-400 dark:text-white dark:shadow-5",
       )}
     >
       {showMenuButton && (

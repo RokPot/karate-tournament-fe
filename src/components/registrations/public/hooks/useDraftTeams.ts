@@ -78,6 +78,12 @@ export function useDraftTeams(draft: UseDraftParticipantsReturn) {
 
   const resetTeams = useCallback(() => {
     setTeams([]);
+    seenCategoryIdsRef.current = new Set();
+  }, []);
+
+  const replaceTeams = useCallback((next: DraftTeam[]) => {
+    setTeams(next);
+    seenCategoryIdsRef.current = new Set(next.map((team) => team.categoryId));
   }, []);
 
   const getTeamsForCategory = useCallback(
@@ -143,6 +149,7 @@ export function useDraftTeams(draft: UseDraftParticipantsReturn) {
     updateTeam,
     removeTeam,
     resetTeams,
+    replaceTeams,
     getTeamsForCategory,
   };
 }

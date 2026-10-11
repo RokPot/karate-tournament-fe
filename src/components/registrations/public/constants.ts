@@ -1,12 +1,16 @@
 import { CommonModels } from "@/data/common/common.models";
 
-import type { WizardStep } from "./types";
+import type { RegistrantMode, WizardStep } from "./types";
 
 export const WIZARD_STEPS: WizardStep[] = [
+  "contact",
   "participants",
   "categories",
-  "coach",
 ];
+
+export function isSingleAthleteMode(mode: RegistrantMode): boolean {
+  return mode === "single";
+}
 
 export const PARTICIPANT_FORM_DEFAULTS = {
   firstName: "",

@@ -10,15 +10,26 @@ export function useDraftParticipants() {
   const [participants, setParticipants] = useState<DraftParticipant[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const addParticipant = useCallback((attributes: ParticipantAttributes) => {
-    const participant: DraftParticipant = {
-      clientId: createParticipantId(),
-      ...attributes,
-      categoryIds: [],
-    };
-    setParticipants((prev) => [...prev, participant]);
-    setEditingId(null);
-  }, []);
+  const addParticipant = useCallback(
+    (attributes: ParticipantAttributes, maxParticipants?: number) => {
+      setParticipants((prev) => {
+        if (
+          maxParticipants != null &&
+          prev.length >= maxParticipants
+        ) {
+          return prev;
+        }
+        const participant: DraftParticipant = {
+          clientId: createParticipantId(),
+          ...attributes,
+          categoryIds: [],
+        };
+        return [...prev, participant];
+      });
+      setEditingId(null);
+    },
+    [],
+  );
 
   const updateParticipant = useCallback(
     (clientId: string, attributes: ParticipantAttributes) => {

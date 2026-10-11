@@ -38,10 +38,10 @@ export function RegistrationResults({
   }, [categories, results.results]);
 
   return (
-    <div className="flex flex-col gap-6 px-6 py-6">
+    <div className="flex flex-col gap-10 px-6 py-6 items-center">
       <Typography size="h3">{t("registrations.public.results.title")}</Typography>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 max-w-2xl">
         {results.results.map((result) => {
           const participant = participants[result.participantIndex];
           const categoryId =
