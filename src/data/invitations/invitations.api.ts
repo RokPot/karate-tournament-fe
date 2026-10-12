@@ -1,19 +1,17 @@
-import { AppRestClient } from "@/util/rest/clients/app-rest-client";
 import { z } from "zod";
-import { InvitationsModels } from "./invitations.models";
+
 import { CommonModels } from "@/data/common/common.models";
+import { AppRestClient } from "@/util/rest/clients/app-rest-client";
+
+import { InvitationsModels } from "./invitations.models";
 
 export namespace InvitationsApi {
   export const findAll = (clubId?: string) => {
-    return AppRestClient.get(
-      { resSchema: InvitationsModels.InvitationsFindAllResponseSchema },
-      `/invitations`,
-      {
-        params: {
-          clubId,
-        },
+    return AppRestClient.get({ resSchema: InvitationsModels.InvitationsFindAllResponseSchema }, `/invitations`, {
+      params: {
+        clubId,
       },
-    );
+    });
   };
 
   export const cancel = (id: string) => {
