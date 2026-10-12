@@ -7,6 +7,8 @@ import { CategoryList } from "@/components/categories/CategoryList";
 import { ErrorState } from "@/components/shared/layout/ErrorState";
 import { LoadingState } from "@/components/shared/layout/LoadingState";
 import { DeclineTournamentDialog } from "@/components/tournaments/DeclineTournamentDialog";
+import { EditTournamentModal } from "@/components/tournaments/EditTournamentModal";
+import { TournamentFeeScheduleSummary } from "@/components/tournaments/TournamentFeeScheduleSummary";
 import { TournamentBracketsPanel } from "@/components/tournaments/TournamentBracketsPanel";
 import { TournamentDetailShell } from "@/components/tournaments/TournamentDetailShell";
 import { TournamentRegistrationsPanel } from "@/components/tournaments/registrations/TournamentRegistrationsPanel";
@@ -69,6 +71,7 @@ const TournamentDetailPage = () => {
   const tournamentId = id as string;
   const [createCategoryDialogOpen, setCreateCategoryDialogOpen] =
     useState(false);
+  const [editTournamentOpen, setEditTournamentOpen] = useState(false);
   const [declineOpen, setDeclineOpen] = useState(false);
   const { t } = useTranslation();
   const { successToast } = useToast();
@@ -186,8 +189,12 @@ const TournamentDetailPage = () => {
               <Typography size="h2" className="truncate">
                 {tournament.name}
               </Typography>
-              {isClubOwner && (
-                <IconButton className="h-10 w-10">
+              {canManageSetup && (
+                <IconButton
+                  className="h-10 w-10"
+                  aria-label={t("shared.edit")}
+                  onClick={() => setEditTournamentOpen(true)}
+                >
                   <FontAwesomeIcon
                     icon={faPencil}
                     className="text-primary-300"
@@ -290,6 +297,7 @@ const TournamentDetailPage = () => {
               </Typography>
             </Pill>
           </div>
+          <TournamentFeeScheduleSummary fees={tournament.fees} variant="pills" />
           {!registrationOpen && (
             <Typography size="body-paragraph-s" className="text-neutral-200">
               {registrationClosedCopy?.body ??
@@ -362,6 +370,11 @@ const TournamentDetailPage = () => {
         onClose={() => setCreateCategoryDialogOpen(false)}
         tournamentId={tournamentId}
         currentCategoryNames={tournament.categoryIds}
+      />
+      <EditTournamentModal
+        open={editTournamentOpen}
+        tournament={tournament}
+        onClose={() => setEditTournamentOpen(false)}
       />
       <DeclineTournamentDialog
         open={declineOpen}

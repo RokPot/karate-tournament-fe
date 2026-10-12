@@ -2,19 +2,163 @@
   "appName": "KarateApp",
   "appDescription": "KarateApp App",
   "shared": {
+    "registration": "Prijava",
+    "languages": {
+      "slovenian": "Slovenščina",
+      "english": "Angleščina"
+    },
+    "loadingState": {
+      "text": "Nalaganje..."
+    },
+    "errorState": {
+      "retryBtn": "Poskusi znova"
+    },
+    "notFound": {
+      "head": {
+        "title": "Stran ni najdena",
+        "description": "Stran, ki jo iščete, ne obstaja."
+      },
+      "heading": "Stran ni najdena",
+      "subheading": "Stran, ki jo iščete, ne obstaja.",
+      "homeBtn": "Pojdi na domov"
+    },
+    "errorFallback": {
+      "heading": "Prišlo je do napake",
+      "subheading": "Napaka: {{error}}",
+      "retryBtn": "Poskusi znova",
+      "reportABugBtn": "Prijavi napako"
+    },
+    "sharedErrors": {
+      "dataValidation": "Pri preverjanju podatkov je prišlo do napake",
+      "internalError": "Prišlo je do notranje napake. Najverjetneje gre za napako na naši strani. Poskusite znova pozneje.",
+      "networkError": "Prišlo je do napake omrežja. Ali ste povezani z internetom?",
+      "canceledError": "Zahteva je bila preklicana.",
+      "unknownError": "Prišlo je do neznane napake. Poskusite znova pozneje."
+    },
+    "theme": {
+      "toggle": "Preklopi temo"
+    },
+    "pagination": {
+      "loadMore": "Naloži več"
+    },
+    "cancel": "Prekliči",
+    "create": "Ustvari",
+    "creating": "Ustvarjanje...",
     "edit": "Uredi",
     "duplicate": "Podvoji",
     "delete": "Izbriši",
     "actions": "Dejanja",
+    "location": "Lokacija",
+    "startDate": "Začetni datum",
+    "registrationDeadline": "Rok za prijavo",
+    "weight": "Teža",
+    "age": "Starost",
+    "belt": "Pas",
+    "discipline": "Disciplina",
+    "gender": "Spol",
+    "kata": "Kata",
+    "back": "Nazaj",
+    "createNew": "Ustvari novo",
+    "save": "Shrani",
+    "remove": "Odstrani",
+    "country": "Država",
+    "name": "Ime",
+    "membersCount": "Št. članov",
+    "address": "Naslov",
+    "birthday": "Rojstni dan",
+    "categories": "Kategorije",
+    "registrationsCount": "Št. prijav",
+    "tournaments": "Turnirji",
+    "none": "Brez",
+    "subDiscipline": "Poddisciplina",
     "updatedAt": "Posodobljeno",
     "status": "Status",
     "club": "Klub"
   },
+  "belt": {
+    "10-kyu": "10. Kyu",
+    "9-kyu": "9. Kyu",
+    "8-kyu": "8. Kyu",
+    "7-kyu": "7. Kyu",
+    "6-kyu": "6. Kyu",
+    "5-kyu": "5. Kyu",
+    "4-kyu": "4. Kyu",
+    "3-kyu": "3. Kyu",
+    "2-kyu": "2. Kyu",
+    "1-kyu": "1. Kyu",
+    "1-dan": "1. Dan",
+    "2-dan": "2. Dan",
+    "3-dan": "3. Dan",
+    "4-dan": "4. Dan",
+    "5-dan": "5. Dan",
+    "6-dan": "6. Dan",
+    "7-dan": "7. Dan",
+    "8-dan": "8. Dan",
+    "9-dan": "9. Dan",
+    "10-dan": "10. Dan"
+  },
+  "discipline": {
+    "kata": "Kata",
+    "kata-team": "Kata (team)",
+    "yako-soku-kumite": "Yako-soku kumite",
+    "yiju-kumite": "Yiju kumite",
+    "kumite-team": "Kumite (team)"
+  },
+  "subDiscipline": {
+    "gohon-ippon-kumite": "Gohon ippon kumite",
+    "sanbon-ippon-kumite": "Sanbon ippon kumite",
+    "kihon-ippon-kumite": "Kihon ippon kumite",
+    "dyu-ippon-kumite": "Dyu ippon kumite"
+  },
+  "ui": {
+    "dropdown": {
+      "closeAlt": "Zapri meni",
+      "selectAll": "Izberi vse",
+      "clearSelection": "Počisti",
+      "allOption": "Vse"
+    },
+    "datePicker": {
+      "today": "Danes",
+      "clear": "Počisti",
+      "save": "Shrani"
+    },
+    "modal": {
+      "closeBtn": "Zapri"
+    },
+    "autocomplete": {
+      "createNewBtn": "Ustvari"
+    }
+  },
+  "auth": {
+    "shared": {
+      "email": {
+        "label": "E-poštni naslov",
+        "invalid": "Vnesite veljaven e-poštni naslov",
+        "required": "E-poštni naslov je obvezen"
+      },
+      "password": {
+        "label": "Geslo",
+        "weak": "Geslo je prešibko",
+        "required": "Geslo je obvezno"
+      },
+      "sign-up": {
+        "title": "Registracija",
+        "lostPassword": "Ste pozabili geslo?"
+      }
+    }
+  },
+  "table": {
+    "noData": "Ni najdenih podatkov",
+    "seeAll": "Prikaži vse ({{count}})"
+  },
   "categories": {
     "title": "Kategorije",
     "noCategories": "Ni najdenih kategorij",
+    "addCategory": "Dodaj kategorijo",
     "addCategoryModal": {
-      "sortByName": "Razvrsti po imenu"
+      "sortByName": "Razvrsti po imenu",
+      "success": "Kategorije so bile uspešno dodane",
+      "error": "Dodajanje kategorij ni uspelo"
     },
     "actions": {
       "duplicateSuccess": "Kategorije so bile uspešno podvojene",
@@ -29,7 +173,36 @@
       "saving": "Shranjevanje..."
     },
     "create": {
-      "teamReservesShort": "rez."
+      "success": "Kategorija je bila uspešno ustvarjena",
+      "error": "Ustvarjanje kategorije ni uspelo",
+      "title": "Ustvari kategorijo",
+      "name": "Ime",
+      "ageMin": "Najmanjša starost",
+      "ageMax": "Največja starost",
+      "weightMin": "Najmanjša teža (kg)",
+      "weightMax": "Največja teža (kg)",
+      "beltMin": "Najnižji pas",
+      "beltMax": "Najvišji pas",
+      "subDiscipline": "Poddisciplina",
+      "noRestriction": "Brez omejitve",
+      "male": "Moški",
+      "female": "Ženska",
+      "other": "Drugo",
+      "teamSize": "Velikost ekipe",
+      "teamReservesSize": "Rezervna mesta",
+      "teamReservesShort": "rez.",
+      "validation": {
+        "genderRequired": "Spol je obvezen",
+        "ageMinRequired": "Najmanjša starost je obvezna",
+        "ageMaxRequired": "Največja starost je obvezna",
+        "weightMinRequired": "Najmanjša teža je obvezna",
+        "weightMaxRequired": "Največja teža je obvezna",
+        "beltMinRequired": "Najnižji pas je obvezen",
+        "beltMaxRequired": "Najvišji pas je obvezen",
+        "teamSizeRequired": "Velikost ekipe je obvezna",
+        "teamReservesSizeRequired": "Število rezervnih mest je obvezno",
+        "subDisciplineRequired": "Poddisciplina je obvezna"
+      }
     },
     "format": {
       "empty": "—",
@@ -56,8 +229,17 @@
     "collapseCategory": "Skrij prijave za {{name}}",
     "views": {
       "label": "Pogledi prijav",
+      "submissions": "Po prijavi",
       "category": "Po kategoriji",
       "participants": "Po udeležencu"
+    },
+    "submissions": {
+      "empty": "Ni še prijav po oddaji. Starejše prijave brez oddaje so vidne pod Po kategoriji in Po udeležencu.",
+      "club": "Klub",
+      "noParticipants": "Na tej oddaji ni udeležencev.",
+      "participantFee": "{{name}} ({{count}} kategorij)",
+      "teamFee": "Ekipa · {{category}}",
+      "total": "Skupaj"
     },
     "staff": {
       "addTitle": "Dodaj udeleženca",
@@ -149,6 +331,7 @@
       "singleAthleteHint": "Dodajte tekmovalca, ki ga prijavljate.",
       "participantFirstName": "Ime",
       "participantLastName": "Priimek",
+      "birthYear": "Leto rojstva",
       "addParticipant": "Dodaj udeleženca",
       "editParticipant": "Uredi udeleženca",
       "updateParticipant": "Posodobi udeleženca",
@@ -229,6 +412,20 @@
         "startOver": "Prijavi več udeležencev"
       }
     }
+  },
+  "clubs": {
+    "title": "Klubi",
+    "createNew": "Ustvari nov klub",
+    "createTitle": "Ustvari klub",
+    "createSuccess": "Klub je bil uspešno ustvarjen.",
+    "createError": "Ustvarjanje kluba ni uspelo.",
+    "initialAdminEmail": "E-pošta začetnega administratorja kluba (neobvezno)",
+    "ownerFirstName": "Ime lastnika (neobvezno)",
+    "ownerLastName": "Priimek lastnika (neobvezno)",
+    "inviteSuccessMessage": "Klub je ustvarjen. Delite to povezavo z lastnikom kluba.",
+    "inviteLinkLabel": "Povezava za vabilo",
+    "copyInviteLink": "Kopiraj povezavo za vabilo",
+    "inviteLinkCopied": "Povezava za vabilo je kopirana v odložišče"
   },
   "landing": {
     "head": {
@@ -316,6 +513,21 @@
       "error": "Ustvarjanje turnirja ni uspelo",
       "startTime": "Začetni čas",
       "submitRequest": "Pošlji zahtevo"
+    },
+    "edit": {
+      "title": "Uredi turnir",
+      "success": "Turnir je bil uspešno posodobljen",
+      "error": "Posodobitev turnirja ni uspela",
+      "saving": "Shranjevanje..."
+    },
+    "fees": {
+      "title": "Prijava — pristojbine (€)",
+      "participantTitle": "Pristojbine za udeležence (€)",
+      "teamTitle": "Pristojbine za ekipe (€)",
+      "oneCategory": "1 kategorija",
+      "twoCategories": "2 kategoriji",
+      "threeOrMoreCategories": "3 ali več kategorij",
+      "team": "Ekipna pristojbina"
     },
     "review": {
       "approve": "Odobri",
@@ -449,6 +661,10 @@
     }
   },
   "invitations": {
+    "title": "Povabila",
+    "clubName": "Klub",
+    "email": "E-pošta",
+    "inviteeName": "Povabljenec",
     "status": {
       "label": "Status",
       "pending": "V čakanju",
@@ -456,6 +672,10 @@
       "expired": "Poteklo",
       "cancelled": "Preklicano"
     },
+    "createdAt": "Ustvarjeno",
+    "expiresAt": "Poteče",
+    "acceptedAt": "Sprejeto",
+    "noInvitations": "Ni najdenih povabil",
     "signUpToJoin": "Ustvari račun",
     "invitedAs": "Povabljeni kot {{name}}",
     "invitedEmail": "To vabilo je bilo poslano na {{email}}",
@@ -484,6 +704,30 @@
       "success": "Vabilo je bilo znova poslano",
       "successCopied": "Vabilo je bilo znova poslano. Nova povezava je kopirana.",
       "error": "Ponovno pošiljanje vabila ni uspelo"
+    }
+  },
+  "members": {
+    "addMember": "Dodaj člana",
+    "title": "Člani",
+    "create": {
+      "title": "Dodaj člana",
+      "success": "Član je bil uspešno dodan",
+      "error": "Dodajanje člana ni uspelo",
+      "role": "Vloga",
+      "firstName": "Ime",
+      "lastName": "Priimek",
+      "email": "E-pošta"
+    },
+    "edit": {
+      "title": "Uredi člana",
+      "success": "Član je bil uspešno posodobljen",
+      "error": "Posodobitev člana ni uspela",
+      "saving": "Shranjevanje..."
+    },
+    "removeConfirm": "Odstraniti {{name}} iz tega kluba?",
+    "remove": {
+      "success": "Član je bil odstranjen iz kluba",
+      "error": "Odstranitev člana ni uspela"
     }
   }
 }

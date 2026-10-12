@@ -83,6 +83,23 @@ export namespace TournamentsApi {
     );
   };
 
+  export const calculateFees = (
+    id: string,
+    userId?: string,
+    submissionId?: string,
+  ) => {
+    return AppRestClient.get(
+      { resSchema: CommonModels.TournamentFeesCalculationDtoSchema },
+      `/tournaments/${id}/fees`,
+      {
+        params: {
+          userId,
+          submissionId,
+        },
+      },
+    );
+  };
+
   export const findOne = (id: string) => {
     return AppRestClient.get(
       { resSchema: CommonModels.TournamentResponseDtoSchema },

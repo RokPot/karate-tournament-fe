@@ -199,6 +199,76 @@ export namespace RegistrationsModels {
   >;
 
   /**
+   * RegistrationSubmissionParticipantDtoSchema
+   * @type { object }
+   * @property { string } id Participant user ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } firstName First name. Example: `John`
+   * @property { string } lastName Last name. Example: `Doe`
+   * @property { string } gender Gender. Example: `male`
+   * @property { string } dateOfBirth Date of birth. Example: `2018-02-02T00:00:00.000Z`
+   * @property { number } weight Weight in kg. Example: `65`
+   * @property { string } beltLevel Belt level. Example: `10-kyu`
+   * @property { CommonModels.CategoryResponseDto[] } categories Categories this participant was registered into on this submit
+   */
+  export const RegistrationSubmissionParticipantDtoSchema = z.object({
+    id: z.string(),
+    firstName: z.string().nullish(),
+    lastName: z.string().nullish(),
+    gender: CommonModels.ParticipantGenderEnumSchema.nullish(),
+    dateOfBirth: z.string().datetime({ offset: true }).nullish(),
+    weight: z.number().nullish(),
+    beltLevel: CommonModels.BeltEnumSchema.nullish(),
+    categories: z.array(CommonModels.CategoryResponseDtoSchema),
+  });
+  export type RegistrationSubmissionParticipantDto = z.infer<
+    typeof RegistrationSubmissionParticipantDtoSchema
+  >;
+
+  /**
+   * RegistrationSubmissionDetailsDtoSchema
+   * @type { object }
+   * @property { string } id Submission ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } tournamentId Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } email Contact email from the Club and contact form. Example: `coach@club.com`
+   * @property { string } firstName Contact first name. Example: `Jane`
+   * @property { string } lastName Contact last name. Example: `Coach`
+   * @property { string } clubName Club name as typed on the form (kept even when no matching club exists). Example: `Test 123`
+   * @property { string } clubId Resolved club ID when a matching club exists. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } registeredByUserId Coach / contact user ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } createdAt When this submit was created. Example: `2024-01-01T00:00:00.000Z`
+   */
+  export const RegistrationSubmissionDetailsDtoSchema = z.object({
+    id: z.string(),
+    tournamentId: z.string(),
+    email: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+    clubName: z.string().nullish(),
+    clubId: z.string().nullish(),
+    registeredByUserId: z.string().nullish(),
+    createdAt: z.string().datetime({ offset: true }),
+  });
+  export type RegistrationSubmissionDetailsDto = z.infer<
+    typeof RegistrationSubmissionDetailsDtoSchema
+  >;
+
+  /**
+   * RegistrationSubmissionResponseDtoSchema
+   * @type { object }
+   * @property { RegistrationSubmissionDetailsDto } details Club and contact details from this submit
+   * @property { RegistrationSubmissionParticipantDto[] } participants Participants registered on this submit, each with their categories
+   * @property { CommonModels.TournamentFeesCalculationDto } fees Fees due for pending and approved registrations on this submit
+   */
+  export const RegistrationSubmissionResponseDtoSchema = z.object({
+    details: RegistrationSubmissionDetailsDtoSchema,
+    participants: z.array(RegistrationSubmissionParticipantDtoSchema),
+    fees: CommonModels.TournamentFeesCalculationDtoSchema,
+  });
+  export type RegistrationSubmissionResponseDto = z.infer<
+    typeof RegistrationSubmissionResponseDtoSchema
+  >;
+
+  /**
    * TeamMembershipDtoSchema
    * @type { object }
    * @property { string } teamId Team ID. Example: `123e4567-e89b-12d3-a456-426614174000`
@@ -432,6 +502,17 @@ export namespace RegistrationsModels {
   );
   export type FindCountsByTournamentResponse = z.infer<
     typeof FindCountsByTournamentResponseSchema
+  >;
+
+  /**
+   * FindSubmissionsByTournamentResponseSchema
+   * @type { array }
+   */
+  export const FindSubmissionsByTournamentResponseSchema = z.array(
+    RegistrationSubmissionResponseDtoSchema,
+  );
+  export type FindSubmissionsByTournamentResponse = z.infer<
+    typeof FindSubmissionsByTournamentResponseSchema
   >;
 
   /**

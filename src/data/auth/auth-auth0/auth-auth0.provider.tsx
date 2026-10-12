@@ -12,7 +12,6 @@ import { AuthContext } from "@/data/auth/auth.context";
 import { logger } from "@/util/logger";
 
 export const AuthAuth0Provider = ({ children }: React.PropsWithChildren) => {
-
   return (
     <Auth0Provider
       domain={AppConfig.authAuth0.domain}

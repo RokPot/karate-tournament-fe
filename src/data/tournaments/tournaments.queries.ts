@@ -18,6 +18,8 @@ export namespace TournamentsQueries {
     findRegistered: () => [...keys.all, "/tournaments/registered"] as const,
     findOnePublic: (id: string) =>
       [...keys.all, "/tournaments/public/:id", id] as const,
+    calculateFees: (id: string, userId?: string, submissionId?: string) =>
+      [...keys.all, "/tournaments/:id/fees", id, userId, submissionId] as const,
     findOne: (id: string) => [...keys.all, "/tournaments/:id", id] as const,
   };
 
@@ -90,7 +92,7 @@ export namespace TournamentsQueries {
   /**
    * Query `useFindOnePublic`
    * @summary Get tournament (public lite)
-   * @description Returns tournament name, dates, location, status, and full category details. No authentication required. Pending and declined tournaments are not returned.
+   * @description Returns tournament name, dates, location, status, fees, hosting club when assigned, and full category details. No authentication required. Pending and declined tournaments are not returned.
    * @param { string } object.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<TournamentsModels.TournamentPublicLiteResponseDto> } Tournament found
@@ -240,6 +242,32 @@ export namespace TournamentsQueries {
         invalidateQueries(queryClient, moduleName, options);
         options?.onSuccess?.(...args);
       },
+    });
+  };
+
+  /**
+   * Query `useCalculateFees`
+   * @summary Calculate tournament fees
+   * @description Returns amounts due from current pending and approved registrations. Omit filters for the full bill. Pass userId for one athlete, submissionId for one registration submit, or both.
+   * @param { string } object.id Path parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { string } object.userId Query parameter. When set, return only this athlete’s individual fee and the teams they belong to. Omit for the full tournament bill.. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { string } object.submissionId Query parameter. When set, return fees for this registration submit only (the Club and contact form). Combine with userId to further limit to one athlete.. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { AppQueryOptions } options Query options
+   * @returns { UseQueryResult<CommonModels.TournamentFeesCalculationDto> } Calculated fees
+   * @statusCodes [200, 401, 403, 404]
+   */
+  export const useCalculateFees = <TData>(
+    {
+      id,
+      userId,
+      submissionId,
+    }: { id: string; userId?: string; submissionId?: string },
+    options?: AppQueryOptions<typeof TournamentsApi.calculateFees, TData>,
+  ) => {
+    return useQuery({
+      queryKey: keys.calculateFees(id, userId, submissionId),
+      queryFn: () => TournamentsApi.calculateFees(id, userId, submissionId),
+      ...options,
     });
   };
 

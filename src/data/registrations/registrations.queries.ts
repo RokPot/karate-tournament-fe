@@ -35,6 +35,12 @@ export namespace RegistrationsQueries {
         "/registrations/by-tournament/counts",
         tournamentId,
       ] as const,
+    findSubmissionsByTournament: (tournamentId: string) =>
+      [
+        ...keys.all,
+        "/registrations/by-tournament/submissions",
+        tournamentId,
+      ] as const,
     findByTournament: (tournamentId: string, categoryId?: string) =>
       [
         ...keys.all,
@@ -281,6 +287,29 @@ export namespace RegistrationsQueries {
     return useQuery({
       queryKey: keys.findCountsByTournament(tournamentId),
       queryFn: () => RegistrationsApi.findCountsByTournament(tournamentId),
+      ...options,
+    });
+  };
+
+  /**
+   * Query `useFindSubmissionsByTournament`
+   * @summary List registration submits for a tournament
+   * @description Returns each public Club and contact submit with contact details, participants grouped by the categories they were registered into, and fees due for that submit. Legacy registrations without a submit are omitted (use GET /registrations/by-tournament).
+   * @param { string } object.tournamentId Query parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @param { AppQueryOptions } options Query options
+   * @returns { UseQueryResult<RegistrationsModels.FindSubmissionsByTournamentResponse> } Registration submits
+   * @statusCodes [200, 401, 403, 404]
+   */
+  export const useFindSubmissionsByTournament = <TData>(
+    { tournamentId }: { tournamentId: string },
+    options?: AppQueryOptions<
+      typeof RegistrationsApi.findSubmissionsByTournament,
+      TData
+    >,
+  ) => {
+    return useQuery({
+      queryKey: keys.findSubmissionsByTournament(tournamentId),
+      queryFn: () => RegistrationsApi.findSubmissionsByTournament(tournamentId),
       ...options,
     });
   };

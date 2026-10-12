@@ -1,18 +1,20 @@
-import { Button, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-import { TournamentsModels } from "@/data/tournaments/tournaments.models";
-import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
+import CustomDialog from "@/components/ui/overlays/CustomDialog";
 import { useToast } from "@/components/ui/status/Toast/useToast";
 import { getTournamentDetailRoute } from "@/config/route.config";
-import { useRouter } from "next/router";
-import CustomDialog from "@/components/ui/overlays/CustomDialog";
 import { CommonModels } from "@/data/common/common.models";
 import { QueryModule } from "@/data/invalidateQueries";
+import { TournamentsModels } from "@/data/tournaments/tournaments.models";
+import { TournamentsQueries } from "@/data/tournaments/tournaments.queries";
 import { useAuthRoles } from "@/hooks/useAuthRoles";
 import { useAuthUser } from "@/hooks/useAuthUser";
+
+import { TournamentFeeFields } from "./TournamentFeeFields";
 
 interface IProps {
   open: boolean;
@@ -52,6 +54,14 @@ export const CreateTournamentModal = ({ open, onClose, clubId }: IProps) => {
     reset,
   } = useForm<TournamentsModels.CreateTournamentDto>({
     resolver: zodResolver(TournamentsModels.CreateTournamentDtoSchema),
+    defaultValues: {
+      fees: {
+        oneCategory: 0,
+        twoCategories: 0,
+        threeOrMoreCategories: 0,
+        team: 0,
+      },
+    },
   });
 
   const onSubmit = (data: TournamentsModels.CreateTournamentDto) => {
@@ -123,6 +133,7 @@ export const CreateTournamentModal = ({ open, onClose, clubId }: IProps) => {
             required
             InputLabelProps={{ shrink: true }}
           />
+          <TournamentFeeFields register={register} errors={errors} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} disabled={createMutation.isPending}>

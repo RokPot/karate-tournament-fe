@@ -229,8 +229,17 @@
     "collapseCategory": "Hide registrations for {{name}}",
     "views": {
       "label": "Registration views",
+      "submissions": "By submission",
       "category": "By category",
       "participants": "By participant"
+    },
+    "submissions": {
+      "empty": "No submissions yet. Older registrations without a submission appear under By category and By participant.",
+      "club": "Club",
+      "noParticipants": "No participants on this submission.",
+      "participantFee": "{{name}} ({{count}} categories)",
+      "teamFee": "Team · {{category}}",
+      "total": "Total"
     },
     "staff": {
       "addTitle": "Add participant",
@@ -463,6 +472,21 @@
       "startTime": "Start Time",
       "submitRequest": "Submit request"
     },
+    "edit": {
+      "title": "Edit tournament",
+      "success": "Tournament updated successfully",
+      "error": "Failed to update tournament",
+      "saving": "Saving..."
+    },
+    "fees": {
+      "title": "Registration fees (€)",
+      "participantTitle": "Participant fees (€)",
+      "teamTitle": "Team fees (€)",
+      "oneCategory": "1 category",
+      "twoCategories": "2 categories",
+      "threeOrMoreCategories": "3 or more categories",
+      "team": "Team fee"
+    },
     "review": {
       "approve": "Approve",
       "decline": "Decline",
@@ -623,6 +647,17 @@
       "firstName": "First name",
       "lastName": "Last name",
       "email": "Email"
+    },
+    "edit": {
+      "title": "Edit member",
+      "success": "Member updated successfully",
+      "error": "Failed to update member",
+      "saving": "Saving..."
+    },
+    "removeConfirm": "Remove {{name}} from this club?",
+    "remove": {
+      "success": "Member removed from club",
+      "error": "Failed to remove member"
     }
   },
   "profile": {

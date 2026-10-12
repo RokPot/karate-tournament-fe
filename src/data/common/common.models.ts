@@ -192,6 +192,24 @@ export namespace CommonModels {
   export type UserResponseDto = z.infer<typeof UserResponseDtoSchema>;
 
   /**
+   * TournamentFeeScheduleDtoSchema
+   * @type { object }
+   * @property { number } oneCategory Total fee when a participant is registered in 1 individual category. Example: `10`
+   * @property { number } twoCategories Total fee when a participant is registered in 2 individual categories. Example: `20`
+   * @property { number } threeOrMoreCategories Total fee when a participant is registered in 3 or more individual categories. Example: `30`
+   * @property { number } team Fee charged once per team in a team category. Example: `30`
+   */
+  export const TournamentFeeScheduleDtoSchema = z.object({
+    oneCategory: z.number().gte(0),
+    twoCategories: z.number().gte(0),
+    threeOrMoreCategories: z.number().gte(0),
+    team: z.number().gte(0),
+  });
+  export type TournamentFeeScheduleDto = z.infer<
+    typeof TournamentFeeScheduleDtoSchema
+  >;
+
+  /**
    * TournamentResponseDtoSchema
    * @type { object }
    * @property { string } id Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
@@ -212,6 +230,7 @@ export namespace CommonModels {
    * @property { string } startedBy User ID who marked the tournament in progress. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { string } endedAt When the tournament was marked ended. Example: `2024-06-16T18:00:00.000Z`
    * @property { string } endedBy User ID who marked the tournament ended. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { TournamentFeeScheduleDto } fees Registration fee schedule for this tournament
    * @property { string } createdAt Creation timestamp. Example: `2024-01-01T00:00:00.000Z`
    * @property { string } updatedAt Last update timestamp. Example: `2024-01-01T00:00:00.000Z`
    */
@@ -234,6 +253,7 @@ export namespace CommonModels {
     startedBy: z.string().nullish(),
     endedAt: z.string().datetime({ offset: true }).nullish(),
     endedBy: z.string().nullish(),
+    fees: CommonModels.TournamentFeeScheduleDtoSchema,
     createdAt: z.string().datetime({ offset: true }),
     updatedAt: z.string().datetime({ offset: true }),
   });
@@ -280,6 +300,84 @@ export namespace CommonModels {
     updatedAt: z.string().datetime({ offset: true }),
   });
   export type CategoryResponseDto = z.infer<typeof CategoryResponseDtoSchema>;
+
+  /**
+   * TournamentFeeParticipantDtoSchema
+   * @type { object }
+   * @property { string } userId Participant user ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } name Participant display name. Example: `Jane Doe`
+   * @property { string } clubId Club ID from the participant’s individual registrations. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { number } categoryCount Number of individual (non-team) categories this participant is registered in. Example: `2`
+   * @property { number } amount Individual category fee for this participant in euros. Example: `20`
+   */
+  export const TournamentFeeParticipantDtoSchema = z.object({
+    userId: z.string(),
+    name: z.string(),
+    clubId: z.string().nullish(),
+    categoryCount: z.number(),
+    amount: z.number(),
+  });
+  export type TournamentFeeParticipantDto = z.infer<
+    typeof TournamentFeeParticipantDtoSchema
+  >;
+
+  /**
+   * TournamentFeeTeamLineDtoSchema
+   * @type { object }
+   * @property { string } teamId Team ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } categoryId Team category ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } categoryName Team category name. Example: `Kumite Team Senior`
+   * @property { string } clubId Club ID on the team. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { number } amount Team fee in euros. Example: `30`
+   */
+  export const TournamentFeeTeamLineDtoSchema = z.object({
+    teamId: z.string(),
+    categoryId: z.string(),
+    categoryName: z.string(),
+    clubId: z.string().nullish(),
+    amount: z.number(),
+  });
+  export type TournamentFeeTeamLineDto = z.infer<
+    typeof TournamentFeeTeamLineDtoSchema
+  >;
+
+  /**
+   * TournamentFeeClubLineDtoSchema
+   * @type { object }
+   * @property { string } clubId Club ID. Null when registrations or teams have no club.. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { number } participantTotal Sum of individual participant fees for this club in euros. Example: `40`
+   * @property { number } teamTotal Sum of team fees for this club in euros. Example: `30`
+   * @property { number } total Participant and team fees combined in euros. Example: `70`
+   */
+  export const TournamentFeeClubLineDtoSchema = z.object({
+    clubId: z.string().nullish(),
+    participantTotal: z.number(),
+    teamTotal: z.number(),
+    total: z.number(),
+  });
+  export type TournamentFeeClubLineDto = z.infer<
+    typeof TournamentFeeClubLineDtoSchema
+  >;
+
+  /**
+   * TournamentFeesCalculationDtoSchema
+   * @type { object }
+   * @property { TournamentFeeScheduleDto } fees Fee schedule used for this calculation
+   * @property { TournamentFeeParticipantDto[] } participants Individual participant fees. Team categories are excluded from the count.
+   * @property { TournamentFeeTeamLineDto[] } teams Team fees. Each qualifying team is charged once.
+   * @property { TournamentFeeClubLineDto[] } clubs Fees rolled up by club. Null clubId is kept as its own row.
+   * @property { number } total Tournament (or user-scoped) total in euros. Example: `90`
+   */
+  export const TournamentFeesCalculationDtoSchema = z.object({
+    fees: CommonModels.TournamentFeeScheduleDtoSchema,
+    participants: z.array(CommonModels.TournamentFeeParticipantDtoSchema),
+    teams: z.array(CommonModels.TournamentFeeTeamLineDtoSchema),
+    clubs: z.array(CommonModels.TournamentFeeClubLineDtoSchema),
+    total: z.number(),
+  });
+  export type TournamentFeesCalculationDto = z.infer<
+    typeof TournamentFeesCalculationDtoSchema
+  >;
 
   /**
    * InvitationCreatedResponseDtoSchema

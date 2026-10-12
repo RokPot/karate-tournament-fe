@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { CheckIcon } from "@/assets/icons/general/Check";
+import { TournamentFeeScheduleSummary } from "@/components/tournaments/TournamentFeeScheduleSummary";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { TournamentsModels } from "@/data/tournaments/tournaments.models";
 import { DateUtils } from "@/util/date.utils";
@@ -252,6 +253,8 @@ export function RegistrationIntro({
             ))}
           </ul>
         </section>
+
+        <TournamentFeeScheduleSummary fees={tournament.fees} />
 
         <CategoryFitPreview tournament={tournament} />
 

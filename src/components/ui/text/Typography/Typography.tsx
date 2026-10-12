@@ -68,7 +68,7 @@ const typography = cva("", {
       "default-italic": ["italic"],
       "prominent-1": ["font-weight-500"],
       "prominent-1-italic": ["italic"],
-      "prominent-2": ["font-weight-700"],
+      "prominent-2": ["font-weight-600"],
       "prominent-2-italic": ["italic"],
     },
   },

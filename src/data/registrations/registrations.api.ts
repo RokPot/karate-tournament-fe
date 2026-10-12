@@ -96,6 +96,21 @@ export namespace RegistrationsApi {
     );
   };
 
+  export const findSubmissionsByTournament = (tournamentId: string) => {
+    return AppRestClient.get(
+      {
+        resSchema:
+          RegistrationsModels.FindSubmissionsByTournamentResponseSchema,
+      },
+      `/registrations/by-tournament/submissions`,
+      {
+        params: {
+          tournamentId,
+        },
+      },
+    );
+  };
+
   export const findByTournament = (
     tournamentId: string,
     categoryId?: string,

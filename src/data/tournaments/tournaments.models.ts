@@ -19,6 +19,26 @@ export namespace TournamentsModels {
     TournamentPublicLiteStatusEnumSchema.enum;
 
   /**
+   * CreateTournamentDtoSchema
+   * @type { object }
+   * @property { string } name Tournament name. Max Length: `255`. Example: `European Karate Championship 2024`
+   * @property { string } location Tournament location. Max Length: `255`. Example: `Paris, France`
+   * @property { string } startDate Tournament start date and time. Example: `2024-06-15`
+   * @property { string } registrationDeadline Registration deadline. Example: `2024-06-01`
+   * @property { string } clubId Club ID to assign to the tournament. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { CommonModels.TournamentFeeScheduleDto } fees Registration fee schedule for this tournament
+   */
+  export const CreateTournamentDtoSchema = z.object({
+    name: z.string().max(255),
+    location: z.string().max(255),
+    startDate: z.string(),
+    registrationDeadline: z.string(),
+    clubId: z.string().uuid().optional(),
+    fees: CommonModels.TournamentFeeScheduleDtoSchema,
+  });
+  export type CreateTournamentDto = z.infer<typeof CreateTournamentDtoSchema>;
+
+  /**
    * TournamentPublicLiteResponseDtoSchema
    * @type { object }
    * @property { string } id Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
@@ -29,16 +49,11 @@ export namespace TournamentsModels {
    * @property { string } status Public lifecycle status. Pending and declined tournaments are not returned.. Example: `approved`
    * @property { string } startedAt When the tournament was marked in progress. Example: `2024-06-15T09:00:00.000Z`
    * @property { string } endedAt When the tournament was marked ended. Example: `2024-06-16T18:00:00.000Z`
+   * @property { string } clubId Club ID assigned to the tournament. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { CommonModels.ClubResponseDto } club Club assigned to the tournament, if any
+   * @property { CommonModels.TournamentFeeScheduleDto } fees Registration fee schedule for this tournament
    * @property { CommonModels.CategoryResponseDto[] } categories Categories assigned to this tournament
    */
-  export const TournamentPublicLiteClubSchema = z.object({
-    id: z.string(),
-    name: z.string(),
-  });
-  export type TournamentPublicLiteClub = z.infer<
-    typeof TournamentPublicLiteClubSchema
-  >;
-
   export const TournamentPublicLiteResponseDtoSchema = z.object({
     id: z.string(),
     name: z.string(),
@@ -48,8 +63,9 @@ export namespace TournamentsModels {
     status: TournamentPublicLiteStatusEnumSchema,
     startedAt: z.string().datetime({ offset: true }).nullish(),
     endedAt: z.string().datetime({ offset: true }).nullish(),
-    /** Hosting club when exposed by the public API. */
-    club: TournamentPublicLiteClubSchema.nullish(),
+    clubId: z.string().nullish(),
+    club: CommonModels.ClubResponseDtoSchema.nullish(),
+    fees: CommonModels.TournamentFeeScheduleDtoSchema,
     categories: z.array(CommonModels.CategoryResponseDtoSchema),
   });
   export type TournamentPublicLiteResponseDto = z.infer<
@@ -57,22 +73,46 @@ export namespace TournamentsModels {
   >;
 
   /**
-   * CreateTournamentDtoSchema
+   * UpdateTournamentFeeScheduleDtoSchema
+   * @type { object }
+   * @property { number } oneCategory Total fee when a participant is registered in 1 individual category. Example: `10`
+   * @property { number } twoCategories Total fee when a participant is registered in 2 individual categories. Example: `20`
+   * @property { number } threeOrMoreCategories Total fee when a participant is registered in 3 or more individual categories. Example: `30`
+   * @property { number } team Fee charged once per team in a team category. Example: `30`
+   */
+  export const UpdateTournamentFeeScheduleDtoSchema = z
+    .object({
+      oneCategory: z.number().gte(0),
+      twoCategories: z.number().gte(0),
+      threeOrMoreCategories: z.number().gte(0),
+      team: z.number().gte(0),
+    })
+    .partial();
+  export type UpdateTournamentFeeScheduleDto = z.infer<
+    typeof UpdateTournamentFeeScheduleDtoSchema
+  >;
+
+  /**
+   * UpdateTournamentDtoSchema
    * @type { object }
    * @property { string } name Tournament name. Max Length: `255`. Example: `European Karate Championship 2024`
    * @property { string } location Tournament location. Max Length: `255`. Example: `Paris, France`
    * @property { string } startDate Tournament start date and time. Example: `2024-06-15`
    * @property { string } registrationDeadline Registration deadline. Example: `2024-06-01`
-   * @property { string } clubId Club ID to assign to the tournament. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } clubId Club ID to assign to the tournament (null to unassign). Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { UpdateTournamentFeeScheduleDto } fees Registration fee schedule. Any field sent replaces that amount.
    */
-  export const CreateTournamentDtoSchema = z.object({
-    name: z.string().max(255),
-    location: z.string().max(255),
-    startDate: z.string(),
-    registrationDeadline: z.string(),
-    clubId: z.string().uuid().optional(),
-  });
-  export type CreateTournamentDto = z.infer<typeof CreateTournamentDtoSchema>;
+  export const UpdateTournamentDtoSchema = z
+    .object({
+      name: z.string().max(255),
+      location: z.string().max(255),
+      startDate: z.string().nullable(),
+      registrationDeadline: z.string().nullable(),
+      clubId: z.string().uuid().nullable(),
+      fees: UpdateTournamentFeeScheduleDtoSchema,
+    })
+    .partial();
+  export type UpdateTournamentDto = z.infer<typeof UpdateTournamentDtoSchema>;
 
   /**
    * DeclineTournamentDtoSchema
@@ -105,26 +145,6 @@ export namespace TournamentsModels {
     categoryIds: z.array(z.string().uuid()),
   });
   export type AssignCategoriesDto = z.infer<typeof AssignCategoriesDtoSchema>;
-
-  /**
-   * UpdateTournamentDtoSchema
-   * @type { object }
-   * @property { string } name Tournament name. Max Length: `255`. Example: `European Karate Championship 2024`
-   * @property { string } location Tournament location. Max Length: `255`. Example: `Paris, France`
-   * @property { string } startDate Tournament start date and time. Example: `2024-06-15`
-   * @property { string } registrationDeadline Registration deadline. Example: `2024-06-01`
-   * @property { string } clubId Club ID to assign to the tournament (null to unassign). Example: `123e4567-e89b-12d3-a456-426614174000`
-   */
-  export const UpdateTournamentDtoSchema = z
-    .object({
-      name: z.string().max(255),
-      location: z.string().max(255),
-      startDate: z.string().nullable(),
-      registrationDeadline: z.string().nullable(),
-      clubId: z.string().uuid().nullable(),
-    })
-    .partial();
-  export type UpdateTournamentDto = z.infer<typeof UpdateTournamentDtoSchema>;
 
   /**
    * TournamentsFindAllStatusParamSchema
