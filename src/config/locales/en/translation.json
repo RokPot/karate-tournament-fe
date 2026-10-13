@@ -58,6 +58,7 @@
     "gender": "Gender",
     "kata": "Kata",
     "back": "Back",
+    "next": "Next",
     "createNew": "Create New",
     "save": "Save",
     "remove": "Remove",
@@ -202,7 +203,15 @@
     "addCategoryModal": {
       "sortByName": "Sort by name",
       "success": "Categories added successfully",
-      "error": "Failed to add categories"
+      "error": "Failed to add categories",
+      "search": "Search categories",
+      "availableCount": "Available ({{count}})",
+      "selectedCount": "Selected ({{count}})",
+      "addAllVisible": "Add all visible",
+      "allDisciplines": "All disciplines",
+      "emptyAvailable": "No categories match your search.",
+      "emptyAvailableAllSelected": "All categories are selected.",
+      "emptySelected": "No categories selected yet."
     },
     "format": {
       "empty": "—",
@@ -470,7 +479,12 @@
       "requestSuccess": "Tournament request submitted. Waiting for approval.",
       "error": "Failed to create tournament",
       "startTime": "Start Time",
-      "submitRequest": "Submit request"
+      "submitRequest": "Submit request",
+      "categoriesHint": "Choose categories now, or skip and add them later from the tournament page.",
+      "steps": {
+        "details": "Details",
+        "categories": "Categories"
+      }
     },
     "edit": {
       "title": "Edit tournament",

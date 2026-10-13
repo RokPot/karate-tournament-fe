@@ -4,19 +4,23 @@ import { Checkbox, IconButton } from "@mui/material";
 import {
   ColumnDef,
   Header,
+  OnChangeFn,
   PaginationState,
   RowSelectionState,
+  SortingState,
   Updater,
 } from "@tanstack/react-table";
 import { MouseEvent, ReactNode, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useCategoryFormatters } from "@/components/categories/category-formatters";
+import { compareCategoryNames } from "@/components/categories/category-name-sort";
 import { Table } from "@/components/ui/table/Table";
 import TableCell from "@/components/ui/table/TableCell";
 import TableHeaderCell from "@/components/ui/table/TableHeaderCell";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { CommonModels } from "@/data/common/common.models";
+import { BeltUtils } from "@/util/belt.utils";
 import { DateUtils } from "@/util/date.utils";
 
 type Category = CommonModels.CategoryResponseDto;
@@ -57,6 +61,56 @@ const SelectionTableCell = ({ row }: { row: any }) => (
 
 const stopRowToggle = (event: MouseEvent) => {
   event.stopPropagation();
+};
+
+const DEFAULT_SORTING: SortingState = [{ id: "name", desc: false }];
+
+const withDirection = (comparison: number, desc: boolean) =>
+  desc ? -comparison : comparison;
+
+const compareOptionalNumber = (
+  left: number | null | undefined,
+  right: number | null | undefined,
+  desc: boolean,
+) => {
+  const leftEmpty = left == null;
+  const rightEmpty = right == null;
+  if (leftEmpty || rightEmpty) {
+    if (leftEmpty && rightEmpty) {
+      return 0;
+    }
+    return leftEmpty ? 1 : -1;
+  }
+  return withDirection(left - right, desc);
+};
+
+const compareText = (left: string, right: string, desc: boolean) => {
+  const leftEmpty = left.trim() === "" || left === "—";
+  const rightEmpty = right.trim() === "" || right === "—";
+  if (leftEmpty || rightEmpty) {
+    if (leftEmpty && rightEmpty) {
+      return 0;
+    }
+    return leftEmpty ? 1 : -1;
+  }
+  return withDirection(
+    left.localeCompare(right, undefined, { numeric: true, sensitivity: "base" }),
+    desc,
+  );
+};
+
+const compareRange = (
+  leftMin: number | null | undefined,
+  leftMax: number | null | undefined,
+  rightMin: number | null | undefined,
+  rightMax: number | null | undefined,
+  desc: boolean,
+) => {
+  const byMin = compareOptionalNumber(leftMin, rightMin, desc);
+  if (byMin !== 0) {
+    return byMin;
+  }
+  return compareOptionalNumber(leftMax, rightMax, desc);
 };
 
 const renderCategoryActionsCell = ({
@@ -122,10 +176,94 @@ export const CategoryList = ({
   const { t } = useTranslation();
   const { formatAgeRange, formatBeltRange, formatTeamSize, formatWeightRange } =
     useCategoryFormatters();
+  const [sorting, setSorting] = useState<SortingState>(DEFAULT_SORTING);
+
+  const compareCategories = (left: Category, right: Category) => {
+    const sort = sorting[0] ?? DEFAULT_SORTING[0];
+    const { desc } = sort;
+
+    switch (sort.id) {
+      case "discipline":
+        return compareText(
+          t(`discipline.${left.discipline}`),
+          t(`discipline.${right.discipline}`),
+          desc,
+        );
+      case "subDiscipline":
+        return compareText(
+          left.subDiscipline ? t(`subDiscipline.${left.subDiscipline}`) : "",
+          right.subDiscipline ? t(`subDiscipline.${right.subDiscipline}`) : "",
+          desc,
+        );
+      case "gender":
+        return compareText(
+          left.gender ? t(`categories.create.${left.gender}`) : "",
+          right.gender ? t(`categories.create.${right.gender}`) : "",
+          desc,
+        );
+      case "ageMin":
+        return compareRange(left.ageMin, left.ageMax, right.ageMin, right.ageMax, desc);
+      case "weightMin":
+        return compareRange(
+          left.weightMin,
+          left.weightMax,
+          right.weightMin,
+          right.weightMax,
+          desc,
+        );
+      case "beltMin": {
+        const beltRank = (belt: Category["beltMin"]) => {
+          const rank = BeltUtils.getBeltRank(belt);
+          return rank < 0 ? null : rank;
+        };
+        return compareRange(
+          beltRank(left.beltMin),
+          beltRank(left.beltMax),
+          beltRank(right.beltMin),
+          beltRank(right.beltMax),
+          desc,
+        );
+      }
+      case "teamSize":
+        return compareRange(
+          left.teamSize,
+          left.teamReservesSize,
+          right.teamSize,
+          right.teamReservesSize,
+          desc,
+        );
+      case "updatedAt":
+        return compareOptionalNumber(
+          Date.parse(left.updatedAt),
+          Date.parse(right.updatedAt),
+          desc,
+        );
+      case "name":
+      default:
+        return withDirection(compareCategoryNames(left.name, right.name), desc);
+    }
+  };
+
+  const sortedCategories = useMemo(
+    () => [...categories].sort(compareCategories),
+    // compareCategories closes over the active sort and translators.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [categories, sorting, t],
+  );
+
+  const [pagination, setPagination] = useState<PaginationState | undefined>(initialPagination);
+
+  const currentItems = useMemo(() => {
+    if (!pagination) {
+      return sortedCategories;
+    }
+    const start = pagination.pageIndex * pagination.pageSize;
+    return sortedCategories.slice(start, start + pagination.pageSize);
+  }, [pagination, sortedCategories]);
 
   const managementRowSelection = useMemo(
     () =>
-      categories.reduce<RowSelectionState>((selection, category, index) => {
+      currentItems.reduce<RowSelectionState>((selection, category, index) => {
         if (selectedCategoryIds.includes(category.id)) {
           return {
             ...selection,
@@ -134,10 +272,20 @@ export const CategoryList = ({
         }
         return selection;
       }, {}),
-    [categories, selectedCategoryIds],
+    [currentItems, selectedCategoryIds],
   );
 
   const rowSelection = mode === "edit" ? managementRowSelection : {};
+
+  const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
+    setSorting((current) => {
+      const next = typeof updater === "function" ? updater(current) : updater;
+      return next.length === 0 ? DEFAULT_SORTING : next;
+    });
+    setPagination((current) =>
+      current ? { ...current, pageIndex: 0 } : current,
+    );
+  };
 
   const columns = useMemo<ColumnDef<Category>[]>(() => {
     const categoryColumns: ColumnDef<Category>[] = [
@@ -208,6 +356,7 @@ export const CategoryList = ({
           id: "select",
           header: SelectionHeaderCell,
           cell: SelectionTableCell,
+          enableSorting: false,
           size: 64,
         },
         ...categoryColumns,
@@ -264,20 +413,15 @@ export const CategoryList = ({
       return;
     }
 
-    onSelectedCategoryIdsChange?.(
-      categories
-        .filter((_, index) => Boolean(nextSelection[index]))
-        .map((category) => category.id),
-    );
+    const visibleIds = new Set(currentItems.map((category) => category.id));
+    const hiddenSelection = selectedCategoryIds.filter((id) => !visibleIds.has(id));
+    const visibleSelection = currentItems
+      .filter((_, index) => Boolean(nextSelection[index]))
+      .map((category) => category.id);
+
+    onSelectedCategoryIdsChange?.([...hiddenSelection, ...visibleSelection]);
   };
-  const [pagination, setPagination] = useState<PaginationState | undefined>(initialPagination);
   const totalItemsCount = categories.length;
-  const currentItems = useMemo(() => {
-    if (!pagination) {
-      return categories;
-    }
-    return categories.slice(pagination.pageIndex * pagination.pageSize, (pagination.pageIndex + 1) * pagination.pageSize);
-  }, [categories, pagination])
 
   const paginationOptions = useMemo(() => {
     if (!pagination) {
@@ -307,8 +451,9 @@ export const CategoryList = ({
       <Table
         data={currentItems}
         columns={columns}
-        sorting={[]}
-        onSortingChange={() => { }}
+        sorting={sorting}
+        onSortingChange={handleSortingChange}
+        manualSorting
         onRowSelectionChange={
           mode === "edit" ? handleRowSelectionChange : undefined
         }

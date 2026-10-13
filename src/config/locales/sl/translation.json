@@ -58,6 +58,7 @@
     "gender": "Spol",
     "kata": "Kata",
     "back": "Nazaj",
+    "next": "Naprej",
     "createNew": "Ustvari novo",
     "save": "Shrani",
     "remove": "Odstrani",
@@ -158,7 +159,15 @@
     "addCategoryModal": {
       "sortByName": "Razvrsti po imenu",
       "success": "Kategorije so bile uspešno dodane",
-      "error": "Dodajanje kategorij ni uspelo"
+      "error": "Dodajanje kategorij ni uspelo",
+      "search": "Išči kategorije",
+      "availableCount": "Na voljo ({{count}})",
+      "selectedCount": "Izbrane ({{count}})",
+      "addAllVisible": "Dodaj vse vidne",
+      "allDisciplines": "Vse discipline",
+      "emptyAvailable": "Nobena kategorija ne ustreza iskanju.",
+      "emptyAvailableAllSelected": "Vse kategorije so izbrane.",
+      "emptySelected": "Ni še izbranih kategorij."
     },
     "actions": {
       "duplicateSuccess": "Kategorije so bile uspešno podvojene",
@@ -512,7 +521,12 @@
       "requestSuccess": "Zahteva za turnir je poslana. Čaka na odobritev.",
       "error": "Ustvarjanje turnirja ni uspelo",
       "startTime": "Začetni čas",
-      "submitRequest": "Pošlji zahtevo"
+      "submitRequest": "Pošlji zahtevo",
+      "categoriesHint": "Kategorije lahko izberete zdaj ali jih dodate pozneje na strani turnirja.",
+      "steps": {
+        "details": "Podatki",
+        "categories": "Kategorije"
+      }
     },
     "edit": {
       "title": "Uredi turnir",

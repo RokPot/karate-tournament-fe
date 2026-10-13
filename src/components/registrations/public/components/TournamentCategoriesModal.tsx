@@ -9,6 +9,7 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 import { HeaderCell, TextCell } from "@/components/categories/CategoryList";
+import { useCategoryFormatters } from "@/components/categories/category-formatters";
 import CustomDialog from "@/components/ui/overlays/CustomDialog";
 import { Table } from "@/components/ui/table/Table";
 import { Typography } from "@/components/ui/text/Typography/Typography";
@@ -26,6 +27,7 @@ export function TournamentCategoriesModal({
   categories,
 }: TournamentCategoriesModalProps) {
   const { t } = useTranslation();
+  const { formatAgeRange, formatWeightRange } = useCategoryFormatters();
 
   const columns = useMemo<
     ColumnDef<CommonModels.CategoryResponseDto>[]
@@ -70,17 +72,13 @@ export function TournamentCategoriesModal({
       {
         header: ({ header }) => HeaderCell(header, t("shared.age")),
         accessorKey: "ageMin",
-        cell: ({ row }) =>
-          TextCell(`${row.original.ageMin ?? "–"} - ${row.original.ageMax ?? "–"}`),
+        cell: ({ row }) => TextCell(formatAgeRange(row.original)),
         size: 120,
       },
       {
         header: ({ header }) => HeaderCell(header, t("shared.weight")),
         accessorKey: "weightMin",
-        cell: ({ row }) =>
-          TextCell(
-            `${row.original.weightMin ?? "–"} - ${row.original.weightMax ?? "–"}`,
-          ),
+        cell: ({ row }) => TextCell(formatWeightRange(row.original)),
         size: 120,
       },
       {
@@ -101,7 +99,7 @@ export function TournamentCategoriesModal({
       },
 
     ],
-    [t],
+    [formatAgeRange, formatWeightRange, t],
   );
 
   return (

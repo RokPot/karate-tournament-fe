@@ -3,68 +3,56 @@ import { useTranslation } from "react-i18next";
 
 import { CommonModels } from "@/data/common/common.models";
 
-const hasBoundedRange = (
+const isOpenBound = (value: number | null | undefined) =>
+  value == null || value === 0;
+
+const formatOpenRange = (
   min: number | null | undefined,
   max: number | null | undefined,
-) =>
-  min !== null &&
-  min !== undefined &&
-  min >= 0 &&
-  max !== null &&
-  max !== undefined &&
-  max >= 0;
+  copy: {
+    from: (min: number) => string;
+    upTo: (max: number) => string;
+    range: (min: number, max: number) => string;
+    empty: string;
+  },
+) => {
+  const openMin = isOpenBound(min);
+  const openMax = isOpenBound(max);
+
+  if (!openMin && openMax) {
+    return copy.from(min as number);
+  }
+  if (openMin && !openMax) {
+    return copy.upTo(max as number);
+  }
+  if (!openMin && !openMax) {
+    return copy.range(min as number, max as number);
+  }
+  return copy.empty;
+};
 
 export const useCategoryFormatters = () => {
   const { t } = useTranslation();
 
   const formatAgeRange = useCallback(
-    (category: CommonModels.CategoryResponseDto) => {
-      if (hasBoundedRange(category.ageMin, category.ageMax)) {
-        if (category.ageMin === 0) {
-          return t("categories.format.ageUpTo", { max: category.ageMax });
-        }
-        if (category.ageMax === 100) {
-          return t("categories.format.ageFrom", { min: category.ageMin });
-        }
-        return t("categories.format.ageRange", {
-          min: category.ageMin,
-          max: category.ageMax,
-        });
-      }
-
-      if (category.ageMin) {
-        return t("categories.format.ageYears", { age: category.ageMin });
-      }
-      if (category.ageMax) {
-        return t("categories.format.ageYears", { age: category.ageMax });
-      }
-      return t("categories.format.empty");
-    },
+    (category: CommonModels.CategoryResponseDto) =>
+      formatOpenRange(category.ageMin, category.ageMax, {
+        from: (min) => t("categories.format.ageFrom", { min }),
+        upTo: (max) => t("categories.format.ageUpTo", { max }),
+        range: (min, max) => t("categories.format.ageRange", { min, max }),
+        empty: t("categories.format.empty"),
+      }),
     [t],
   );
 
   const formatWeightRange = useCallback(
-    (category: CommonModels.CategoryResponseDto) => {
-      if (hasBoundedRange(category.weightMin, category.weightMax)) {
-        if (category.weightMin === 0) {
-          return t("categories.format.weightUpTo", { max: category.weightMax });
-        }
-        if (category.weightMax === 100) {
-          return t("categories.format.weightFrom", { min: category.weightMin });
-        }
-        return t("categories.format.weightRange", {
-          min: category.weightMin,
-          max: category.weightMax,
-        });
-      }
-      if (category.weightMin) {
-        return t("categories.format.weightKg", { weight: category.weightMin });
-      }
-      if (category.weightMax) {
-        return t("categories.format.weightKg", { weight: category.weightMax });
-      }
-      return t("categories.format.empty");
-    },
+    (category: CommonModels.CategoryResponseDto) =>
+      formatOpenRange(category.weightMin, category.weightMax, {
+        from: (min) => t("categories.format.weightFrom", { min }),
+        upTo: (max) => t("categories.format.weightUpTo", { max }),
+        range: (min, max) => t("categories.format.weightRange", { min, max }),
+        empty: t("categories.format.empty"),
+      }),
     [t],
   );
 
@@ -110,11 +98,32 @@ export const useCategoryFormatters = () => {
     [t],
   );
 
+  const formatSummaryLine = useCallback(
+    (category: CommonModels.CategoryResponseDto) => {
+      const empty = t("categories.format.empty");
+      const parts = [
+        t(`discipline.${category.discipline}`),
+        category.subDiscipline
+          ? t(`subDiscipline.${category.subDiscipline}`)
+          : null,
+        category.gender ? t(`categories.create.${category.gender}`) : null,
+        formatAgeRange(category),
+        formatWeightRange(category),
+        formatBeltRange(category),
+        formatTeamSize(category),
+      ].filter((part): part is string => Boolean(part) && part !== empty);
+
+      return parts.join(" · ");
+    },
+    [formatAgeRange, formatBeltRange, formatTeamSize, formatWeightRange, t],
+  );
+
   return {
     emptyLabel: t("categories.format.empty"),
     formatAgeRange,
     formatWeightRange,
     formatBeltRange,
     formatTeamSize,
+    formatSummaryLine,
   };
 };

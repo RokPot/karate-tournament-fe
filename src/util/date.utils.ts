@@ -42,9 +42,7 @@ export namespace DateUtils {
   }
 
   /** Full years between birth date and today (floor). */
-  export function calculateAgeInYearsFromBirthDate(
-    birthDate?: string | null,
-  ): number | undefined {
+  export function calculateAgeInYearsFromBirthDate(birthDate?: string | null): number | undefined {
     const parsed = parseDate(birthDate ?? undefined);
     if (!parsed) return undefined;
 
@@ -54,8 +52,7 @@ export namespace DateUtils {
     let years = today.getFullYear() - parsed.getFullYear();
     const birthdayNotYetThisYear =
       today.getMonth() < parsed.getMonth() ||
-      (today.getMonth() === parsed.getMonth() &&
-        today.getDate() < parsed.getDate());
+      (today.getMonth() === parsed.getMonth() && today.getDate() < parsed.getDate());
 
     if (birthdayNotYetThisYear) {
       years -= 1;
@@ -74,13 +71,7 @@ export namespace DateUtils {
   export const BIRTH_YEAR_PLACEHOLDER_DAY = 2;
 
   export function dateOfBirthFromBirthYear(year: number): string {
-    return new Date(
-      Date.UTC(
-        year,
-        BIRTH_YEAR_PLACEHOLDER_MONTH - 1,
-        BIRTH_YEAR_PLACEHOLDER_DAY,
-      ),
-    ).toISOString();
+    return new Date(Date.UTC(year, BIRTH_YEAR_PLACEHOLDER_MONTH - 1, BIRTH_YEAR_PLACEHOLDER_DAY)).toISOString();
   }
 
   /** Normalize API / form values to the same ISO string for comparison. */
@@ -92,9 +83,7 @@ export namespace DateUtils {
     return parsed.toISOString();
   }
 
-  export function getBirthYearFromDateOfBirth(
-    dateOfBirth?: string | null,
-  ): number | undefined {
+  export function getBirthYearFromDateOfBirth(dateOfBirth?: string | null): number | undefined {
     const parsed = parseDate(dateOfBirth ?? undefined);
     return parsed?.getFullYear();
   }
@@ -105,16 +94,8 @@ export namespace DateUtils {
     if (!end) return undefined;
 
     const today = new Date();
-    const startOfToday = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-    );
-    const startOfEnd = new Date(
-      end.getFullYear(),
-      end.getMonth(),
-      end.getDate(),
-    );
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const startOfEnd = new Date(end.getFullYear(), end.getMonth(), end.getDate());
     const ms = startOfEnd.getTime() - startOfToday.getTime();
     return Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
   }

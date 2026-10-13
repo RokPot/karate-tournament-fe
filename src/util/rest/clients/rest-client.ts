@@ -108,10 +108,15 @@ export class RestClient {
     try {
       let res: AxiosResponse;
       if (MethodHasBody[method]) {
-        res = await this.client[method](url, data, config);
+        if (method === "delete") {
+          res = await this.client.delete(url, { ...config, data });
+        } else {
+          res = await this.client[method](url, data, config);
+        }
       } else {
         res = await this.client[method](url, config);
       }
+
       if (!Object.keys(res).length) {
         return null as Res;
       }
