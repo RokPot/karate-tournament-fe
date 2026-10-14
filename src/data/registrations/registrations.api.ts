@@ -35,9 +35,9 @@ export namespace RegistrationsApi {
 
   export const getPublicSuitableCategories = (
     tournamentId: string,
-    weight: number,
     beltLevel: RegistrationsModels.GetPublicSuitableCategoriesBeltLevelParam,
     dateOfBirth: string,
+    weight?: number,
     gender?: RegistrationsModels.GetPublicSuitableCategoriesGenderParam,
   ) => {
     return AppRestClient.get(

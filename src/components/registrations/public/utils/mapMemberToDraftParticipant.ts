@@ -37,7 +37,7 @@ export function mapMemberToDraftParticipant(
     lastName,
     gender: member.gender ?? ("" as CommonModels.ParticipantGenderEnum),
     dateOfBirth: member.dateOfBirth ?? "",
-    weight: member.weight ?? Number.NaN,
+    weight: member.weight ?? undefined,
     beltLevel: member.beltLevel ?? ("" as CommonModels.BeltEnum),
     categoryIds: [],
   };

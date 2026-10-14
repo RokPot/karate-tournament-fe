@@ -1,6 +1,7 @@
 import { Link } from "@/components/ui/text/Link/Link";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { isAppNavLinkActive } from "@/config/app-shell";
+import { RouteConfig } from "@/config/route.config";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cx } from "class-variance-authority";
 import Image from "next/image";
@@ -20,7 +21,12 @@ export const AppSidebar = ({ onNavigate }: AppSidebarProps) => {
   return (
     <div className="flex h-full flex-col bg-secondary-75 px-3 py-4">
       <div className="mb-6 flex items-center px-2">
-        <Image src={logo} alt="Logo" width={56} height={56} />
+        <Link
+          href={RouteConfig.home}
+          className="flex items-center no-underline!"
+        >
+          <Image src={logo} alt="Logo" width={56} height={56} />
+        </Link>
       </div>
       <nav className="flex flex-col gap-1">
         {links.map((link) => {
@@ -37,8 +43,18 @@ export const AppSidebar = ({ onNavigate }: AppSidebarProps) => {
                   : "text-primary-200 hover:bg-secondary-100 hover:text-primary-300!",
               )}
             >
-              <FontAwesomeIcon icon={link.icon} className={cx("w-4", isActive ? "text-primary-400" : "text-primary-200")} />
-              <Typography size="body-paragraph-s" as="span" variant={isActive ? "prominent-1" : "default"}>
+              <FontAwesomeIcon
+                icon={link.icon}
+                className={cx(
+                  "w-4",
+                  isActive ? "text-primary-400" : "text-primary-200",
+                )}
+              />
+              <Typography
+                size="body-paragraph-s"
+                as="span"
+                variant={isActive ? "prominent-1" : "default"}
+              >
                 {link.label}
               </Typography>
             </Link>

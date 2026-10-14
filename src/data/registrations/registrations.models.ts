@@ -45,7 +45,7 @@ export namespace RegistrationsModels {
    * @type { object }
    * @property { string } firstName First name. Max Length: `100`. Example: `John`
    * @property { string } lastName Last name. Max Length: `100`. Example: `Doe`
-   * @property { number } weight Weight in kg. Example: `65`
+   * @property { number } weight Weight in kg (omit/null when unknown; skipped for categories with no weight limits). Example: `65`
    * @property { string } dateOfBirth Date of birth. Example: `2018-02-02T00:00:00.000Z`
    * @property { string } gender Gender (required when matching categories with a gender restriction). Example: `male`
    * @property { string } beltLevel Belt level. Example: `10-kyu`
@@ -54,7 +54,7 @@ export namespace RegistrationsModels {
   export const BulkParticipantDtoSchema = z.object({
     firstName: z.string().max(100),
     lastName: z.string().max(100),
-    weight: z.number().gte(0),
+    weight: z.number().gte(0).nullish(),
     dateOfBirth: z.string().datetime({ offset: true }),
     gender: CommonModels.ParticipantGenderEnumSchema.optional(),
     beltLevel: CommonModels.BeltEnumSchema.optional(),
@@ -66,11 +66,13 @@ export namespace RegistrationsModels {
    * BulkTeamDtoSchema
    * @type { object }
    * @property { string } categoryId Team category ID (must be a team discipline on the tournament). Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } name Team display name. Omit to generate from club name or starter last names.. Max Length: `255`. Example: `SKIF Ljubljana A`
    * @property { number[] } starters Participant indexes for starters (length must equal category teamSize). Min Items: `1`. Example: `0,1,2`
    * @property { number[] } reserves Participant indexes for reserves. Example: `3`
    */
   export const BulkTeamDtoSchema = z.object({
     categoryId: z.string(),
+    name: z.string().max(255).optional(),
     starters: z.array(z.number().gte(0)).min(1),
     reserves: z.array(z.number().gte(0)).optional(),
   });
@@ -85,7 +87,7 @@ export namespace RegistrationsModels {
    * @property { string } clubName Club name (free text). If a matching club exists in the system, it is linked; otherwise registrations proceed without a club.. Min Length: `1`. Max Length: `255`. Example: `Dragon Karate Club`
    * @property { string } tournamentId Tournament ID for all registrations in this request. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { BulkParticipantDto[] } participants Participants to register. Min Items: `1`
-   * @property { BulkTeamDto[] } teams Team rosters (kata-team / kumite-team). Participant indexes refer to participants[]. The same person may be on multiple teams; two teams in a category may not have the same set of people.
+   * @property { BulkTeamDto[] } teams Team rosters (kata-team / kumite-team / yako-soku-kumite). Participant indexes refer to participants[]. The same person may be on multiple teams; two teams in a category may not have the same set of people.
    */
   export const BulkPublicRegistrationDtoSchema = z.object({
     email: z.string().email(),
@@ -105,7 +107,7 @@ export namespace RegistrationsModels {
    * @type { object }
    * @property { string } firstName First name. Max Length: `100`. Example: `John`
    * @property { string } lastName Last name. Max Length: `100`. Example: `Doe`
-   * @property { number } weight Weight in kg. Example: `65`
+   * @property { number } weight Weight in kg (omit/null when unknown; skipped for categories with no weight limits). Example: `65`
    * @property { string } dateOfBirth Date of birth. Example: `2018-02-02T00:00:00.000Z`
    * @property { string } gender Gender (required when matching categories with a gender restriction). Example: `male`
    * @property { string } beltLevel Belt level. Example: `10-kyu`
@@ -113,7 +115,7 @@ export namespace RegistrationsModels {
   export const PublicParticipantProfileDtoSchema = z.object({
     firstName: z.string().max(100),
     lastName: z.string().max(100),
-    weight: z.number().gte(0),
+    weight: z.number().gte(0).nullish(),
     dateOfBirth: z.string().datetime({ offset: true }),
     gender: CommonModels.ParticipantGenderEnumSchema.optional(),
     beltLevel: CommonModels.BeltEnumSchema.optional(),
@@ -150,7 +152,7 @@ export namespace RegistrationsModels {
   export const PublicParticipantSuitableCategoriesItemDtoSchema = z.object({
     firstName: z.string(),
     lastName: z.string(),
-    weight: z.number(),
+    weight: z.number().nullish(),
     dateOfBirth: z.string().datetime({ offset: true }),
     gender: CommonModels.ParticipantGenderEnumSchema.nullish(),
     beltLevel: CommonModels.BeltEnumSchema.nullish(),
@@ -175,7 +177,7 @@ export namespace RegistrationsModels {
     participantIndex: z.number().gte(0),
     firstName: z.string(),
     lastName: z.string(),
-    weight: z.number(),
+    weight: z.number().nullish(),
     dateOfBirth: z.string().datetime({ offset: true }),
     gender: CommonModels.ParticipantGenderEnumSchema.nullish(),
     beltLevel: CommonModels.BeltEnumSchema.nullish(),
@@ -269,14 +271,44 @@ export namespace RegistrationsModels {
   >;
 
   /**
+   * RegistrationSubmissionGroupDtoSchema
+   * @type { object }
+   * @property { string } groupKey Stable key for this coach + club in the tournament. Example: `user-id|club:club-id`
+   * @property { string } email Contact email from the latest submit in this group. Example: `coach@club.com`
+   * @property { string } firstName Contact first name from the latest submit. Example: `Jane`
+   * @property { string } lastName Contact last name from the latest submit. Example: `Coach`
+   * @property { string } clubName Club name from the latest submit. Example: `SKIF Ljubljana`
+   * @property { string } clubId Resolved club ID from the latest submit. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } registeredByUserId Coach / contact user ID from the latest submit. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { CommonModels.TournamentFeesCalculationDto } fees Fees due for pending and approved registrations across all submits in this group
+   * @property { RegistrationSubmissionResponseDto[] } submissions Individual form sends in this group, oldest first, each with this-submit fees
+   */
+  export const RegistrationSubmissionGroupDtoSchema = z.object({
+    groupKey: z.string(),
+    email: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+    clubName: z.string().nullish(),
+    clubId: z.string().nullish(),
+    registeredByUserId: z.string().nullish(),
+    fees: CommonModels.TournamentFeesCalculationDtoSchema,
+    submissions: z.array(RegistrationSubmissionResponseDtoSchema),
+  });
+  export type RegistrationSubmissionGroupDto = z.infer<
+    typeof RegistrationSubmissionGroupDtoSchema
+  >;
+
+  /**
    * TeamMembershipDtoSchema
    * @type { object }
    * @property { string } teamId Team ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { string } teamRole Role on this team roster. Example: `starter`
+   * @property { string } teamName Team display name. Example: `SKIF Ljubljana A`
    */
   export const TeamMembershipDtoSchema = z.object({
     teamId: z.string(),
     teamRole: TeamRoleEnumSchema,
+    teamName: z.string().nullish(),
   });
   export type TeamMembershipDto = z.infer<typeof TeamMembershipDtoSchema>;
 
@@ -509,7 +541,7 @@ export namespace RegistrationsModels {
    * @type { array }
    */
   export const FindSubmissionsByTournamentResponseSchema = z.array(
-    RegistrationSubmissionResponseDtoSchema,
+    RegistrationSubmissionGroupDtoSchema,
   );
   export type FindSubmissionsByTournamentResponse = z.infer<
     typeof FindSubmissionsByTournamentResponseSchema

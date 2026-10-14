@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 
+import ctaImage from "@/assets/images/registration-6-1.png";
 import { LandingImagePlaceholder } from "@/components/landing/LandingImagePlaceholder";
 import { useLandingScrollContainer } from "@/components/landing/LandingScrollContext";
 import { Typography } from "@/components/ui/text/Typography/Typography";
@@ -36,7 +37,7 @@ export const LandingCtaSection = () => {
           className="flex flex-col gap-5"
           style={shouldReduceMotion ? undefined : { x: copyX }}
         >
-          <Typography as="h2" size="h2" sizeMobile="h3" variant="prominent-1" className="text-neutral-500">
+          <Typography as="h2" size="h2" sizeMobile="h3" variant="prominent-1" className="text-neutral-300">
             {t("landing.cta.title")}
           </Typography>
           <Typography size="body-paragraph-m" className="max-w-[34rem] text-neutral-300">
@@ -52,7 +53,7 @@ export const LandingCtaSection = () => {
           </div>
         </motion.div>
         <motion.div style={shouldReduceMotion ? undefined : { x: imageX, rotate: imageRotate }}>
-          <LandingImagePlaceholder label={t("landing.cta.imageLabel")} aspectRatio="aspect-[16/10]" />
+          <LandingImagePlaceholder image={ctaImage} label={t("landing.cta.imageLabel")} aspectRatio="aspect-[16/10]" />
         </motion.div>
       </motion.div>
     </section>

@@ -36,12 +36,11 @@ export function CategoryFitPreview({ tournament }: CategoryFitPreviewProps) {
     if (!dateOfBirth || !gender) return null;
     const parsedDob = DateUtils.parseDate(dateOfBirth);
     if (!parsedDob) return [];
-    const weightKg = weight.trim() === "" ? undefined : Number(weight);
+    const parsedWeight = weight.trim() === "" ? undefined : Number(weight);
     return filterCategoriesByPreview(tournament.categories, {
       dateOfBirth: parsedDob.toISOString(),
       gender,
-      weightKg:
-        weightKg != null && Number.isFinite(weightKg) ? weightKg : undefined,
+      weightKg: parsedWeight != null && !Number.isNaN(parsedWeight) ? parsedWeight : undefined,
       competitionDate: tournament.startDate,
     });
   }, [dateOfBirth, gender, tournament.categories, tournament.startDate, weight]);

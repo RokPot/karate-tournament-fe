@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
+import { isUnrestrictedKataCategory } from "@/components/categories/category-form-profiles";
 import { CommonModels } from "@/data/common/common.models";
 
 const isOpenBound = (value: number | null | undefined) =>
@@ -35,13 +36,17 @@ export const useCategoryFormatters = () => {
   const { t } = useTranslation();
 
   const formatAgeRange = useCallback(
-    (category: CommonModels.CategoryResponseDto) =>
-      formatOpenRange(category.ageMin, category.ageMax, {
+    (category: CommonModels.CategoryResponseDto) => {
+      if (isUnrestrictedKataCategory(category)) {
+        return t("categories.format.unrestricted");
+      }
+      return formatOpenRange(category.ageMin, category.ageMax, {
         from: (min) => t("categories.format.ageFrom", { min }),
         upTo: (max) => t("categories.format.ageUpTo", { max }),
         range: (min, max) => t("categories.format.ageRange", { min, max }),
         empty: t("categories.format.empty"),
-      }),
+      });
+    },
     [t],
   );
 

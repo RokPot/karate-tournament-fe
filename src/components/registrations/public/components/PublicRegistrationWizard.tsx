@@ -64,12 +64,13 @@ export function PublicRegistrationWizard({
   });
 
   const formStep = wizardStepForFlowStep(step);
+  const isAssignmentStep = step === "categories" || step === "review";
   const suitable = useSuitableParticipantsByCategory({
     tournamentId,
     participants: draft.participants,
-    enabled: step === "categories" || step === "review",
+    enabled: isAssignmentStep,
   });
-  const { categories } = useTournamentCategories(tournamentId);
+  const { categories, tournament } = useTournamentCategories(tournamentId);
   const assignments = useCategoryAssignments(draft);
 
   const goToStep = (next: RegistrationFlowStep) =>
@@ -201,13 +202,15 @@ export function PublicRegistrationWizard({
             maxParticipants={maxParticipants}
           />
         )}
-        {(step === "categories" || step === "review") && (
+        {isAssignmentStep && (
           <CategoryAssignmentStep
             draft={draft}
             suitable={suitable}
             assignments={assignments}
             teamsDraft={teamsDraft}
             tournamentCategories={categories}
+            clubName={contactDetails?.clubName}
+            fees={tournament?.fees}
             reviewMode={step === "review"}
             onEnterReview={() => void goToStep("review")}
             onLeaveReview={() => void goToStep("categories")}

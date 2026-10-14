@@ -2,6 +2,10 @@ import { CommonModels } from "@/data/common/common.models";
 import { RegistrationsModels } from "@/data/registrations/registrations.models";
 
 import type { CoachDetails, DraftParticipant, DraftTeam } from "../types";
+import {
+  generateUniqueTeamNames,
+  type TeamNameFormatter,
+} from "./generateTeamNames";
 import { getTeamCategoryIds, teamMemberIds } from "./teamOverlap";
 
 export function mapToBulkDto(
@@ -10,6 +14,7 @@ export function mapToBulkDto(
   participants: DraftParticipant[],
   teams: DraftTeam[] = [],
   tournamentCategories: CommonModels.CategoryResponseDto[] = [],
+  teamNameFormatter: TeamNameFormatter,
 ): RegistrationsModels.BulkPublicRegistrationDto {
   const trimmedClubName = coach.clubName?.trim();
   const teamCategoryIds = getTeamCategoryIds(tournamentCategories);
@@ -26,11 +31,19 @@ export function mapToBulkDto(
     included.map((participant, index) => [participant.clientId, index]),
   );
 
+  const teamNames = generateUniqueTeamNames(
+    teams,
+    tournamentCategories,
+    trimmedClubName,
+    teamNameFormatter,
+  );
+
   const mappedTeams =
     teams.length === 0
       ? undefined
       : teams.map((team) => ({
           categoryId: team.categoryId,
+          name: teamNames.get(team.clientId),
           starters: team.starterIds.map(
             (id) => indexByClientId.get(id) ?? -1,
           ),

@@ -1,6 +1,9 @@
 import { motion, useReducedMotion } from "motion/react";
 import { useTranslation } from "react-i18next";
 
+import categoriesImage from "@/assets/images/categories-1.png";
+import registrationsImage from "@/assets/images/registration-3.png";
+import tournamentsImage from "@/assets/images/tournament-1.png";
 import { LandingImagePlaceholder } from "@/components/landing/LandingImagePlaceholder";
 import { useLandingScrollContainer } from "@/components/landing/LandingScrollContext";
 import { Typography } from "@/components/ui/text/Typography/Typography";
@@ -11,18 +14,30 @@ const FEATURES = [
     descriptionKey: "landing.features.tournaments.description",
     x: -64,
     y: 32,
+    image: tournamentsImage,
+    objectPosition: "left center",
+    scale: 1.7,
+    origin: "55% 10%",
   },
   {
     titleKey: "landing.features.categories.title",
     descriptionKey: "landing.features.categories.description",
     x: 0,
     y: 72,
+    image: categoriesImage,
+    objectPosition: "left center",
+    scale: 1,
+    origin: "center",
   },
   {
     titleKey: "landing.features.registrations.title",
     descriptionKey: "landing.features.registrations.description",
     x: 64,
     y: 32,
+    image: registrationsImage,
+    objectPosition: "left center",
+    scale: 2.2,
+    origin: "10% 32%",
   },
 ] as const;
 
@@ -33,7 +48,7 @@ export const LandingFeaturesSection = () => {
 
   return (
     <section id="features" className="bg-secondary-75 px-4 py-16 t:px-10 m:px-16 m:py-24">
-      <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-10">
+      <div className="mx-auto flex w-full max-w-[1300px] flex-col gap-10">
         <motion.div
           className="flex max-w-[40rem] flex-col gap-3"
           initial={shouldReduceMotion ? false : { opacity: 0, y: 32 }}
@@ -41,7 +56,7 @@ export const LandingFeaturesSection = () => {
           viewport={{ once: true, amount: 0.4, root: container }}
           transition={{ duration: 0.55, ease: "easeOut" }}
         >
-          <Typography as="h2" size="h2" sizeMobile="h3" variant="prominent-1">
+          <Typography as="h2" size="h2" sizeMobile="h3" variant="prominent-1" className="text-primary-400">
             {t("landing.features.title")}
           </Typography>
           <Typography size="body-paragraph-m" className="text-neutral-200">
@@ -57,11 +72,11 @@ export const LandingFeaturesSection = () => {
                 shouldReduceMotion
                   ? false
                   : {
-                      opacity: 0,
-                      x: feature.x,
-                      y: feature.y,
-                      scale: 0.88,
-                    }
+                    opacity: 0,
+                    x: feature.x,
+                    y: feature.y,
+                    scale: 0.88,
+                  }
               }
               whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
               viewport={{ once: true, amount: 0.3, root: container }}
@@ -69,7 +84,12 @@ export const LandingFeaturesSection = () => {
             >
               <LandingImagePlaceholder
                 label={t("landing.features.imageLabel")}
+                alt={t(feature.titleKey)}
                 aspectRatio="aspect-[16/10]"
+                image={feature.image}
+                objectPosition={feature.objectPosition}
+                scale={feature.scale}
+                origin={feature.origin}
               />
               <Typography as="h3" size="h5" variant="prominent-1">
                 {t(feature.titleKey)}

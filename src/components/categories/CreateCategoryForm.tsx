@@ -1,19 +1,22 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
+  Checkbox,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   TextField,
 } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import {
   clearHiddenCategoryFields,
   getCategoryFormProfile,
+  isUnrestrictedKataCategory,
   mapCategoryToFormValues,
   toCreateCategoryPayload,
   toUpdateCategoryPayload,
@@ -88,8 +91,11 @@ export const CreateCategoryForm = ({
     defaultValues: {},
   });
 
+  const [isUnrestrictedKata, setIsUnrestrictedKata] = useState(false);
   const discipline = watch("discipline");
-  const profile = getCategoryFormProfile(discipline);
+  const unrestrictedKata =
+    discipline === CommonModels.DisciplineEnum.kata && isUnrestrictedKata;
+  const profile = getCategoryFormProfile(discipline, { unrestrictedKata });
   const isEditMode = mode === "edit" && !!initialCategory;
   const isSubmitting =
     createCategoryMutation.isPending || updateCategoryMutation.isPending;
@@ -104,6 +110,9 @@ export const CreateCategoryForm = ({
         ? mapCategoryToFormValues(initialCategory)
         : {},
     );
+    setIsUnrestrictedKata(
+      Boolean(isEditMode && initialCategory && isUnrestrictedKataCategory(initialCategory)),
+    );
   }, [initialCategory, isEditMode, open, reset]);
 
   useEffect(() => {
@@ -113,7 +122,8 @@ export const CreateCategoryForm = ({
   }, [discipline, setValue]);
 
   const onSubmit = (data: CategoriesModels.CreateCategoryDto) => {
-    const profileErrors = validateCategoryForm(data);
+    const profileOptions = { unrestrictedKata };
+    const profileErrors = validateCategoryForm(data, profileOptions);
     if (profileErrors.length > 0) {
       for (const error of profileErrors) {
         setError(error.path, { message: error.message });
@@ -124,12 +134,12 @@ export const CreateCategoryForm = ({
     if (isEditMode && initialCategory) {
       updateCategoryMutation.mutate({
         id: initialCategory.id,
-        data: toUpdateCategoryPayload(data),
+        data: toUpdateCategoryPayload(data, profileOptions),
       });
       return;
     }
 
-    const payload = toCreateCategoryPayload(data);
+    const payload = toCreateCategoryPayload(data, profileOptions);
     if (!isAdmin && authUser?.clubId) {
       payload.clubId = authUser.clubId;
     }
@@ -138,6 +148,7 @@ export const CreateCategoryForm = ({
 
   const handleClose = () => {
     reset();
+    setIsUnrestrictedKata(false);
     onClose();
   };
 
@@ -170,13 +181,30 @@ export const CreateCategoryForm = ({
           <DisciplineSelect
             label={t("shared.discipline")}
             value={discipline}
-            onChange={(value) => setValue("discipline", value)}
+            onChange={(value) => {
+              setValue("discipline", value);
+              if (value !== CommonModels.DisciplineEnum.kata) {
+                setIsUnrestrictedKata(false);
+              }
+            }}
             error={!!errors.discipline}
             helperText={errors.discipline?.message}
             required
           />
 
           <CategoryGenderRadio control={control} errors={errors} />
+
+          {isAdmin && discipline === CommonModels.DisciplineEnum.kata && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isUnrestrictedKata}
+                  onChange={(event) => setIsUnrestrictedKata(event.target.checked)}
+                />
+              }
+              label={t("categories.create.unrestricted")}
+            />
+          )}
 
           {profile && (
             <CategoryFieldsByDiscipline

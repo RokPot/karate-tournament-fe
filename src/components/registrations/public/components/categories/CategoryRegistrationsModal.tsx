@@ -18,6 +18,7 @@ interface CategoryRegistrationsModalProps {
   participants: DraftParticipant[];
   tournamentCategories: CommonModels.CategoryResponseDto[];
   teams?: DraftTeam[];
+  clubName?: string;
 }
 
 export function CategoryRegistrationsModal({
@@ -26,6 +27,7 @@ export function CategoryRegistrationsModal({
   participants,
   tournamentCategories,
   teams,
+  clubName,
 }: CategoryRegistrationsModalProps) {
   const { t } = useTranslation();
 
@@ -39,6 +41,7 @@ export function CategoryRegistrationsModal({
           participants={participants}
           tournamentCategories={tournamentCategories}
           teams={teams}
+          clubName={clubName}
           groupBy="category"
           compact
           emptyLabel={t("registrations.public.stepper.emptyCategory")}

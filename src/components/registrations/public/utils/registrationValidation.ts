@@ -12,7 +12,7 @@ export interface CategoryGroupedRegistrations {
 export function isParticipantComplete(
   participant: Pick<
     DraftParticipant,
-    "firstName" | "lastName" | "gender" | "dateOfBirth" | "weight" | "beltLevel"
+    "firstName" | "lastName" | "gender" | "dateOfBirth" | "beltLevel"
   >,
 ): boolean {
   return (
@@ -20,8 +20,6 @@ export function isParticipantComplete(
     !!participant.lastName.trim() &&
     !!participant.gender &&
     !!participant.dateOfBirth &&
-    participant.weight >= 0 &&
-    Number.isFinite(participant.weight) &&
     !!participant.beltLevel
   );
 }
@@ -131,5 +129,13 @@ export function getParticipantLabel(
   index: number,
 ): string {
   const name = `${participant.firstName} ${participant.lastName}`.trim();
-  return `${name || `#${index + 1}`} · ${participant.gender} · ${formatParticipantDateOfBirthLabel(participant.dateOfBirth)} · ${participant.weight}kg`;
+  const parts = [
+    name || `#${index + 1}`,
+    participant.gender,
+    formatParticipantDateOfBirthLabel(participant.dateOfBirth),
+  ];
+  if (participant.weight != null) {
+    parts.push(`${participant.weight}kg`);
+  }
+  return parts.join(" · ");
 }

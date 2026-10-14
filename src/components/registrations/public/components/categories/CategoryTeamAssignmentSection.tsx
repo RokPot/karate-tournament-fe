@@ -235,7 +235,7 @@ export function CategoryTeamAssignmentSection({
     activeTeam.reserveIds.length >= reserveCap;
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border border-secondary-200 bg-white p-4">
+    <div className="flex flex-col gap-4 rounded-lg border border-secondary-200 bg-white py-4 px-6">
       <div className="flex flex-col">
         <Typography size="body-paragraph-lg" variant="prominent-2">
           {category.name}

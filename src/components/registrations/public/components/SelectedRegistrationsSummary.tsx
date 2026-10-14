@@ -4,6 +4,10 @@ import { CommonModels } from "@/data/common/common.models";
 import { useTranslation } from "react-i18next";
 
 import {
+  generateUniqueTeamNames,
+  teamNameFormatterFromT,
+} from "../utils/generateTeamNames";
+import {
   getParticipantLabel,
   getParticipantsWithSelections,
   getRegistrationsGroupedByCategory,
@@ -15,6 +19,7 @@ interface SelectedRegistrationsSummaryProps {
   participants: DraftParticipant[];
   tournamentCategories: CommonModels.CategoryResponseDto[];
   teams?: DraftTeam[];
+  clubName?: string;
   compact?: boolean;
   groupBy?: "participant" | "category";
   emptyLabel?: string;
@@ -24,11 +29,18 @@ export function SelectedRegistrationsSummary({
   participants,
   tournamentCategories,
   teams = [],
+  clubName,
   compact = false,
   groupBy = "participant",
   emptyLabel,
 }: SelectedRegistrationsSummaryProps) {
   const { t } = useTranslation();
+  const teamNames = generateUniqueTeamNames(
+    teams,
+    tournamentCategories,
+    clubName,
+    teamNameFormatterFromT(t),
+  );
   const withSelections = getParticipantsWithSelections(participants);
   const categoryGroups = getRegistrationsGroupedByCategory(
     participants,
@@ -81,15 +93,16 @@ export function SelectedRegistrationsSummary({
                 </Typography>
                 {showTeams ? (
                   <div className="flex flex-col gap-2">
-                    {categoryTeams.map((team, index) => (
+                    {categoryTeams.map((team) => (
                       <div
                         key={team.clientId}
                         className="flex flex-col gap-1"
                       >
                         <Typography size="body-paragraph-xs" variant="prominent-2">
-                          {t("registrations.public.teams.teamN", {
-                            n: index + 1,
-                          })}
+                          {teamNames.get(team.clientId) ??
+                            t("registrations.public.teams.teamN", {
+                              n: 1,
+                            })}
                         </Typography>
                         <div className="flex flex-row flex-wrap gap-1">
                           {team.starterIds.map((id) => (

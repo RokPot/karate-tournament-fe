@@ -12,8 +12,11 @@ import { useCategoryAssignmentStepper } from "../../hooks/useCategoryAssignmentS
 import type { UseDraftParticipantsReturn } from "../../hooks/useDraftParticipants";
 import type { UseDraftTeamsReturn } from "../../hooks/useDraftTeams";
 import type { useSuitableParticipantsByCategory } from "../../hooks/useSuitableParticipantsByCategory";
+import { calculateDraftFees } from "../../utils/calculateDraftFees";
+import { teamNameFormatterFromT } from "../../utils/generateTeamNames";
 import { canAdvanceFromCategories } from "../../utils/registrationValidation";
 import { isTeamCategory } from "../../utils/teamOverlap";
+import { RegistrationFeesEstimate } from "../RegistrationFeesEstimate";
 import { SelectedRegistrationsSummary } from "../SelectedRegistrationsSummary";
 import { CategoryParticipantsSection } from "./CategoryParticipantsSection";
 import { CategoryRegistrationsModal } from "./CategoryRegistrationsModal";
@@ -48,6 +51,8 @@ interface CategoryAssignmentStepProps {
   assignments: ReturnType<typeof useCategoryAssignments>;
   teamsDraft: UseDraftTeamsReturn;
   tournamentCategories: CommonModels.CategoryResponseDto[];
+  clubName?: string;
+  fees?: CommonModels.TournamentFeeScheduleDto;
   onWizardBack: () => void;
   onWizardNext: () => void;
   /** When true, show review overview (URL step=review). */
@@ -64,6 +69,8 @@ export function CategoryAssignmentStep({
   assignments,
   teamsDraft,
   tournamentCategories,
+  clubName,
+  fees,
   onWizardBack,
   onWizardNext,
   reviewMode = false,
@@ -95,6 +102,20 @@ export function CategoryAssignmentStep({
       ? 0
       : ((stepper.categoryIndex + 1) / totalCategories) * 100;
   const canContinue = canAdvanceFromCategories(participants);
+  const feesEstimate = useMemo(
+    () =>
+      fees
+        ? calculateDraftFees(
+            participants,
+            teamsDraft.teams,
+            tournamentCategories,
+            fees,
+            clubName,
+            teamNameFormatterFromT(t),
+          )
+        : null,
+    [clubName, fees, participants, t, teamsDraft.teams, tournamentCategories],
+  );
 
   const handleBack = () => {
     if (phase === "overview") {
@@ -206,9 +227,13 @@ export function CategoryAssignmentStep({
                   participants={participants}
                   tournamentCategories={tournamentCategories}
                   teams={teamsDraft.teams}
+                  clubName={clubName}
                   groupBy="category"
                   emptyLabel={t("registrations.public.stepper.emptyCategory")}
                 />
+                {feesEstimate && (
+                  <RegistrationFeesEstimate estimate={feesEstimate} />
+                )}
                 {!canContinue && (
                   <Typography
                     size="body-paragraph-s"
@@ -292,6 +317,7 @@ export function CategoryAssignmentStep({
         participants={participants}
         tournamentCategories={tournamentCategories}
         teams={teamsDraft.teams}
+        clubName={clubName}
       />
     </div>
   );

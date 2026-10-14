@@ -51,7 +51,10 @@ function matchesWeight(
   weightMin: number | null | undefined,
   weightMax: number | null | undefined,
 ): boolean {
-  if (weightKg == null || !Number.isFinite(weightKg)) return true;
+  const hasLimit = !isUnboundedMin(weightMin) || !isUnboundedMax(weightMax);
+  if (weightKg == null) {
+    return !hasLimit;
+  }
   if (!isUnboundedMin(weightMin) && weightKg < (weightMin as number)) {
     return false;
   }

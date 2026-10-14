@@ -15,18 +15,18 @@ export namespace RegistrationsQueries {
     all: [moduleName] as const,
     getPublicSuitableCategories: (
       tournamentId: string,
-      weight: number,
       beltLevel: RegistrationsModels.GetPublicSuitableCategoriesBeltLevelParam,
       dateOfBirth: string,
+      weight?: number,
       gender?: RegistrationsModels.GetPublicSuitableCategoriesGenderParam,
     ) =>
       [
         ...keys.all,
         "/registrations/public/suitable-categories",
         tournamentId,
-        weight,
         beltLevel,
         dateOfBirth,
+        weight,
         gender,
       ] as const,
     findCountsByTournament: (tournamentId: string) =>
@@ -161,11 +161,11 @@ export namespace RegistrationsQueries {
   /**
    * Query `useGetPublicSuitableCategories`
    * @summary Get suitable categories by attributes (public)
-   * @description Returns tournament categories matching weight, age, and belt. Optionally pass gender to include gender-restricted categories. No authentication required.
+   * @description Returns tournament categories matching age and belt. Weight is optional and skipped for categories with no weight limits. Optionally pass gender to include gender-restricted categories. No authentication required.
    * @param { string } object.tournamentId Query parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
-   * @param { number } object.weight Query parameter. Weight in kg. Example: `65`
    * @param { RegistrationsModels.GetPublicSuitableCategoriesBeltLevelParam } object.beltLevel Query parameter. Belt level. Example: `7-kyu`
    * @param { string } object.dateOfBirth Query parameter. Date of birth. Example: `2018-02-02T00:00:00.000Z`
+   * @param { number } object.weight Query parameter. Weight in kg (omit when unknown; skipped for categories with no weight limits). Example: `65`
    * @param { RegistrationsModels.GetPublicSuitableCategoriesGenderParam } object.gender Query parameter. Gender (omit to exclude categories with a gender restriction). Example: `male`
    * @param { AppQueryOptions } options Query options
    * @returns { UseQueryResult<RegistrationsModels.GetPublicSuitableCategoriesResponse> } Suitable categories
@@ -174,15 +174,15 @@ export namespace RegistrationsQueries {
   export const useGetPublicSuitableCategories = <TData>(
     {
       tournamentId,
-      weight,
       beltLevel,
       dateOfBirth,
+      weight,
       gender,
     }: {
       tournamentId: string;
-      weight: number;
       beltLevel: RegistrationsModels.GetPublicSuitableCategoriesBeltLevelParam;
       dateOfBirth: string;
+      weight?: number;
       gender?: RegistrationsModels.GetPublicSuitableCategoriesGenderParam;
     },
     options?: AppQueryOptions<
@@ -193,17 +193,17 @@ export namespace RegistrationsQueries {
     return useQuery({
       queryKey: keys.getPublicSuitableCategories(
         tournamentId,
-        weight,
         beltLevel,
         dateOfBirth,
+        weight,
         gender,
       ),
       queryFn: () =>
         RegistrationsApi.getPublicSuitableCategories(
           tournamentId,
-          weight,
           beltLevel,
           dateOfBirth,
+          weight,
           gender,
         ),
       ...options,
@@ -213,7 +213,7 @@ export namespace RegistrationsQueries {
   /**
    * Mutation `useGetBulkPublicSuitableCategories`
    * @summary Get suitable categories for multiple participants (public)
-   * @description Returns each participant with tournament categories they are eligible for (weight, age, belt, and gender when provided).
+   * @description Returns each participant with tournament categories they are eligible for (age, belt, gender when provided, and weight when provided). Weight is skipped for categories with no weight limits.
    * @param { RegistrationsModels.BulkPublicSuitableCategoriesDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<RegistrationsModels.GetBulkPublicSuitableCategoriesResponse> } Suitable categories per participant
@@ -242,7 +242,7 @@ export namespace RegistrationsQueries {
   /**
    * Mutation `useGetSuitableParticipantsByCategory`
    * @summary Get suitable participants per category (public)
-   * @description Returns each tournament category with participants eligible for it (weight, age, belt, and gender when provided). Participants are matched by request array index via participantIndex.
+   * @description Returns each tournament category with participants eligible for it (age, belt, gender when provided, and weight when provided). Weight is skipped for categories with no weight limits. Participants are matched by request array index via participantIndex.
    * @param { RegistrationsModels.BulkPublicSuitableCategoriesDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<RegistrationsModels.GetSuitableParticipantsByCategoryResponse> } Eligible participants per category
@@ -293,11 +293,11 @@ export namespace RegistrationsQueries {
 
   /**
    * Query `useFindSubmissionsByTournament`
-   * @summary List registration submits for a tournament
-   * @description Returns each public Club and contact submit with contact details, participants grouped by the categories they were registered into, and fees due for that submit. Legacy registrations without a submit are omitted (use GET /registrations/by-tournament).
+   * @summary List registration submits for a tournament, grouped by coach and club
+   * @description Returns one group per coach + club. Group fees are the combined bill across that coach’s submits (1/2/3+ discounts apply across sends). Nested submits keep this-submit-only fees. Legacy registrations without a submit are omitted (use GET /registrations/by-tournament).
    * @param { string } object.tournamentId Query parameter. Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @param { AppQueryOptions } options Query options
-   * @returns { UseQueryResult<RegistrationsModels.FindSubmissionsByTournamentResponse> } Registration submits
+   * @returns { UseQueryResult<RegistrationsModels.FindSubmissionsByTournamentResponse> } Registration submit groups
    * @statusCodes [200, 401, 403, 404]
    */
   export const useFindSubmissionsByTournament = <TData>(

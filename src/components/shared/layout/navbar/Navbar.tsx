@@ -1,4 +1,5 @@
 import { Link } from "@/components/ui/text/Link/Link";
+import { Typography } from "@/components/ui/text/Typography/Typography";
 import { RouteConfig } from "@/config/route.config";
 import { AuthContext } from "@/data/auth/auth.context";
 import { faBars, faUser } from "@fortawesome/free-solid-svg-icons";
@@ -24,7 +25,7 @@ export const Navbar = ({
   variant = "solid",
 }: NavbarProps) => {
   const { t } = useTranslation();
-  const { useLogout } = AuthContext.useAuth();
+  const { useLogout, isLoggedIn } = AuthContext.useAuth();
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const isProfileMenuOpen = Boolean(menuAnchorEl);
   const isDark = variant === "dark";
@@ -49,21 +50,33 @@ export const Navbar = ({
     >
       {showMenuButton && (
         <div className="t:hidden">
-          <IconButton
-            aria-label={t("nav.openMenu")}
-            onClick={onMenuClick}
-          >
+          <IconButton aria-label={t("nav.openMenu")} onClick={onMenuClick}>
             <FontAwesomeIcon icon={faBars} className="text-primary-200" />
           </IconButton>
         </div>
       )}
       {showLogo && (
-        <div className="flex items-center">
-          <Image src={logo} alt="Logo" width={56} height={56} />
-        </div>
+        <Link
+          href={RouteConfig.home}
+          className="flex items-center no-underline!"
+        >
+          <Image src={logo} alt={t("appName")} width={56} height={56} />
+        </Link>
       )}
 
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-1">
+        {isLoggedIn && (
+          <IconButton
+            component={Link}
+            href={RouteConfig.dashboard}
+            aria-label={t("nav.home")}
+            className="no-underline!"
+          >
+            <Typography size="body-paragraph-m" variant="prominent-1" className="text-primary-50">
+              {t("nav.home")}
+            </Typography>
+          </IconButton>
+        )}
         <Button
           type="button"
           aria-controls={isProfileMenuOpen ? "profile-menu" : undefined}
@@ -110,6 +123,6 @@ export const Navbar = ({
           </MenuItem>
         </Menu>
       </div>
-    </header>
+    </header >
   );
 };

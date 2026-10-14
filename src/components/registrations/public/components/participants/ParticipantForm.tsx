@@ -33,7 +33,12 @@ const ParticipantFormSchema = z.object({
     .int()
     .min(minBirthYear, `Year must be ${minBirthYear} or later`)
     .max(currentYear, `Year cannot be after ${currentYear}`),
-  weight: z.coerce.number().gte(0),
+  weight: z.preprocess((value) => {
+    if (value === "" || value === null || value === undefined) {
+      return undefined;
+    }
+    return value;
+  }, z.coerce.number().gte(0).optional()),
   beltLevel: CommonModels.BeltEnumSchema,
 });
 
@@ -191,9 +196,10 @@ export function ParticipantForm({
           type="number"
           {...register("weight")}
           error={!!errors.weight}
-          helperText={errors.weight?.message}
+          helperText={
+            errors.weight?.message ?? t("registrations.public.weightOptionalHint")
+          }
           fullWidth
-          required
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}

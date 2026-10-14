@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
+import heroImage from "@/assets/images/home-1.png";
 import { LandingImagePlaceholder } from "@/components/landing/LandingImagePlaceholder";
 import { useLandingScrollContainer } from "@/components/landing/LandingScrollContext";
 import { Typography } from "@/components/ui/text/Typography/Typography";
@@ -48,19 +49,19 @@ export const LandingHeroSection = () => {
       ref={sectionRef}
       className="flex min-h-[calc(100dvh-72px)] items-center overflow-hidden bg-gold-gradient-subtle px-4 pb-12 pt-8 t:px-10 m:px-16"
     >
-      <div className="mx-auto grid w-full max-w-[1200px] items-center gap-10 m:grid-cols-2">
+      <div className="mx-auto flex w-full max-w-[2000px] items-center gap-10 m:grid-cols-2">
         <motion.div
-          className="flex flex-col gap-6"
+          className="flex flex-col gap-6 max-w-[500px]"
           style={
             shouldReduceMotion
               ? undefined
               : {
-                  y: copyY,
-                  opacity: copyOpacity,
-                }
+                y: copyY,
+                opacity: copyOpacity,
+              }
           }
         >
-          <Typography as="h1" size="display-d6" sizeMobile="h2" variant="prominent-1" className="text-neutral-500">
+          <Typography as="h1" size="display-d6" sizeMobile="h2" variant="prominent-1" className="text-primary-300">
             {t("landing.hero.title")}
           </Typography>
           <Typography size="body-paragraph-lg" className="max-w-[34rem] text-neutral-200">
@@ -73,7 +74,7 @@ export const LandingHeroSection = () => {
           </div>
         </motion.div>
         <motion.div style={shouldReduceMotion ? undefined : { scale: imageScale }} className="origin-center">
-          <LandingImagePlaceholder label={t("landing.hero.imageLabel")} aspectRatio="aspect-[4/5] m:aspect-[5/6]" />
+          <LandingImagePlaceholder image={heroImage} label={t("landing.hero.imageLabel")} alt={t("landing.hero.imageLabel")} aspectRatio="" />
         </motion.div>
       </div>
     </section>

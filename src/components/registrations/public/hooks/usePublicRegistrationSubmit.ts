@@ -5,6 +5,7 @@ import { useToast } from "@/components/ui/status/Toast/useToast";
 import { CommonModels } from "@/data/common/common.models";
 import { RegistrationsQueries } from "@/data/registrations/registrations.queries";
 
+import { teamNameFormatterFromT } from "../utils/generateTeamNames";
 import { mapToBulkDto } from "../utils/mapToBulkDto";
 import type {
   BulkRegistrationResponse,
@@ -56,10 +57,11 @@ export function usePublicRegistrationSubmit(
         participants,
         teams,
         tournamentCategories,
+        teamNameFormatterFromT(t),
       );
       mutation.mutate({ data: payload });
     },
-    [mutation, tournamentId],
+    [mutation, t, tournamentId],
   );
 
   const resetResults = useCallback(() => {

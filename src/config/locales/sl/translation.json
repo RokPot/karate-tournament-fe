@@ -101,6 +101,7 @@
   "discipline": {
     "kata": "Kata",
     "kata-team": "Kata (team)",
+    "kumite": "Kumite",
     "yako-soku-kumite": "Yako-soku kumite",
     "yiju-kumite": "Yiju kumite",
     "kumite-team": "Kumite (team)"
@@ -194,6 +195,7 @@
       "beltMax": "Najvišji pas",
       "subDiscipline": "Poddisciplina",
       "noRestriction": "Brez omejitve",
+      "unrestricted": "Brez omejitev (brez starosti, pasa in teže)",
       "male": "Moški",
       "female": "Ženska",
       "other": "Drugo",
@@ -226,7 +228,8 @@
       "beltRange": "Pas: {{min}} - {{max}}",
       "beltSingle": "Pas: {{belt}}",
       "teamSize": "Velikost ekipe: {{size}}",
-      "teamSizeWithReserves": "Velikost ekipe: {{size}} + {{reserves}} {{reservesLabel}}"
+      "teamSizeWithReserves": "Velikost ekipe: {{size}} + {{reserves}} {{reservesLabel}}",
+      "unrestricted": "Brez omejitev"
     }
   },
   "registrations": {
@@ -247,8 +250,9 @@
       "club": "Klub",
       "noParticipants": "Na tej oddaji ni udeležencev.",
       "participantFee": "{{name}} ({{count}} kategorij)",
-      "teamFee": "Ekipa · {{category}}",
-      "total": "Skupaj"
+      "teamFee": "{{name}} · {{category}}",
+      "total": "Skupaj",
+      "sendLabel": "Oddano {{date}}"
     },
     "staff": {
       "addTitle": "Dodaj udeleženca",
@@ -296,7 +300,7 @@
         "readyTitle": "Pripravite si",
         "ready": {
           "dob": "Datum rojstva vsakega tekmovalca",
-          "weight": "Trenutna teža (potrebna za kumite)",
+          "weight": "Trenutna teža (potrebna za kategorije z omejitvijo teže, npr. kumite)",
           "belt": "Stopnja pasu",
           "contact": "Kontaktni e-poštni naslov in telefonska številka"
         },
@@ -348,7 +352,16 @@
       "clubMembersLoaded": "Naloženih je {{count}} članov iz vašega kluba. Pred nadaljevanjem jih uredite ali odstranite.",
       "noCategories": "Za ta turnir ni razpoložljivih kategorij",
       "categoriesLoading": "Nalaganje primernih kategorij…",
+      "weightOptionalHint": "Neobvezno. Brez teže tekmovalec ne bo ustrezal kategorijam z omejitvijo teže.",
       "categoriesHint": "Izberite udeležence za vsako kategorijo",
+      "assignmentMode": {
+        "category": "Dodeli po kategoriji",
+        "athlete": "Dodeli po tekmovalcu"
+      },
+      "byAthlete": {
+        "hint": "Izberite kategorije, ki ustrezajo temu tekmovalcu",
+        "noEligible": "Ta tekmovalec nima ustreznih posameznih kategorij"
+      },
       "noEligibleParticipantsForCategory": "Za to kategorijo ni ustreznih udeležencev",
       "stepper": {
         "progress": "{{current}} od {{total}}",
@@ -371,6 +384,7 @@
         },
         "optional": "neobvezno",
         "teamN": "Ekipa {{n}}",
+        "generatedName": "Ekipa {{club}} {{discipline}} {{index}}",
         "available": "Na voljo",
         "reusable": "Že v ekipi",
         "blocked": "Ni mogoče dodati",
@@ -384,6 +398,9 @@
         "title": "Izbrane prijave",
         "hint": "Ti udeleženci in kategorije bodo oddani ob zaključku.",
         "selectedForParticipant": "Izbrane kategorije"
+      },
+      "feesEstimate": {
+        "title": "Predvidene pristojbine"
       },
       "coachSectionTitle": "Vaši podatki",
       "coachEmail": "E-pošta",

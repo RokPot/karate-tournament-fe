@@ -327,6 +327,7 @@ export namespace CommonModels {
    * @property { string } teamId Team ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { string } categoryId Team category ID. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { string } categoryName Team category name. Example: `Kumite Team Senior`
+   * @property { string } name Team display name. Example: `SKIF Ljubljana A`
    * @property { string } clubId Club ID on the team. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { number } amount Team fee in euros. Example: `30`
    */
@@ -334,6 +335,7 @@ export namespace CommonModels {
     teamId: z.string(),
     categoryId: z.string(),
     categoryName: z.string(),
+    name: z.string(),
     clubId: z.string().nullish(),
     amount: z.number(),
   });

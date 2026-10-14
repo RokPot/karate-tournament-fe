@@ -55,7 +55,7 @@ export interface DraftParticipant {
   lastName: string;
   gender: CommonModels.ParticipantGenderEnum;
   dateOfBirth: string;
-  weight: number;
+  weight?: number;
   beltLevel: CommonModels.BeltEnum;
   categoryIds: string[];
 }

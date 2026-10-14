@@ -94,13 +94,58 @@ export const categoryFormProfiles: Record<CommonModels.DisciplineEnum, CategoryF
   },
 };
 
+export type CategoryFormProfileOptions = {
+  unrestrictedKata?: boolean;
+};
+
+function isOpenAgeBound(value: number | null | undefined): boolean {
+  return value == null || value === 0;
+}
+
+export function isUnrestrictedKataCategory(
+  category: Pick<
+    CommonModels.CategoryResponseDto,
+    "discipline" | "ageMin" | "ageMax" | "beltMin" | "beltMax"
+  >,
+): boolean {
+  return (
+    category.discipline === CommonModels.DisciplineEnum.kata &&
+    isOpenAgeBound(category.ageMin) &&
+    isOpenAgeBound(category.ageMax) &&
+    !category.beltMin &&
+    !category.beltMax
+  );
+}
+
+function withUnrestrictedKataProfile(profile: CategoryFormProfile): CategoryFormProfile {
+  return {
+    show: {
+      ...profile.show,
+      age: false,
+      weight: false,
+      belt: false,
+    },
+    require: {
+      ...profile.require,
+      age: false,
+      weight: false,
+      belt: false,
+    },
+  };
+}
+
 export function getCategoryFormProfile(
   discipline: CommonModels.DisciplineEnum | undefined,
+  options?: CategoryFormProfileOptions,
 ): CategoryFormProfile | null {
   if (!discipline) {
     return null;
   }
-  return categoryFormProfiles[discipline];
+  const profile = categoryFormProfiles[discipline];
+  if (discipline === CommonModels.DisciplineEnum.kata && options?.unrestrictedKata) {
+    return withUnrestrictedKataProfile(profile);
+  }
+  return profile;
 }
 
 export type CategoryFormValidationPath = keyof CategoryFormValues;
@@ -120,9 +165,14 @@ function isMissingBelt(value: CommonModels.BeltEnum | null | undefined): boolean
 
 export function validateCategoryForm(
   data: CategoryFormValues,
+  options?: CategoryFormProfileOptions,
 ): CategoryFormValidationError[] {
-  const profile = categoryFormProfiles[data.discipline];
+  const profile = getCategoryFormProfile(data.discipline, options);
   const errors: CategoryFormValidationError[] = [];
+
+  if (!profile) {
+    return errors;
+  }
 
   if (profile.require.age) {
     if (isMissingNumber(data.ageMin)) {
@@ -223,9 +273,10 @@ export function clearHiddenCategoryFields(
 
 function toNormalizedCategoryPayload(
   data: CategoryFormValues,
+  options?: CategoryFormProfileOptions,
 ): CategoriesModels.CreateCategoryDto {
   const { discipline } = data;
-  const profile = categoryFormProfiles[discipline];
+  const profile = getCategoryFormProfile(discipline, options) ?? categoryFormProfiles[discipline];
 
   return {
     name: data.name,
@@ -264,12 +315,14 @@ export function mapCategoryToFormValues(
 
 export function toCreateCategoryPayload(
   data: CategoryFormValues,
+  options?: CategoryFormProfileOptions,
 ): CategoriesModels.CreateCategoryDto {
-  return toNormalizedCategoryPayload(data);
+  return toNormalizedCategoryPayload(data, options);
 }
 
 export function toUpdateCategoryPayload(
   data: CategoryFormValues,
+  options?: CategoryFormProfileOptions,
 ): CategoriesModels.UpdateCategoryDto {
-  return toNormalizedCategoryPayload(data);
+  return toNormalizedCategoryPayload(data, options);
 }

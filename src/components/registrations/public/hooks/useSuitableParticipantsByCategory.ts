@@ -42,13 +42,13 @@ export function useSuitableParticipantsByCategory({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canFetch, tournamentId, mutate, reset]);
 
-  const categoryItems = useMemo(
-    () =>
-      canFetch
-        ? (items ?? []).filter((item) => item.participants.length > 0)
-        : [],
-    [canFetch, items],
-  );
+  const categoryItems = useMemo(() => {
+    if (!canFetch) {
+      return [];
+    }
+
+    return (items ?? []).filter((item) => item.participants.length > 0);
+  }, [canFetch, items]);
 
   return {
     categoryItems,
