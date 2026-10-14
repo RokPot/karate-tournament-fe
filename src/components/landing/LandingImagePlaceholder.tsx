@@ -68,7 +68,12 @@ export const LandingImage = ({
 
   if (!aspectRatio) {
     return (
-      <Image src={image} alt={alt ?? ""} className={clsx("h-auto w-full rounded-2xl", className)} />
+      <Image
+        src={image}
+        alt={alt ?? ""}
+        unoptimized
+        className={clsx("h-auto w-full rounded-2xl", className)}
+      />
     );
   }
 
@@ -78,6 +83,7 @@ export const LandingImage = ({
         src={image}
         alt={alt ?? ""}
         fill
+        unoptimized
         sizes="(min-width: 1024px) 380px, 100vw"
         className="object-cover"
         style={{
