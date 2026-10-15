@@ -2,8 +2,6 @@ import type { DraftParticipant } from "@/components/registrations/public/types";
 import { CommonModels } from "@/data/common/common.models";
 import { RegistrationsModels } from "@/data/registrations/registrations.models";
 
-import { expect } from "@playwright/test";
-import { describe, it, } from "node:test";
 import { deriveAthleteAssignmentItems } from "./deriveAthleteAssignmentItems";
 
 const category = (
@@ -108,5 +106,27 @@ describe("deriveAthleteAssignmentItems", () => {
       "kumite",
     ]);
     expect(result.teamItems.map((item) => item.category.id)).toEqual(["k-team"]);
+  });
+
+  it("groups yako-soku-kumite as a team when team size is set", () => {
+    const yakoTeam = category({
+      id: "yako-team",
+      name: "Yako team",
+      discipline: "yako-soku-kumite",
+      teamSize: 3,
+    });
+    const ada = participant({});
+
+    const result = deriveAthleteAssignmentItems(
+      [ada],
+      [bulkItem([kumite, yakoTeam])],
+    );
+
+    expect(result.participantItems[0]?.categories.map((item) => item.id)).toEqual([
+      "kumite",
+    ]);
+    expect(result.teamItems.map((item) => item.category.id)).toEqual([
+      "yako-team",
+    ]);
   });
 });

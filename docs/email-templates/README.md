@@ -98,6 +98,56 @@ Example payload fragment:
 
 ---
 
+## 3. Registration code (continue roster)
+
+Replaces the plain OTP mail (“Use this code to continue your tournament registration”). The coach already has the form open and types the 6-digit code there, so this template has **no link and no button**.
+
+Keep the code out of the subject. A subject that includes the digits shows up on the lock screen.
+
+|                            |                                                                                            |
+| -------------------------- | ------------------------------------------------------------------------------------------ |
+| **File**                   | [`registration-code.html`](./registration-code.html)                                       |
+| **Suggested Brevo name**   | `registration-code`                                                                        |
+| **Suggested subject (EN)** | `Your registration code for {{ params.tournamentName }}`                                   |
+
+### Params
+
+| Param               | Type             | Required | Notes                                              |
+| ------------------- | ---------------- | -------- | -------------------------------------------------- |
+| `code`              | string           | yes      | 6 digits, sent as one string so it can be copied  |
+| `tournamentName`    | string           | yes      |                                                    |
+| `expiresInMinutes`  | number \| string | yes      | Currently `10`                                     |
+| `firstName`         | string           | optional | Greeting. Omit the `{{#if}}` block if unused      |
+| `clubName`          | string           | optional | Which roster the code unlocks (email + club)      |
+
+Example payload fragment:
+
+```json
+{
+  "firstName": "Rok",
+  "code": "558977",
+  "tournamentName": "Turnir",
+  "clubName": "Karate klub Gortina",
+  "expiresInMinutes": 10
+}
+```
+
+Plain-text alternative, if Brevo needs one:
+
+```text
+Use this code to continue your registration for {{ params.tournamentName }}.
+
+{{ params.code }}
+
+This code expires in {{ params.expiresInMinutes }} minutes.
+
+If you didn't ask to continue this registration, you can ignore this email.
+
+Karate App
+```
+
+---
+
 ## Brevo notes
 
 - Placeholders use transactional syntax: `{{ params.fieldName }}`.

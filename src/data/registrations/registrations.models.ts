@@ -49,6 +49,7 @@ export namespace RegistrationsModels {
    * @property { string } dateOfBirth Date of birth. Example: `2018-02-02T00:00:00.000Z`
    * @property { string } gender Gender (required when matching categories with a gender restriction). Example: `male`
    * @property { string } beltLevel Belt level. Example: `10-kyu`
+   * @property { string } userId Existing participant user ID (continue-roster PUT). Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { BulkParticipantRegistrationDto[] } registrations Individual category registrations for this participant. May be empty when the person is only on teams.
    */
   export const BulkParticipantDtoSchema = z.object({
@@ -58,6 +59,7 @@ export namespace RegistrationsModels {
     dateOfBirth: z.string().datetime({ offset: true }),
     gender: CommonModels.ParticipantGenderEnumSchema.optional(),
     beltLevel: CommonModels.BeltEnumSchema.optional(),
+    userId: z.string().optional(),
     registrations: z.array(BulkParticipantRegistrationDtoSchema).optional(),
   });
   export type BulkParticipantDto = z.infer<typeof BulkParticipantDtoSchema>;
@@ -66,12 +68,14 @@ export namespace RegistrationsModels {
    * BulkTeamDtoSchema
    * @type { object }
    * @property { string } categoryId Team category ID (must be a team discipline on the tournament). Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } id Existing team ID (continue-roster PUT). Omit to create a new team.. Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { string } name Team display name. Omit to generate from club name or starter last names.. Max Length: `255`. Example: `SKIF Ljubljana A`
    * @property { number[] } starters Participant indexes for starters (length must equal category teamSize). Min Items: `1`. Example: `0,1,2`
    * @property { number[] } reserves Participant indexes for reserves. Example: `3`
    */
   export const BulkTeamDtoSchema = z.object({
     categoryId: z.string(),
+    id: z.string().optional(),
     name: z.string().max(255).optional(),
     starters: z.array(z.number().gte(0)).min(1),
     reserves: z.array(z.number().gte(0)).optional(),
@@ -299,6 +303,90 @@ export namespace RegistrationsModels {
   >;
 
   /**
+   * RosterRegistrationItemDtoSchema
+   * @type { object }
+   * @property { string } id Registration ID
+   * @property { string } categoryId Category ID
+   */
+  export const RosterRegistrationItemDtoSchema = z.object({
+    id: z.string(),
+    categoryId: z.string(),
+  });
+  export type RosterRegistrationItemDto = z.infer<
+    typeof RosterRegistrationItemDtoSchema
+  >;
+
+  /**
+   * RosterParticipantDtoSchema
+   * @type { object }
+   * @property { string } userId Participant user ID
+   * @property { string } firstName First name
+   * @property { string } lastName Last name
+   * @property { number } weight Weight in kg
+   * @property { string } dateOfBirth Date of birth. Example: `2024-01-01T00:00:00.000Z`
+   * @property { string } gender
+   * @property { string } beltLevel
+   * @property { RosterRegistrationItemDto[] } registrations Individual (non-team) category registrations
+   */
+  export const RosterParticipantDtoSchema = z.object({
+    userId: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+    weight: z.number().nullish(),
+    dateOfBirth: z.string().datetime({ offset: true }),
+    gender: CommonModels.ParticipantGenderEnumSchema.nullish(),
+    beltLevel: CommonModels.BeltEnumSchema.nullish(),
+    registrations: z.array(RosterRegistrationItemDtoSchema),
+  });
+  export type RosterParticipantDto = z.infer<typeof RosterParticipantDtoSchema>;
+
+  /**
+   * RosterTeamItemDtoSchema
+   * @type { object }
+   * @property { string } id Team ID
+   * @property { string } name Team display name
+   * @property { string } categoryId Team category ID
+   * @property { number[] } starters Starter indexes into participants[]
+   * @property { number[] } reserves Reserve indexes into participants[]
+   */
+  export const RosterTeamItemDtoSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    categoryId: z.string(),
+    starters: z.array(z.number()),
+    reserves: z.array(z.number()).optional(),
+  });
+  export type RosterTeamItemDto = z.infer<typeof RosterTeamItemDtoSchema>;
+
+  /**
+   * RosterResponseDtoSchema
+   * @type { object }
+   * @property { string } email Coach email
+   * @property { string } firstName Coach first name
+   * @property { string } lastName Coach last name
+   * @property { string } clubName
+   * @property { string } clubId
+   * @property { string } tournamentId Tournament ID
+   * @property { string } updatedAt When the roster was last saved. Example: `2024-01-01T00:00:00.000Z`
+   * @property { RosterParticipantDto[] } participants
+   * @property { RosterTeamItemDto[] } teams
+   * @property { CommonModels.TournamentFeesCalculationDto } fees Current bill for this roster
+   */
+  export const RosterResponseDtoSchema = z.object({
+    email: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+    clubName: z.string().nullish(),
+    clubId: z.string().nullish(),
+    tournamentId: z.string(),
+    updatedAt: z.string().datetime({ offset: true }),
+    participants: z.array(RosterParticipantDtoSchema),
+    teams: z.array(RosterTeamItemDtoSchema),
+    fees: CommonModels.TournamentFeesCalculationDtoSchema.optional(),
+  });
+  export type RosterResponseDto = z.infer<typeof RosterResponseDtoSchema>;
+
+  /**
    * TeamMembershipDtoSchema
    * @type { object }
    * @property { string } teamId Team ID. Example: `123e4567-e89b-12d3-a456-426614174000`
@@ -387,6 +475,72 @@ export namespace RegistrationsModels {
   >;
 
   /**
+   * RosterPutDtoSchema
+   * @type { object }
+   * @property { string } email Coach email address (used to find or create coach user). Example: `coach@club.com`
+   * @property { string } firstName Coach first name. Max Length: `100`. Example: `Jane`
+   * @property { string } lastName Coach last name. Max Length: `100`. Example: `Coach`
+   * @property { string } clubName Club name (free text). If a matching club exists in the system, it is linked; otherwise registrations proceed without a club.. Min Length: `1`. Max Length: `255`. Example: `Dragon Karate Club`
+   * @property { string } tournamentId Tournament ID for all registrations in this request. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { BulkParticipantDto[] } participants Participants to register. Min Items: `1`
+   * @property { BulkTeamDto[] } teams Team rosters (kata-team / kumite-team / yako-soku-kumite). Participant indexes refer to participants[]. The same person may be on multiple teams; two teams in a category may not have the same set of people.
+   * @property { string } accessToken Access token from OTP verify. Min Length: `16`
+   * @property { string } updatedAt Roster updatedAt from GET; must match or the request is rejected with 409. Example: `2024-01-01T00:00:00.000Z`
+   */
+  export const RosterPutDtoSchema = z.object({
+    email: z.string().email(),
+    firstName: z.string().max(100),
+    lastName: z.string().max(100),
+    clubName: z.string().min(1).max(255).optional(),
+    tournamentId: z.string(),
+    participants: z.array(BulkParticipantDtoSchema).min(1),
+    teams: z.array(BulkTeamDtoSchema).optional(),
+    accessToken: z.string().min(16),
+    updatedAt: z.string().datetime({ offset: true }),
+  });
+  export type RosterPutDto = z.infer<typeof RosterPutDtoSchema>;
+
+  /**
+   * RosterLookupResponseDtoSchema
+   * @type { object }
+   * @property { boolean } found Whether a roster exists for this coach + club in the tournament
+   * @property { string } updatedAt When the roster was last saved (present when found is true). Example: `2024-01-01T00:00:00.000Z`
+   */
+  export const RosterLookupResponseDtoSchema = z.object({
+    found: z.boolean(),
+    updatedAt: z.string().datetime({ offset: true }).nullish(),
+  });
+  export type RosterLookupResponseDto = z.infer<
+    typeof RosterLookupResponseDtoSchema
+  >;
+
+  /**
+   * RosterOtpResponseDtoSchema
+   * @type { object }
+   * @property { string } debugCode Present only when mail is disabled outside production, for local continue testing. Example: `123456`
+   */
+  export const RosterOtpResponseDtoSchema = z
+    .object({ debugCode: z.string() })
+    .partial();
+  export type RosterOtpResponseDto = z.infer<typeof RosterOtpResponseDtoSchema>;
+
+  /**
+   * RosterOtpVerifyResponseDtoSchema
+   * @type { object }
+   * @property { string } accessToken Short-lived access token for GET/PUT current roster
+   * @property { string } expiresAt When this access token expires. Example: `2024-01-01T00:00:00.000Z`
+   * @property { string } updatedAt Roster updatedAt for later PUT If-Match. Example: `2024-01-01T00:00:00.000Z`
+   */
+  export const RosterOtpVerifyResponseDtoSchema = z.object({
+    accessToken: z.string(),
+    expiresAt: z.string().datetime({ offset: true }),
+    updatedAt: z.string().datetime({ offset: true }),
+  });
+  export type RosterOtpVerifyResponseDto = z.infer<
+    typeof RosterOtpVerifyResponseDtoSchema
+  >;
+
+  /**
    * CreateRegistrationDtoSchema
    * @type { object }
    * @property { string } userId User ID (optional - defaults to authenticated user). Example: `123e4567-e89b-12d3-a456-426614174000`
@@ -437,6 +591,54 @@ export namespace RegistrationsModels {
   export type CreateRegistrationWithUserDto = z.infer<
     typeof CreateRegistrationWithUserDtoSchema
   >;
+
+  /**
+   * RosterIdentityDtoSchema
+   * @type { object }
+   * @property { string } tournamentId Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } email Coach email. Example: `coach@club.com`
+   * @property { string } clubName Club name as typed on the form. Min Length: `1`. Max Length: `255`. Example: `SKIF Ljubljana`
+   */
+  export const RosterIdentityDtoSchema = z.object({
+    tournamentId: z.string(),
+    email: z.string().email(),
+    clubName: z.string().min(1).max(255).optional(),
+  });
+  export type RosterIdentityDto = z.infer<typeof RosterIdentityDtoSchema>;
+
+  /**
+   * RosterOtpRequestDtoSchema
+   * @type { object }
+   * @property { string } tournamentId Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } email Coach email. Example: `coach@club.com`
+   * @property { string } clubName Club name as typed on the form. Min Length: `1`. Max Length: `255`. Example: `SKIF Ljubljana`
+   */
+  export const RosterOtpRequestDtoSchema = z.object({
+    tournamentId: z.string(),
+    email: z.string().email(),
+    clubName: z.string().min(1).max(255).optional(),
+  });
+  export type RosterOtpRequestDto = z.infer<typeof RosterOtpRequestDtoSchema>;
+
+  /**
+   * RosterOtpVerifyDtoSchema
+   * @type { object }
+   * @property { string } tournamentId Tournament ID. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } email Coach email. Example: `coach@club.com`
+   * @property { string } clubName Club name as typed on the form. Min Length: `1`. Max Length: `255`. Example: `SKIF Ljubljana`
+   * @property { string } code 6-digit code from email. Min Length: `6`. Max Length: `6`. Example: `123456`
+   */
+  export const RosterOtpVerifyDtoSchema = z.object({
+    tournamentId: z.string(),
+    email: z.string().email(),
+    clubName: z.string().min(1).max(255).optional(),
+    code: z
+      .string()
+      .min(6)
+      .max(6)
+      .regex(/^\d{6}$/),
+  });
+  export type RosterOtpVerifyDto = z.infer<typeof RosterOtpVerifyDtoSchema>;
 
   /**
    * TournamentRegistrationCountItemDtoSchema

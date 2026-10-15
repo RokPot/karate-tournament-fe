@@ -42,7 +42,11 @@ export function WizardStepNav({
             : t("registrations.public.submit")}
         </Button>
       ) : (
-        <Button variant="contained" onClick={onNext} disabled={!canGoNext}>
+        <Button
+          variant="contained"
+          onClick={onNext}
+          disabled={!canGoNext || isSubmitting}
+        >
           {t("registrations.public.next")}
         </Button>
       )}

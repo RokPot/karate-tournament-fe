@@ -1,4 +1,4 @@
-import { Tab, Tabs } from "@mui/material";
+import { Tab, Tabs, TextField } from "@mui/material";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -24,6 +24,12 @@ export const TournamentRegistrationsPanel = ({
 }: TournamentRegistrationsPanelProps) => {
   const { t } = useTranslation();
   const [view, setView] = useState<RegistrationsView>("submissions");
+  const [queries, setQueries] = useState<Record<RegistrationsView, string>>({
+    submissions: "",
+    category: "",
+    participants: "",
+  });
+  const query = queries[view];
 
   return (
     <div className="flex flex-col gap-4">
@@ -43,8 +49,24 @@ export const TournamentRegistrationsPanel = ({
         />
       </Tabs>
 
+      <TextField
+        value={query}
+        onChange={(event) =>
+          setQueries((current) => ({
+            ...current,
+            [view]: event.target.value,
+          }))
+        }
+        label={t(`registrations.search.${view}`)}
+        size="small"
+        fullWidth
+      />
+
       {view === "submissions" && (
-        <RegistrationSubmissionsList tournamentId={tournamentId} />
+        <RegistrationSubmissionsList
+          tournamentId={tournamentId}
+          query={query}
+        />
       )}
       {view === "category" && (
         <CategoryRegistrationsAccordion
@@ -52,6 +74,7 @@ export const TournamentRegistrationsPanel = ({
           tournamentId={tournamentId}
           clubId={clubId}
           canEdit={canEditRegistrations}
+          query={query}
         />
       )}
       {view === "participants" && (
@@ -60,6 +83,7 @@ export const TournamentRegistrationsPanel = ({
           categories={categories}
           clubId={clubId}
           canEdit={canEditRegistrations}
+          query={query}
         />
       )}
     </div>

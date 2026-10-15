@@ -19,11 +19,19 @@ export class ApplicationException<CodeT> extends Error {
 
   public serverMessage: string | null = null;
 
-  constructor(message: string, code: CodeT, serverMessage: string | null) {
+  public httpStatus: number | null;
+
+  constructor(
+    message: string,
+    code: CodeT,
+    serverMessage: string | null,
+    httpStatus: number | null = null,
+  ) {
     super(message);
 
     this.code = code;
     this.serverMessage = serverMessage;
+    this.httpStatus = httpStatus;
   }
 }
 
@@ -105,7 +113,15 @@ export class ErrorHandler<CodeT extends string> {
     const errorEntry = this.entries.find((entry) => entry.condition(error ?? {}))!;
 
     const serverMessage = RestUtils.extractServerErrorMessage(error);
-    throw new ApplicationException(errorEntry.getMessage(error), errorEntry.code, serverMessage);
+    const httpStatus = axios.isAxiosError(error)
+      ? (error.response?.status ?? null)
+      : null;
+    throw new ApplicationException(
+      errorEntry.getMessage(error),
+      errorEntry.code,
+      serverMessage,
+      httpStatus,
+    );
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -145,6 +161,13 @@ export class ErrorHandler<CodeT extends string> {
 
     return null;
   }
+}
+
+export function getHttpStatus(error: unknown): number | null {
+  if (error instanceof ApplicationException) {
+    return error.httpStatus;
+  }
+  return null;
 }
 
 // can be used for endpoints that only need general error handling

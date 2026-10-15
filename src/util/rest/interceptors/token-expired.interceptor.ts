@@ -15,8 +15,16 @@ export const TokenExpiredInterceptor = new RestInterceptor((client, onExpired: (
       const { config } = error;
 
       const hasFailedDueToAccessTokenExpiry = error.response?.status === 401;
+      const requestUrl = config?.url ?? "";
+      const isPublicRosterRequest = requestUrl.includes(
+        "/registrations/public/rosters",
+      );
 
-      if (config && hasFailedDueToAccessTokenExpiry) {
+      if (
+        config &&
+        hasFailedDueToAccessTokenExpiry &&
+        !isPublicRosterRequest
+      ) {
         await onExpired();
       }
 

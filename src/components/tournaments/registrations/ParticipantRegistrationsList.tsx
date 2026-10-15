@@ -5,8 +5,8 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ErrorState } from "@/components/shared/layout/ErrorState";
-import { StaffRegistrationModal } from "@/components/tournaments/registrations/StaffRegistrationModal";
 import { ConfirmRemoveRegistrationDialog } from "@/components/tournaments/registrations/ConfirmRemoveRegistrationDialog";
+import { StaffRegistrationModal } from "@/components/tournaments/registrations/StaffRegistrationModal";
 import Pill from "@/components/ui/Pill";
 import { Loader } from "@/components/ui/status/Loader/Loader";
 import { useToast } from "@/components/ui/status/Toast/useToast";
@@ -34,6 +34,7 @@ type ParticipantRegistrationsListProps = {
   categories: CommonModels.CategoryResponseDto[];
   clubId?: string;
   canEdit: boolean;
+  query: string;
 };
 
 export const ParticipantRegistrationsList = ({
@@ -41,6 +42,7 @@ export const ParticipantRegistrationsList = ({
   categories,
   clubId,
   canEdit,
+  query,
 }: ParticipantRegistrationsListProps) => {
   const { t } = useTranslation();
   const { successToast, errorToast } = useToast();
@@ -116,7 +118,7 @@ export const ParticipantRegistrationsList = ({
         registrations: [registration],
       });
     });
-    return [...byUser.values()].sort((left, right) => {
+    const sorted = [...byUser.values()].sort((left, right) => {
       const leftName = [left.user?.lastName, left.user?.firstName]
         .filter(Boolean)
         .join(" ");
@@ -125,7 +127,30 @@ export const ParticipantRegistrationsList = ({
         .join(" ");
       return leftName.localeCompare(rightName);
     });
+    return sorted;
   }, [data]);
+
+  const visibleGroups = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    if (!needle) {
+      return groups;
+    }
+    return groups.filter((group) => {
+      const haystack = [
+        group.user?.firstName,
+        group.user?.lastName,
+        group.club?.name,
+        ...group.registrations.map(
+          (registration) =>
+            categoriesById.get(registration.categoryId)?.name ?? "",
+        ),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(needle);
+    });
+  }, [categoriesById, groups, query]);
 
   const isMutating =
     createMutation.isPending ||
@@ -188,9 +213,8 @@ export const ParticipantRegistrationsList = ({
           </Button>
         </div>
       )}
-
-      {groups.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-xs border border-secondary-300 bg-secondary-200 p-10">
+      {
+        groups.length === 0 && <div className="flex flex-col items-center justify-center gap-3 rounded-xs border border-secondary-300 bg-secondary-200 p-10">
           <Typography size="body-paragraph-lg">
             {t("registrations.noAttendees")}
           </Typography>
@@ -206,9 +230,17 @@ export const ParticipantRegistrationsList = ({
             </Button>
           )}
         </div>
-      ) : (
-        <div className="overflow-hidden rounded-xs border border-secondary-300 bg-secondary-200">
-          {groups.map((group) => {
+      }
+      {
+        visibleGroups.length === 0 && <div className="flex flex-col items-center justify-center gap-3 rounded-xs border border-secondary-300 bg-secondary-200 p-10">
+          <Typography size="body-paragraph-lg">
+            {t("registrations.search.noMatches")}
+          </Typography>
+        </div>
+      }
+      {
+        visibleGroups.length > 0 && <div className="overflow-hidden rounded-xs border border-secondary-300 bg-secondary-200">
+          {visibleGroups.map((group) => {
             const name =
               [group.user?.firstName, group.user?.lastName]
                 .filter(Boolean)
@@ -306,7 +338,9 @@ export const ParticipantRegistrationsList = ({
             );
           })}
         </div>
-      )}
+      }
+
+
 
       <StaffRegistrationModal
         open={modalMode != null}
@@ -317,21 +351,21 @@ export const ParticipantRegistrationsList = ({
         initialValues={
           editingRegistration?.user
             ? {
-                firstName: editingRegistration.user.firstName ?? "",
-                lastName: editingRegistration.user.lastName ?? "",
-                gender:
-                  editingRegistration.user.gender ??
-                  CommonModels.ParticipantGenderEnum.male,
-                dateOfBirth:
-                  editingRegistration.user.dateOfBirth ??
-                  DateUtils.dateOfBirthFromBirthYear(
-                    new Date().getFullYear() - 18,
-                  ),
-                weight: editingRegistration.user.weight ?? 0,
-                beltLevel:
-                  editingRegistration.user.beltLevel ??
-                  CommonModels.BeltEnum["10-kyu"],
-              }
+              firstName: editingRegistration.user.firstName ?? "",
+              lastName: editingRegistration.user.lastName ?? "",
+              gender:
+                editingRegistration.user.gender ??
+                CommonModels.ParticipantGenderEnum.male,
+              dateOfBirth:
+                editingRegistration.user.dateOfBirth ??
+                DateUtils.dateOfBirthFromBirthYear(
+                  new Date().getFullYear() - 18,
+                ),
+              weight: editingRegistration.user.weight ?? 0,
+              beltLevel:
+                editingRegistration.user.beltLevel ??
+                CommonModels.BeltEnum["10-kyu"],
+            }
             : undefined
         }
         onClose={() => {

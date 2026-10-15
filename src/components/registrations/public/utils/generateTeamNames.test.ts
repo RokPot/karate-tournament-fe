@@ -118,4 +118,23 @@ describe("generateUniqueTeamNames", () => {
 
     expect(names.get("a")).toBe("Team Kata 1");
   });
+
+  it("keeps a stored name and skips that label for a new team", () => {
+    const names = generateUniqueTeamNames(
+      [
+        team({
+          clientId: "a",
+          categoryId: "kata-t",
+          name: "Team SL Kata 1",
+        }),
+        team({ clientId: "b", categoryId: "kata-t" }),
+      ],
+      [kataTeam],
+      "SKIF Ljubljana",
+      formatter,
+    );
+
+    expect(names.get("a")).toBe("Team SL Kata 1");
+    expect(names.get("b")).toBe("Team SL Kata 2");
+  });
 });

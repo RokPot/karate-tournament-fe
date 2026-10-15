@@ -43,6 +43,7 @@ export function mapToBulkDto(
       ? undefined
       : teams.map((team) => ({
           categoryId: team.categoryId,
+          ...(team.id ? { id: team.id } : {}),
           name: teamNames.get(team.clientId),
           starters: team.starterIds.map(
             (id) => indexByClientId.get(id) ?? -1,
@@ -65,6 +66,7 @@ export function mapToBulkDto(
       dateOfBirth: participant.dateOfBirth,
       gender: participant.gender,
       beltLevel: participant.beltLevel,
+      ...(participant.userId ? { userId: participant.userId } : {}),
       registrations: participant.categoryIds
         .filter((categoryId) => !teamCategoryIds.has(categoryId))
         .map((categoryId) => ({

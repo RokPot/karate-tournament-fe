@@ -1,6 +1,7 @@
 import { Checkbox, FormControlLabel } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
+import { useCategoryFormatters } from "@/components/categories/category-formatters";
 import { getParticipantLabel } from "@/components/registrations/public/utils/registrationValidation";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 
@@ -18,6 +19,7 @@ export function ParticipantCategoriesSection({
   onToggle,
 }: ParticipantCategoriesSectionProps) {
   const { t } = useTranslation();
+  const { formatSummaryLine } = useCategoryFormatters();
   const { participant, participantIndex, categories } = item;
 
   return (
@@ -47,9 +49,9 @@ export function ParticipantCategoriesSection({
                   <Typography
                     as="span"
                     size="body-paragraph-xs"
-                    className="ml-2 text-neutral-200"
+                    className="mt-0-5 block text-neutral-200"
                   >
-                    {t(`discipline.${category.discipline}`)}
+                    {formatSummaryLine(category)}
                   </Typography>
                 </Typography>
               }

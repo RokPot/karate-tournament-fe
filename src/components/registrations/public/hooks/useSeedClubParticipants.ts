@@ -43,7 +43,7 @@ export function useSeedClubParticipants(
       setSeededCount(mapped.length);
     }
     hasSeededRef.current = true;
-  }, [members, participantCount, setParticipants]);
+  }, [enabled, members, participantCount, setParticipants]);
 
   const resetSeed = useCallback(() => {
     hasSeededRef.current = false;

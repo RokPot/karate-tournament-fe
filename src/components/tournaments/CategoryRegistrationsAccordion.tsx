@@ -11,13 +11,27 @@ interface IProps {
   tournamentId: string;
   clubId?: string;
   canEdit?: boolean;
+  query: string;
 }
+
+const categoryHaystack = (
+  category: CommonModels.CategoryResponseDto,
+  labels: {
+    discipline: string;
+    subDiscipline: string;
+    gender: string;
+  },
+) =>
+  [category.name, labels.discipline, labels.subDiscipline, labels.gender]
+    .join(" ")
+    .toLowerCase();
 
 export const CategoryRegistrationsAccordion = ({
   categories,
   tournamentId,
   clubId,
   canEdit = false,
+  query,
 }: IProps) => {
   const { t } = useTranslation();
   const { data: counts } = RegistrationsQueries.useFindCountsByTournament(
@@ -31,6 +45,24 @@ export const CategoryRegistrationsAccordion = ({
     );
   }, [counts]);
 
+  const needle = query.trim().toLowerCase();
+  const visibleCategories = useMemo(() => {
+    if (!needle) {
+      return categories;
+    }
+    return categories.filter((category) =>
+      categoryHaystack(category, {
+        discipline: t(`discipline.${category.discipline}`),
+        subDiscipline: category.subDiscipline
+          ? t(`subDiscipline.${category.subDiscipline}`)
+          : "",
+        gender: category.gender
+          ? t(`categories.create.${category.gender}`)
+          : "",
+      }).includes(needle),
+    );
+  }, [categories, needle, t]);
+
   if (categories.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 p-10">
@@ -41,9 +73,19 @@ export const CategoryRegistrationsAccordion = ({
     );
   }
 
+  if (visibleCategories.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 p-10">
+        <Typography size="body-paragraph-lg">
+          {t("registrations.search.noMatches")}
+        </Typography>
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-hidden rounded-xs border border-secondary-300 bg-secondary-200">
-      {categories.map((category) => (
+      {visibleCategories.map((category) => (
         <CategoryRegistrationsAccordionItem
           key={category.id}
           category={category}

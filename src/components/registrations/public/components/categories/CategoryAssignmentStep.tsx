@@ -192,7 +192,7 @@ export function CategoryAssignmentStep({
                   {currentItem && (
                     <Typography
                       size="body-paragraph-s"
-                      className="truncate text-neutral-200"
+                      className="min-w-0 text-right text-neutral-200"
                     >
                       {currentItem.category.name}
                     </Typography>

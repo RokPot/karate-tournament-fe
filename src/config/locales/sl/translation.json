@@ -245,6 +245,12 @@
       "category": "Po kategoriji",
       "participants": "Po udeležencu"
     },
+    "search": {
+      "submissions": "Išči prijave",
+      "category": "Išči kategorije",
+      "participants": "Išči udeležence",
+      "noMatches": "Ni zadetkov."
+    },
     "submissions": {
       "empty": "Ni še prijav po oddaji. Starejše prijave brez oddaje so vidne pod Po kategoriji in Po udeležencu.",
       "club": "Klub",
@@ -435,7 +441,39 @@
         "participant": "Udeleženec",
         "category": "Kategorija",
         "error": "Napaka",
-        "startOver": "Prijavi več udeležencev"
+        "startOver": "Prijavi več udeležencev",
+        "edit": "Uredi to prijavo"
+      },
+      "continue": {
+        "or": "ali",
+        "openExisting": "Nadaljuj z obstoječo prijavo",
+        "check": "Preveri obstoječe prijave",
+        "notFound": "Za to e-pošto in klub ni prijave.",
+        "found": "Za ta turnir ste že prijavljeni ({{date}}). Nadaljujem z urejanjem?",
+        "foundNoDate": "Za ta turnir ste že prijavljeni. Nadaljujem z urejanjem?",
+        "continueEditing": "Nadaljuj urejanje",
+        "otpHint": "Na {{email}} smo poslali 6-mestno kodo. Vnesite jo za nadaljevanje.",
+        "otpLabel": "Koda",
+        "verify": "Potrdi kodo",
+        "verifying": "Preverjanje…",
+        "resend": "Pošlji kodo znova",
+        "debugCode": "E-pošta je v tem okolju izklopljena. Koda je {{code}}.",
+        "rateLimit": "Počakajte približno minuto, preden znova zahtevate kodo.",
+        "invalidCode": "Koda je napačna ali je potekla.",
+        "sessionExpired": "Seja je potekla. Poslali smo novo kodo.",
+        "conflict": "To prijavo je nekdo posodobil v drugem zavihku. Naložim trenutni seznam?",
+        "reload": "Naloži znova",
+        "replaceDraft": "Na tej napravi imate neshranjeno prijavo. Jo zamenjam s shranjenim seznamom?",
+        "replace": "Zamenjaj",
+        "keep": "Obdrži neshranjeno",
+        "save": "Shrani spremembe",
+        "saving": "Shranjevanje…",
+        "loading": "Nalaganje prijave…",
+        "savedTitle": "Prijava je posodobljena",
+        "savedBody": "Spremembe so shranjene.",
+        "savedFees": "Trenutne pristojbine: {{total}} €",
+        "editAgain": "Uredi znova",
+        "done": "Končano"
       }
     }
   },

@@ -13,6 +13,12 @@ export namespace RegistrationsQueries {
 
   export const keys = {
     all: [moduleName] as const,
+    getCurrentRoster: (accessToken: string) =>
+      [
+        ...keys.all,
+        "/registrations/public/rosters/current",
+        accessToken,
+      ] as const,
     getPublicSuitableCategories: (
       tournamentId: string,
       beltLevel: RegistrationsModels.GetPublicSuitableCategoriesBeltLevelParam,
@@ -150,6 +156,138 @@ export namespace RegistrationsQueries {
 
     return useMutation({
       mutationFn: ({ data }) => RegistrationsApi.bulkCreateWithCoach(data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
+   * Mutation `useLookupRoster`
+   * @summary Check whether a public registration roster exists
+   * @description Looks up a coach + club roster for a tournament. Returns found + updatedAt only — never participant data.
+   * @param { RegistrationsModels.RosterIdentityDto } mutation.data Body parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<RegistrationsModels.RosterLookupResponseDto> } Lookup result
+   * @statusCodes [200, 404]
+   */
+  export const useLookupRoster = (
+    options?: AppMutationOptions<
+      typeof RegistrationsApi.lookupRoster,
+      { data: RegistrationsModels.RosterIdentityDto }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ data }) => RegistrationsApi.lookupRoster(data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
+   * Mutation `useRequestRosterOtp`
+   * @summary Email a one-time code to continue a registration roster
+   * @description Sends a 6-digit code to the coach email when a roster exists for this tournament and club.
+   * @param { RegistrationsModels.RosterOtpRequestDto } mutation.data Body parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<RegistrationsModels.RosterOtpResponseDto> } Code sent (debugCode only when mail is disabled outside production)
+   * @statusCodes [200, 404, 429]
+   */
+  export const useRequestRosterOtp = (
+    options?: AppMutationOptions<
+      typeof RegistrationsApi.requestRosterOtp,
+      { data: RegistrationsModels.RosterOtpRequestDto }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ data }) => RegistrationsApi.requestRosterOtp(data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
+   * Mutation `useVerifyRosterOtp`
+   * @summary Verify roster OTP
+   * @description Exchanges a valid email code for a short-lived accessToken used on GET/PUT current roster.
+   * @param { RegistrationsModels.RosterOtpVerifyDto } mutation.data Body parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<RegistrationsModels.RosterOtpVerifyResponseDto> } Access token
+   * @statusCodes [200, 400, 404]
+   */
+  export const useVerifyRosterOtp = (
+    options?: AppMutationOptions<
+      typeof RegistrationsApi.verifyRosterOtp,
+      { data: RegistrationsModels.RosterOtpVerifyDto }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ data }) => RegistrationsApi.verifyRosterOtp(data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
+   * Query `useGetCurrentRoster`
+   * @summary Get the current public registration roster
+   * @description Merged latest athletes and teams for the coach + club. Pass accessToken from OTP verify as a query param.
+   * @param { string } object.accessToken Query parameter. Access token from OTP verify. Min Length: `16`
+   * @param { AppQueryOptions } options Query options
+   * @returns { UseQueryResult<RegistrationsModels.RosterResponseDto> } Current roster
+   * @statusCodes [200, 401, 404]
+   */
+  export const useGetCurrentRoster = <TData>(
+    { accessToken }: { accessToken: string },
+    options?: AppQueryOptions<typeof RegistrationsApi.getCurrentRoster, TData>,
+  ) => {
+    return useQuery({
+      queryKey: keys.getCurrentRoster(accessToken),
+      queryFn: () => RegistrationsApi.getCurrentRoster(accessToken),
+      ...options,
+    });
+  };
+
+  /**
+   * Mutation `usePutCurrentRoster`
+   * @summary Replace the current public registration roster
+   * @description Updates athletes and teams in place (no new submission). accessToken and updatedAt are required in the body.
+   * @param { RegistrationsModels.RosterPutDto } mutation.data Body parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<RegistrationsModels.RosterResponseDto> } Updated roster
+   * @statusCodes [200, 401, 409]
+   */
+  export const usePutCurrentRoster = (
+    options?: AppMutationOptions<
+      typeof RegistrationsApi.putCurrentRoster,
+      { data: RegistrationsModels.RosterPutDto }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ data }) => RegistrationsApi.putCurrentRoster(data),
       ...options,
       onSuccess: (...args) => {
         invalidateQueries(queryClient, moduleName, options);

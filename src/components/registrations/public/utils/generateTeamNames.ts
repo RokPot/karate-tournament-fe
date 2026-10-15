@@ -70,25 +70,51 @@ export function generateUniqueTeamNames(
   );
   const counters = new Map<string, number>();
   const names = new Map<string, string>();
+  const reserved = new Set<string>();
 
   for (const team of teams) {
+    const preserved = team.name?.trim();
+    if (preserved) {
+      reserved.add(preserved);
+    }
+  }
+
+  for (const team of teams) {
+    const preserved = team.name?.trim();
+    if (preserved) {
+      names.set(team.clientId, preserved);
+      continue;
+    }
+
     const disciplineKey = teamNameDisciplineKey(
       categoryById.get(team.categoryId)?.discipline,
     );
     const counterKey = `${shortClub}\0${disciplineKey}`;
-    const index = (counters.get(counterKey) ?? 0) + 1;
-    counters.set(counterKey, index);
-    names.set(
-      team.clientId,
-      formatter
+    let index = (counters.get(counterKey) ?? 0) + 1;
+    let candidate = formatter
+      .formatName({
+        club: shortClub,
+        discipline: formatter.disciplineLabel(disciplineKey),
+        index,
+      })
+      .replace(/\s+/g, " ")
+      .trim();
+
+    while (reserved.has(candidate)) {
+      index += 1;
+      candidate = formatter
         .formatName({
           club: shortClub,
           discipline: formatter.disciplineLabel(disciplineKey),
           index,
         })
         .replace(/\s+/g, " ")
-        .trim(),
-    );
+        .trim();
+    }
+
+    counters.set(counterKey, index);
+    reserved.add(candidate);
+    names.set(team.clientId, candidate);
   }
 
   return names;

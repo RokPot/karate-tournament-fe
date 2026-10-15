@@ -4,6 +4,7 @@ import { useReducedMotion } from "motion/react";
 import { useMemo, useRef, useState, type Ref } from "react";
 import { useTranslation } from "react-i18next";
 
+import { useCategoryFormatters } from "@/components/categories/category-formatters";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { RegistrationsModels } from "@/data/registrations/registrations.models";
 
@@ -74,6 +75,7 @@ export function CategoryTeamAssignmentSection({
   onRemoveTeam,
 }: CategoryTeamAssignmentSectionProps) {
   const { t } = useTranslation();
+  const { formatSummaryLine } = useCategoryFormatters();
   const { category } = item;
   const teamSize = category.teamSize ?? 0;
   const reserveCap = category.teamReservesSize ?? 0;
@@ -217,10 +219,6 @@ export function CategoryTeamAssignmentSection({
     }
   };
 
-  const genderLabel = category.gender
-    ? t(`categories.create.${category.gender}`)
-    : t("registrations.public.teams.anyGender");
-
   const activeMembers = activeTeam
     ? [...activeTeam.starterIds, ...activeTeam.reserveIds]
     : [];
@@ -240,11 +238,10 @@ export function CategoryTeamAssignmentSection({
         <Typography size="body-paragraph-lg" variant="prominent-2">
           {category.name}
         </Typography>
+        <Typography size="body-paragraph-s" className="text-neutral-200">
+          {formatSummaryLine(category)}
+        </Typography>
         <Typography size="body-paragraph-xs" className="text-neutral-200">
-          {t(`discipline.${category.discipline}`)}
-          {" · "}
-          {genderLabel}
-          {" · "}
           {reserveCap > 0
             ? t("registrations.public.teams.rosterHintWithReserves", {
               teamSize,

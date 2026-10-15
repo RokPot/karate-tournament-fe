@@ -47,6 +47,10 @@ export interface DraftTeam {
   categoryId: string;
   starterIds: string[];
   reserveIds: string[];
+  /** Server team id when this roster was loaded for continue. */
+  id?: string;
+  /** Keep the name from GET so continue saves do not regenerate it. */
+  name?: string;
 }
 
 export interface DraftParticipant {
@@ -58,6 +62,8 @@ export interface DraftParticipant {
   weight?: number;
   beltLevel: CommonModels.BeltEnum;
   categoryIds: string[];
+  /** Server user id when this person was loaded for continue. */
+  userId?: string;
 }
 
 export type ParticipantAttributes = Pick<

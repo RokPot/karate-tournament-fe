@@ -245,6 +245,12 @@
       "category": "By category",
       "participants": "By participant"
     },
+    "search": {
+      "submissions": "Search submissions",
+      "category": "Search categories",
+      "participants": "Search participants",
+      "noMatches": "No matches."
+    },
     "submissions": {
       "empty": "No submissions yet. Older registrations without a submission appear under By category and By participant.",
       "club": "Club",
@@ -434,7 +440,39 @@
         "participant": "Participant",
         "category": "Category",
         "error": "Error",
-        "startOver": "Register more participants"
+        "startOver": "Register more participants",
+        "edit": "Edit this registration"
+      },
+      "continue": {
+        "or": "or",
+        "openExisting": "Continue with an existing submission",
+        "check": "Check for submissions",
+        "notFound": "No registration found for this email and club.",
+        "found": "You already registered for this tournament on {{date}}. Continue editing?",
+        "foundNoDate": "You already registered for this tournament. Continue editing?",
+        "continueEditing": "Continue editing",
+        "otpHint": "We sent a 6-digit code to {{email}}. Enter it to continue.",
+        "otpLabel": "Code",
+        "verify": "Verify code",
+        "verifying": "Verifying…",
+        "resend": "Resend code",
+        "debugCode": "Mail is off in this environment. The code is {{code}}.",
+        "rateLimit": "Please wait about a minute before requesting another code.",
+        "invalidCode": "That code is invalid or expired.",
+        "sessionExpired": "Your session expired. We sent a new code.",
+        "conflict": "This registration was updated in another tab. Reload the current list?",
+        "reload": "Reload",
+        "replaceDraft": "You have an unsaved registration on this device. Replace it with the saved roster?",
+        "replace": "Replace",
+        "keep": "Keep unsaved",
+        "save": "Save changes",
+        "saving": "Saving…",
+        "loading": "Loading your registration…",
+        "savedTitle": "Registration updated",
+        "savedBody": "Your changes are saved.",
+        "savedFees": "Current fees: {{total}} €",
+        "editAgain": "Edit again",
+        "done": "Done"
       }
     }
   },

@@ -13,6 +13,7 @@ interface RegistrationResultsProps {
   participants: DraftParticipant[];
   categories: CommonModels.CategoryResponseDto[];
   onStartOver: () => void;
+  onEdit?: () => void;
 }
 
 export function RegistrationResults({
@@ -20,6 +21,7 @@ export function RegistrationResults({
   participants,
   categories,
   onStartOver,
+  onEdit,
 }: RegistrationResultsProps) {
   const { t } = useTranslation();
 
@@ -63,9 +65,16 @@ export function RegistrationResults({
         })}
       </div>
 
-      <Button variant="contained" onClick={onStartOver}>
-        {t("registrations.public.results.startOver")}
-      </Button>
+      <div className="flex flex-row flex-wrap justify-center gap-3">
+        {onEdit && (
+          <Button variant="contained" onClick={onEdit}>
+            {t("registrations.public.results.edit")}
+          </Button>
+        )}
+        <Button variant={onEdit ? "outlined" : "contained"} onClick={onStartOver}>
+          {t("registrations.public.results.startOver")}
+        </Button>
+      </div>
     </div>
   );
 }

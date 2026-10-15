@@ -50,13 +50,18 @@ export function classifyTeamMember(
   return alreadyUsed ? "reusable" : "unused";
 }
 
+const TEAM_DISCIPLINES = new Set([
+  "kata-team",
+  "kumite-team",
+  "yako-soku-kumite",
+]);
+
 export function isTeamCategory(category: {
   discipline: string;
   teamSize?: number | null;
 }): boolean {
   return (
-    (category.discipline === "kata-team" ||
-      category.discipline === "kumite-team") &&
+    TEAM_DISCIPLINES.has(category.discipline) &&
     category.teamSize != null &&
     category.teamSize > 0
   );

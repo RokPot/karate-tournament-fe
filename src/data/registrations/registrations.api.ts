@@ -33,6 +33,54 @@ export namespace RegistrationsApi {
     );
   };
 
+  export const lookupRoster = (data: RegistrationsModels.RosterIdentityDto) => {
+    return AppRestClient.post(
+      { resSchema: RegistrationsModels.RosterLookupResponseDtoSchema },
+      `/registrations/public/rosters/lookup`,
+      data,
+    );
+  };
+
+  export const requestRosterOtp = (
+    data: RegistrationsModels.RosterOtpRequestDto,
+  ) => {
+    return AppRestClient.post(
+      { resSchema: RegistrationsModels.RosterOtpResponseDtoSchema },
+      `/registrations/public/rosters/otp`,
+      data,
+    );
+  };
+
+  export const verifyRosterOtp = (
+    data: RegistrationsModels.RosterOtpVerifyDto,
+  ) => {
+    return AppRestClient.post(
+      { resSchema: RegistrationsModels.RosterOtpVerifyResponseDtoSchema },
+      `/registrations/public/rosters/otp/verify`,
+      data,
+    );
+  };
+
+  export const getCurrentRoster = (accessToken: string) => {
+    return AppRestClient.get(
+      { resSchema: RegistrationsModels.RosterResponseDtoSchema },
+      `/registrations/public/rosters/current`,
+      {
+        params: {
+          accessToken,
+        },
+      },
+    );
+  };
+
+  export const putCurrentRoster = (data: RegistrationsModels.RosterPutDto) => {
+    return AppRestClient.put(
+      { resSchema: RegistrationsModels.RosterResponseDtoSchema },
+      `/registrations/public/rosters/current`,
+      data,
+    );
+  };
+
   export const getPublicSuitableCategories = (
     tournamentId: string,
     beltLevel: RegistrationsModels.GetPublicSuitableCategoriesBeltLevelParam,

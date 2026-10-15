@@ -11,6 +11,7 @@ import { DateUtils } from "@/util/date.utils";
 
 type RegistrationSubmissionsListProps = {
   tournamentId: string;
+  query: string;
 };
 
 const formatEuro = (amount: number) =>
@@ -19,8 +20,29 @@ const formatEuro = (amount: number) =>
     maximumFractionDigits: 2,
   })} €`;
 
+const submissionHaystack = (
+  group: RegistrationsModels.RegistrationSubmissionGroupDto,
+) =>
+  [
+    group.clubName,
+    group.firstName,
+    group.lastName,
+    group.email,
+    ...group.submissions.flatMap((send) =>
+      send.participants.flatMap((participant) => [
+        participant.firstName,
+        participant.lastName,
+        ...participant.categories.map((category) => category.name),
+      ]),
+    ),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
 export const RegistrationSubmissionsList = ({
   tournamentId,
+  query,
 }: RegistrationSubmissionsListProps) => {
   const { t } = useTranslation();
   const { data, isLoading, error, refetch } =
@@ -42,6 +64,10 @@ export const RegistrationSubmissionsList = ({
   }
 
   const groups = data ?? [];
+  const needle = query.trim().toLowerCase();
+  const visibleGroups = needle
+    ? groups.filter((group) => submissionHaystack(group).includes(needle))
+    : groups;
 
   if (groups.length === 0) {
     return (
@@ -53,9 +79,19 @@ export const RegistrationSubmissionsList = ({
     );
   }
 
+  if (visibleGroups.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 rounded-xs border border-secondary-300 bg-secondary-200 p-10">
+        <Typography size="body-paragraph-lg">
+          {t("registrations.search.noMatches")}
+        </Typography>
+      </div>
+    );
+  }
+
   return (
     <div className="overflow-hidden rounded-xs border border-secondary-300 bg-secondary-200">
-      {groups.map((group) => {
+      {visibleGroups.map((group) => {
         const contactName = [group.firstName, group.lastName]
           .filter(Boolean)
           .join(" ");

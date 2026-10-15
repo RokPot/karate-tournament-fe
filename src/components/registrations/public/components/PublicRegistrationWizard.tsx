@@ -1,20 +1,20 @@
+import { Button } from "@mui/material";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Typography } from "@/components/ui/text/Typography/Typography";
+import { RegistrationsModels } from "@/data/registrations/registrations.models";
 
 import { isSingleAthleteMode } from "../constants";
 import { useCategoryAssignments } from "../hooks/useCategoryAssignments";
+import { useContinueRegistration } from "../hooks/useContinueRegistration";
 import type { UseRegistrationDraftReturn } from "../hooks/useRegistrationDraft";
 import { usePublicRegistrationSubmit } from "../hooks/usePublicRegistrationSubmit";
 import { useSeedClubParticipants } from "../hooks/useSeedClubParticipants";
 import { useSuitableParticipantsByCategory } from "../hooks/useSuitableParticipantsByCategory";
 import { useTournamentCategories } from "../hooks/useTournamentCategories";
-import type {
-  RegistrantMode,
-  RegistrationFlowStep,
-} from "../types";
+import type { RegistrantMode, RegistrationFlowStep } from "../types";
 import { canAdvanceFromStep } from "../utils/registrationValidation";
 import {
   progressIndexForStep,
@@ -24,8 +24,10 @@ import {
 import { CategoryAssignmentStep } from "./categories/CategoryAssignmentStep";
 import type { CoachDetailsFormHandle } from "./coach/CoachDetailsForm";
 import { CoachDetailsStep } from "./coach/CoachDetailsStep";
+import { ContinueRosterPanel } from "./coach/ContinueRosterPanel";
 import { ParticipantsStep } from "./participants/ParticipantsStep";
 import { RegistrationResults } from "./results/RegistrationResults";
+import { RosterSavedResults } from "./results/RosterSavedResults";
 import { WizardProgress } from "./WizardProgress";
 import { WizardStepNav } from "./WizardStepNav";
 
@@ -45,6 +47,8 @@ export function PublicRegistrationWizard({
   const { t } = useTranslation();
   const router = useRouter();
   const contactFormRef = useRef<CoachDetailsFormHandle>(null);
+  const [savedRoster, setSavedRoster] =
+    useState<RegistrationsModels.RosterResponseDto | null>(null);
 
   const {
     contactDetails,
@@ -54,13 +58,23 @@ export function PublicRegistrationWizard({
     clearDraft,
     clearStoredDraft,
     persistMode,
+    replaceParticipants,
+    replaceTeams,
   } = draftBag;
+
+  const continueFlow = useContinueRegistration(tournamentId, {
+    onCommit: (mapped) => {
+      setContactDetails(mapped.coach);
+      replaceParticipants(mapped.participants);
+      replaceTeams(mapped.teams);
+    },
+  });
 
   const singleAthlete = isSingleAthleteMode(registrantMode);
   const maxParticipants = singleAthlete ? 1 : undefined;
 
   const { seededCount, resetSeed } = useSeedClubParticipants(draft, {
-    enabled: !singleAthlete,
+    enabled: !singleAthlete && !continueFlow.blocksClubSeed,
   });
 
   const formStep = wizardStepForFlowStep(step);
@@ -90,6 +104,8 @@ export function PublicRegistrationWizard({
     t("registrations.public.intro.stepper.review"),
   ];
 
+  const isWorking = submitState.isSubmitting || continueFlow.isBusy;
+
   const handleNext = async () => {
     if (step === "contact") {
       const contact = await contactFormRef.current?.submit();
@@ -97,6 +113,12 @@ export function PublicRegistrationWizard({
         return;
       }
       setContactDetails(contact);
+      const next = continueFlow.beginNewRegistration(contact);
+      if (next.resetDraft) {
+        replaceParticipants([]);
+        replaceTeams([]);
+        resetSeed();
+      }
       void goToStep("participants");
       return;
     }
@@ -111,6 +133,7 @@ export function PublicRegistrationWizard({
 
   const handleBack = () => {
     if (step === "participants") {
+      continueFlow.showForm();
       void goToStep("contact");
       return;
     }
@@ -119,11 +142,26 @@ export function PublicRegistrationWizard({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!contactDetails) {
       return;
     }
     if (!canAdvanceFromStep("categories", draft.participants)) {
+      return;
+    }
+    if (continueFlow.isContinuing) {
+      const result = await continueFlow.save({
+        coach: contactDetails,
+        participants: draft.participants,
+        teams: teamsDraft.teams,
+        categories,
+      });
+      if (result.ok) {
+        setSavedRoster(result.roster);
+        void goToStep("results");
+      } else if (result.reason === "expired") {
+        void goToStep("contact");
+      }
       return;
     }
     submitState.submit(
@@ -138,6 +176,8 @@ export function PublicRegistrationWizard({
     clearDraft();
     resetSeed();
     submitState.resetResults();
+    continueFlow.resetContinue();
+    setSavedRoster(null);
     persistMode(null);
     void router.replace(
       {
@@ -149,6 +189,28 @@ export function PublicRegistrationWizard({
     );
   };
 
+  const handleEditSubmitted = () => {
+    if (!contactDetails) {
+      return;
+    }
+    submitState.resetResults();
+    void continueFlow.startEdit(contactDetails);
+    void goToStep("contact");
+  };
+
+  if (step === "results" && savedRoster) {
+    return (
+      <RosterSavedResults
+        roster={savedRoster}
+        onEdit={() => {
+          setSavedRoster(null);
+          void goToStep("participants");
+        }}
+        onDone={handleStartOver}
+      />
+    );
+  }
+
   if (step === "results" && submitState.results) {
     return (
       <RegistrationResults
@@ -156,6 +218,7 @@ export function PublicRegistrationWizard({
         participants={draft.participants}
         categories={categories}
         onStartOver={handleStartOver}
+        onEdit={contactDetails ? handleEditSubmitted : undefined}
       />
     );
   }
@@ -179,6 +242,12 @@ export function PublicRegistrationWizard({
 
   const isFirstStep = step === "contact";
   const showStepNav = step === "contact" || step === "participants";
+  const saveLabel = continueFlow.isContinuing
+    ? t("registrations.public.continue.save")
+    : t("registrations.public.submit");
+  const savingLabel = continueFlow.isContinuing
+    ? t("registrations.public.continue.saving")
+    : t("registrations.public.submitting");
 
   return (
     <div className="flex flex-1 flex-col">
@@ -187,13 +256,72 @@ export function PublicRegistrationWizard({
         labels={progressLabels}
       />
 
+      {continueFlow.conflictRoster && (
+        <div className="mx-6 mt-4 flex flex-col gap-3 rounded-lg border border-secondary-300 bg-secondary-75 p-4 md:mx-10 lg:mx-20">
+          <Typography size="body-paragraph-m">
+            {t("registrations.public.continue.conflict")}
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={continueFlow.acceptConflict}
+            disabled={continueFlow.isBusy}
+          >
+            {t("registrations.public.continue.reload")}
+          </Button>
+        </div>
+      )}
+
       <div className="flex flex-1 flex-col md:px-10 lg:px-20">
         {step === "contact" && (
           <CoachDetailsStep
             formRef={contactFormRef}
-            initialValues={contactDetails}
-            disabled={submitState.isSubmitting}
-          />
+            initialValues={contactDetails ?? continueFlow.coach}
+            disabled={isWorking}
+          >
+            <ContinueRosterPanel
+              phase={continueFlow.phase}
+              email={continueFlow.coach?.email ?? contactDetails?.email}
+              clubName={continueFlow.coach?.clubName ?? contactDetails?.clubName}
+              foundAt={continueFlow.foundAt}
+              debugCode={continueFlow.debugCode}
+              statusMessage={continueFlow.statusMessage}
+              replacePrompt={continueFlow.replacePrompt}
+              isBusy={continueFlow.isBusy}
+              onCheck={(values) => {
+                void continueFlow
+                  .checkExisting({
+                    email: values.email,
+                    firstName: contactDetails?.firstName ?? "",
+                    lastName: contactDetails?.lastName ?? "",
+                    clubName: values.clubName,
+                  })
+                  .then((route) => {
+                    if (route.type === "resume") {
+                      void goToStep("participants");
+                    }
+                  });
+              }}
+              onContinue={() => {
+                void continueFlow.beginContinue();
+              }}
+              onVerify={(code) => {
+                void continueFlow.verifyCode(code).then((route) => {
+                  if (route === "applied") {
+                    void goToStep("participants");
+                  }
+                });
+              }}
+              onResend={() => {
+                void continueFlow.beginContinue();
+              }}
+              onConfirmReplace={() => {
+                if (continueFlow.confirmReplace()) {
+                  void goToStep("participants");
+                }
+              }}
+              onCancelReplace={continueFlow.cancelReplace}
+            />
+          </CoachDetailsStep>
         )}
         {step === "participants" && (
           <ParticipantsStep
@@ -215,13 +343,11 @@ export function PublicRegistrationWizard({
             onEnterReview={() => void goToStep("review")}
             onLeaveReview={() => void goToStep("categories")}
             onWizardBack={() => void goToStep("participants")}
-            onWizardNext={handleSubmit}
-            overviewNextLabel={
-              submitState.isSubmitting
-                ? t("registrations.public.submitting")
-                : t("registrations.public.submit")
-            }
-            isSubmitting={submitState.isSubmitting}
+            onWizardNext={() => {
+              void handleSubmit();
+            }}
+            overviewNextLabel={isWorking ? savingLabel : saveLabel}
+            isSubmitting={isWorking}
           />
         )}
 
@@ -241,12 +367,17 @@ export function PublicRegistrationWizard({
               isLastFormStep={false}
               canGoNext={
                 step === "contact"
-                  ? true
+                  ? !continueFlow.isBusy
                   : canAdvanceFromStep("participants", draft.participants)
               }
-              isSubmitting={submitState.isSubmitting}
+              isSubmitting={isWorking}
               onBack={handleBack}
-              onNext={handleNext}
+              onNext={() => {
+                void handleNext();
+              }}
+              onSubmit={() => {
+                void handleSubmit();
+              }}
             />
           </>
         )}

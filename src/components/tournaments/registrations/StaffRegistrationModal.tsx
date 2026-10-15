@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import { BeltLevelSelect } from "@/components/karate/BeltLevelSelect";
+import { isTeamCategory } from "@/components/registrations/public/utils/teamOverlap";
 import CustomDialog from "@/components/ui/overlays/CustomDialog";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { CommonModels } from "@/data/common/common.models";
@@ -104,15 +105,7 @@ export const StaffRegistrationModal = ({
 
   const selectableCategories = useMemo(
     () =>
-      categories.filter(
-        (category) =>
-          !(
-            (category.discipline === "kata-team" ||
-              category.discipline === "kumite-team") &&
-            category.teamSize != null &&
-            category.teamSize > 0
-          ),
-      ),
+      categories.filter((category) => !isTeamCategory(category)),
     [categories],
   );
 

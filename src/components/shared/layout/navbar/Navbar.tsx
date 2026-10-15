@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, IconButton, Menu, MenuItem } from "@mui/material";
 import { cx } from "class-variance-authority";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import logo from "src/assets/images/logo-4.png";
@@ -27,6 +28,8 @@ export const Navbar = ({
   const { t } = useTranslation();
   const { useLogout, isLoggedIn } = AuthContext.useAuth();
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const { pathname } = useRouter();
+  const isRegistrationPage = pathname.includes("registration");
   const isProfileMenuOpen = Boolean(menuAnchorEl);
   const isDark = variant === "dark";
   const handleProfileMenuOpen = (
@@ -65,7 +68,7 @@ export const Navbar = ({
       )}
 
       <div className="ml-auto flex items-center gap-1">
-        {isLoggedIn && (
+        {isLoggedIn && isRegistrationPage && (
           <IconButton
             component={Link}
             href={RouteConfig.dashboard}
