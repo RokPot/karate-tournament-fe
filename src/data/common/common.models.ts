@@ -277,6 +277,8 @@ export namespace CommonModels {
    * @property { string } beltMax Maximum belt level (null = no upper limit). Example: `2-dan`
    * @property { number } teamSize Main team roster size (null = not applicable). Example: `3`
    * @property { number } teamReservesSize Number of reserve participants allowed (null = not applicable). Example: `1`
+   * @property { string[] } feederCategoryIds Other category IDs that may supply limited feeder athletes. Empty when none are configured.. Example: ``
+   * @property { number } feederParticipantLimit Maximum feeder-only athletes on one team roster (starters and reserves). Null or 0 = none. Using zero feeder athletes is always allowed.. Example: `1`
    * @property { string } clubId Owning club ID (null = global catalog). Example: `123e4567-e89b-12d3-a456-426614174000`
    * @property { string } createdAt Creation timestamp. Example: `2024-01-01T00:00:00.000Z`
    * @property { string } updatedAt Last update timestamp. Example: `2024-01-01T00:00:00.000Z`
@@ -295,6 +297,8 @@ export namespace CommonModels {
     beltMax: CommonModels.BeltEnumSchema.nullish(),
     teamSize: z.number().nullish(),
     teamReservesSize: z.number().nullish(),
+    feederCategoryIds: z.array(z.string()),
+    feederParticipantLimit: z.number().nullish(),
     clubId: z.string().nullish(),
     createdAt: z.string().datetime({ offset: true }),
     updatedAt: z.string().datetime({ offset: true }),

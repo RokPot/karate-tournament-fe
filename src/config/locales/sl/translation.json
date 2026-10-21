@@ -201,6 +201,9 @@
       "other": "Drugo",
       "teamSize": "Velikost ekipe",
       "teamReservesSize": "Rezervna mesta",
+      "allowOtherCategories": "Dovoli tekmovalce iz drugih kategorij",
+      "otherCategories": "Druge kategorije",
+      "otherCategorySeats": "Koliko jih lahko pride iz teh kategorij",
       "teamReservesShort": "rez.",
       "validation": {
         "genderRequired": "Spol je obvezen",
@@ -212,6 +215,8 @@
         "beltMaxRequired": "Najvišji pas je obvezen",
         "teamSizeRequired": "Velikost ekipe je obvezna",
         "teamReservesSizeRequired": "Število rezervnih mest je obvezno",
+        "otherCategoriesRequired": "Izberi vsaj eno drugo kategorijo",
+        "otherCategorySeatsRequired": "Vnesi, koliko tekmovalcev iz teh kategorij lahko pride",
         "subDisciplineRequired": "Poddisciplina je obvezna"
       }
     },
@@ -381,6 +386,8 @@
         "formedTeams": "Ekipe",
         "currentTeam": "Nova ekipa",
         "eligible": "Ustrezni udeleženci",
+        "otherEligible": "Iz drugih kategorij",
+        "otherEligibleHint": "Največ {{count}} v tej ekipi",
         "addTeam": "Dodaj ekipo",
         "starters": "Člani",
         "reserves": "Rezerve",

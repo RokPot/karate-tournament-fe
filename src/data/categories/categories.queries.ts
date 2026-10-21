@@ -21,7 +21,7 @@ export namespace CategoriesQueries {
   /**
    * Mutation `useCreate`
    * @summary Create a new category
-   * @description Creates a new tournament category. Only name and discipline are required; subDiscipline, gender, age, weight, belt limits, and team size (teamSize, teamReservesSize) are optional. clubId is optional for admins (null &#x3D; global) and defaults to the caller club for club owners.
+   * @description Creates a new tournament category. Only name and discipline are required; subDiscipline, gender, age, weight, belt limits, and team size (teamSize, teamReservesSize) are optional. Team categories may also set feederCategoryIds and feederParticipantLimit. clubId is optional for admins (null &#x3D; global) and defaults to the caller club for club owners.
    * @param { CategoriesModels.CreateCategoryDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<CommonModels.CategoryResponseDto> } Category created successfully

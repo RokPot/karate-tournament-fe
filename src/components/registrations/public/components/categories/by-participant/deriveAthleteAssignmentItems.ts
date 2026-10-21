@@ -53,6 +53,7 @@ export function deriveAthleteAssignmentItems(
         byCategoryId.set(category.id, {
           category,
           participants: [suitable],
+          otherEligibleParticipants: [],
         });
       }
     });

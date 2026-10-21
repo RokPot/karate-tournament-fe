@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import type { CategoryFormProfile } from "@/components/categories/category-form-profiles";
 import { CategoriesModels } from "@/data/categories/categories.models";
+import { CommonModels } from "@/data/common/common.models";
 import { SubDisciplineSelect } from "@/components/karate/SubDisciplineSelect";
 import { FieldErrors, UseFormRegister, UseFormSetValue, UseFormWatch } from "react-hook-form";
 import { CategoryAgeFields } from "./CategoryAgeFields";
@@ -15,6 +16,10 @@ interface CategoryFieldsByDisciplineProps {
   errors: FieldErrors<CategoriesModels.CreateCategoryDto>;
   setValue: UseFormSetValue<CategoriesModels.CreateCategoryDto>;
   watch: UseFormWatch<CategoriesModels.CreateCategoryDto>;
+  otherCategoryOptions: CommonModels.CategoryResponseDto[];
+  excludeCategoryId?: string;
+  allowOtherCategories: boolean;
+  onAllowOtherCategoriesChange: (allowed: boolean) => void;
 }
 
 export function CategoryFieldsByDiscipline({
@@ -23,6 +28,10 @@ export function CategoryFieldsByDiscipline({
   errors,
   setValue,
   watch,
+  otherCategoryOptions,
+  excludeCategoryId,
+  allowOtherCategories,
+  onAllowOtherCategoriesChange,
 }: CategoryFieldsByDisciplineProps) {
   const { t } = useTranslation();
   const subDiscipline = watch("subDiscipline");
@@ -69,6 +78,12 @@ export function CategoryFieldsByDiscipline({
         <CategoryTeamFields
           register={register}
           errors={errors}
+          setValue={setValue}
+          watch={watch}
+          otherCategoryOptions={otherCategoryOptions}
+          excludeCategoryId={excludeCategoryId}
+          allowOtherCategories={allowOtherCategories}
+          onAllowOtherCategoriesChange={onAllowOtherCategoriesChange}
           required={profile.require.team}
         />
       )}

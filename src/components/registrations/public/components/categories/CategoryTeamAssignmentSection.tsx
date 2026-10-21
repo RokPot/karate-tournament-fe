@@ -96,6 +96,30 @@ export function CategoryTeamAssignmentSection({
     });
   }, [draftParticipants, item.participants]);
 
+  const otherEligibleParticipants = useMemo(() => {
+    return item.otherEligibleParticipants.flatMap((suitable) => {
+      const draft = draftParticipants[suitable.participantIndex];
+      return draft ? [draft] : [];
+    });
+  }, [draftParticipants, item.otherEligibleParticipants]);
+
+  const otherOnlyParticipants = useMemo(() => {
+    const mainIds = new Set(
+      eligibleParticipants.map((participant) => participant.clientId),
+    );
+    return otherEligibleParticipants.filter(
+      (participant) => !mainIds.has(participant.clientId),
+    );
+  }, [eligibleParticipants, otherEligibleParticipants]);
+
+  const otherEligibleIds = useMemo(
+    () => new Set(otherOnlyParticipants.map((participant) => participant.clientId)),
+    [otherOnlyParticipants],
+  );
+  const otherSeatLimit = category.feederParticipantLimit ?? 0;
+  const showOtherList =
+    (category.feederCategoryIds?.length ?? 0) > 0 && otherSeatLimit > 0;
+
   const activeTeam =
     editorTeams.find((team) => team.localId === activeTeamId) ?? editorTeams[0];
 
@@ -160,6 +184,12 @@ export function CategoryTeamAssignmentSection({
     }
     const currentMembers = [...activeTeam.starterIds, ...activeTeam.reserveIds];
     if (currentMembers.includes(clientId)) {
+      return;
+    }
+    const otherSeatsUsed = currentMembers.filter((id) =>
+      otherEligibleIds.has(id),
+    ).length;
+    if (otherEligibleIds.has(clientId) && otherSeatsUsed >= otherSeatLimit) {
       return;
     }
     if (
@@ -227,6 +257,10 @@ export function CategoryTeamAssignmentSection({
     !!activeTeam &&
     activeTeam.starterIds.length === teamSize &&
     isDuplicateTeam(activeMembers, activeOthers);
+  const activeOtherSeatsUsed = activeMembers.filter((id) =>
+    otherEligibleIds.has(id),
+  ).length;
+  const otherSeatsFull = activeOtherSeatsUsed >= otherSeatLimit;
   const activeSlotsFull =
     !!activeTeam &&
     activeTeam.starterIds.length >= teamSize &&
@@ -336,6 +370,68 @@ export function CategoryTeamAssignmentSection({
                 );
               })}
             </div>
+          )}
+          {showOtherList && (
+            <>
+              <Typography
+                size="body-paragraph-s"
+                variant="prominent-2"
+                className="mt-3"
+              >
+                {t("registrations.public.teams.otherEligible")}
+              </Typography>
+              <Typography size="body-paragraph-xs" className="text-neutral-200">
+                {t("registrations.public.teams.otherEligibleHint", {
+                  count: otherSeatLimit,
+                })}
+              </Typography>
+              {otherOnlyParticipants.length === 0 ? (
+                <Typography size="body-paragraph-s" className="text-neutral-200">
+                  {t("registrations.public.noEligibleParticipantsForCategory")}
+                </Typography>
+              ) : (
+                <div className="flex min-h-0 flex-col gap-1 overflow-y-auto">
+                  {otherOnlyParticipants.map((participant) => {
+                    const availability = classifyTeamMember(
+                      participant.clientId,
+                      activeMembers,
+                      activeOthers,
+                    );
+                    const disabled =
+                      availability === "blocked" ||
+                      activeSlotsFull ||
+                      (otherSeatsFull &&
+                        !activeMembers.includes(participant.clientId));
+                    return (
+                      <button
+                        key={participant.clientId}
+                        type="button"
+                        disabled={disabled}
+                        onClick={() => handleSelect(participant.clientId)}
+                        className="flex cursor-pointer flex-row items-center justify-between rounded-m px-2 py-1 text-left hover:bg-secondary-75 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        <Typography size="body-paragraph-m">
+                          {getParticipantLabel(
+                            participant,
+                            draftParticipants.indexOf(participant),
+                          )}
+                        </Typography>
+                        <Typography
+                          size="body-paragraph-xs"
+                          className="text-neutral-200"
+                        >
+                          {availability === "unused"
+                            ? t("registrations.public.teams.available")
+                            : availability === "reusable"
+                              ? t("registrations.public.teams.reusable")
+                              : t("registrations.public.teams.blocked")}
+                        </Typography>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

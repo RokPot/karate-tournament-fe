@@ -47,7 +47,11 @@ export function useSuitableParticipantsByCategory({
       return [];
     }
 
-    return (items ?? []).filter((item) => item.participants.length > 0);
+    return (items ?? []).filter(
+      (item) =>
+        item.participants.length > 0 ||
+        item.otherEligibleParticipants.length > 0,
+    );
   }, [canFetch, items]);
 
   return {

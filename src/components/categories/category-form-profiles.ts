@@ -96,6 +96,7 @@ export const categoryFormProfiles: Record<CommonModels.DisciplineEnum, CategoryF
 
 export type CategoryFormProfileOptions = {
   unrestrictedKata?: boolean;
+  allowOtherCategories?: boolean;
 };
 
 function isOpenAgeBound(value: number | null | undefined): boolean {
@@ -155,7 +156,9 @@ export type CategoryFormValidationError = {
   message: string;
 };
 
-function isMissingNumber(value: number | null | undefined): boolean {
+function isMissingNumber(
+  value: number | null | undefined,
+): value is null | undefined {
   return value === undefined || value === null;
 }
 
@@ -244,6 +247,36 @@ export function validateCategoryForm(
   return errors;
 }
 
+export function otherCategorySeatErrors(
+  data: CategoryFormValues,
+  allowOtherCategories: boolean,
+): CategoryFormValidationError[] {
+  const profile = getCategoryFormProfile(data.discipline);
+  if (
+    !allowOtherCategories ||
+    !profile?.show.team ||
+    isMissingNumber(data.teamSize) ||
+    data.teamSize <= 0
+  ) {
+    return [];
+  }
+
+  const errors: CategoryFormValidationError[] = [];
+  if (!data.feederCategoryIds?.length) {
+    errors.push({
+      path: "feederCategoryIds",
+      message: "otherCategoriesRequired",
+    });
+  }
+  if (isMissingNumber(data.feederParticipantLimit) || data.feederParticipantLimit < 1) {
+    errors.push({
+      path: "feederParticipantLimit",
+      message: "otherCategorySeatsRequired",
+    });
+  }
+  return errors;
+}
+
 export function clearHiddenCategoryFields(
   discipline: CommonModels.DisciplineEnum,
   setValue: UseFormSetValue<CategoryFormValues>,
@@ -265,6 +298,8 @@ export function clearHiddenCategoryFields(
   if (!profile.show.team) {
     setValue("teamSize", undefined);
     setValue("teamReservesSize", undefined);
+    setValue("feederCategoryIds", []);
+    setValue("feederParticipantLimit", null);
   }
   if (!profile.show.subDiscipline) {
     setValue("subDiscipline", null);
@@ -277,6 +312,9 @@ function toNormalizedCategoryPayload(
 ): CategoriesModels.CreateCategoryDto {
   const { discipline } = data;
   const profile = getCategoryFormProfile(discipline, options) ?? categoryFormProfiles[discipline];
+  const teamSize = profile.show.team ? (data.teamSize ?? null) : null;
+  const allowOthers =
+    options?.allowOtherCategories === true && teamSize != null && teamSize > 0;
 
   return {
     name: data.name,
@@ -289,8 +327,12 @@ function toNormalizedCategoryPayload(
     weightMax: profile.show.weight ? (data.weightMax ?? null) : null,
     beltMin: profile.show.belt ? (data.beltMin ?? null) : null,
     beltMax: profile.show.belt ? (data.beltMax ?? null) : null,
-    teamSize: profile.show.team ? (data.teamSize ?? null) : null,
+    teamSize,
     teamReservesSize: profile.show.team ? (data.teamReservesSize ?? null) : null,
+    feederCategoryIds: allowOthers ? (data.feederCategoryIds ?? []) : [],
+    feederParticipantLimit: allowOthers
+      ? (data.feederParticipantLimit ?? null)
+      : null,
   };
 }
 
@@ -310,6 +352,8 @@ export function mapCategoryToFormValues(
     beltMax: category.beltMax ?? null,
     teamSize: category.teamSize ?? undefined,
     teamReservesSize: category.teamReservesSize ?? undefined,
+    feederCategoryIds: category.feederCategoryIds ?? [],
+    feederParticipantLimit: category.feederParticipantLimit ?? null,
   };
 }
 

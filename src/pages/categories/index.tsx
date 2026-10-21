@@ -174,6 +174,7 @@ const CategoriesPage = () => {
         category={
           categories?.find((category) => category.id === editingCategoryId)
         }
+        otherCategoryOptions={categories ?? []}
         onClose={handleCloseCategoryModal}
       />
     </div>

@@ -188,6 +188,9 @@
       "other": "Other",
       "teamSize": "Team size",
       "teamReservesSize": "Reserve slots",
+      "allowOtherCategories": "Allow athletes from other categories",
+      "otherCategories": "Other categories",
+      "otherCategorySeats": "How many can join from those categories",
       "teamReservesShort": "res.",
       "validation": {
         "genderRequired": "Gender is required",
@@ -199,6 +202,8 @@
         "beltMaxRequired": "Maximum belt is required",
         "teamSizeRequired": "Team size is required",
         "teamReservesSizeRequired": "Reserve slots is required",
+        "otherCategoriesRequired": "Select at least one other category",
+        "otherCategorySeatsRequired": "Enter how many athletes from those categories can join",
         "subDisciplineRequired": "Sub-discipline is required"
       }
     },
@@ -380,6 +385,8 @@
         "formedTeams": "Teams",
         "currentTeam": "New team",
         "eligible": "Eligible participants",
+        "otherEligible": "From other categories",
+        "otherEligibleHint": "Up to {{count}} on this team",
         "addTeam": "Add team",
         "starters": "Starters",
         "reserves": "Reserves",

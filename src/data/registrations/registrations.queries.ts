@@ -380,7 +380,7 @@ export namespace RegistrationsQueries {
   /**
    * Mutation `useGetSuitableParticipantsByCategory`
    * @summary Get suitable participants per category (public)
-   * @description Returns each tournament category with participants eligible for it (age, belt, gender when provided, and weight when provided). Weight is skipped for categories with no weight limits. Participants are matched by request array index via participantIndex.
+   * @description Returns each tournament category with participants eligible for it, plus otherEligibleParticipants who only fit a configured feeder category (team categories with a positive feeder limit). Weight is skipped for categories with no weight limits. Participants are matched by request array index via participantIndex.
    * @param { RegistrationsModels.BulkPublicSuitableCategoriesDto } mutation.data Body parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<RegistrationsModels.GetSuitableParticipantsByCategoryResponse> } Eligible participants per category

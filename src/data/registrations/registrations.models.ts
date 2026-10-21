@@ -195,10 +195,12 @@ export namespace RegistrationsModels {
    * @type { object }
    * @property { CommonModels.CategoryResponseDto } category Tournament category
    * @property { SuitableParticipantDto[] } participants Participants eligible for this category (empty if none match)
+   * @property { SuitableParticipantDto[] } otherEligibleParticipants Participants who do not fit this category but fit a configured feeder category. Empty unless this is a team category with feeder categories and a positive feederParticipantLimit. Not required on the roster.
    */
   export const CategorySuitableParticipantsItemDtoSchema = z.object({
     category: CommonModels.CategoryResponseDtoSchema,
     participants: z.array(SuitableParticipantDtoSchema),
+    otherEligibleParticipants: z.array(SuitableParticipantDtoSchema),
   });
   export type CategorySuitableParticipantsItemDto = z.infer<
     typeof CategorySuitableParticipantsItemDtoSchema

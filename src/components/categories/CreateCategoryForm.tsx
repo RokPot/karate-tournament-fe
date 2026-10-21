@@ -18,6 +18,7 @@ import {
   getCategoryFormProfile,
   isUnrestrictedKataCategory,
   mapCategoryToFormValues,
+  otherCategorySeatErrors,
   toCreateCategoryPayload,
   toUpdateCategoryPayload,
   validateCategoryForm,
@@ -38,6 +39,7 @@ interface IProps {
   open: boolean;
   mode?: "create" | "edit";
   initialCategory?: CommonModels.CategoryResponseDto | null;
+  otherCategoryOptions?: CommonModels.CategoryResponseDto[];
   onClose: (category?: CommonModels.CategoryResponseDto) => void;
 }
 
@@ -45,6 +47,7 @@ export const CreateCategoryForm = ({
   open,
   mode = "create",
   initialCategory,
+  otherCategoryOptions = [],
   onClose,
 }: IProps) => {
   const { successToast, errorToast } = useToast();
@@ -92,6 +95,7 @@ export const CreateCategoryForm = ({
   });
 
   const [isUnrestrictedKata, setIsUnrestrictedKata] = useState(false);
+  const [allowOtherCategories, setAllowOtherCategories] = useState(false);
   const discipline = watch("discipline");
   const unrestrictedKata =
     discipline === CommonModels.DisciplineEnum.kata && isUnrestrictedKata;
@@ -113,6 +117,14 @@ export const CreateCategoryForm = ({
     setIsUnrestrictedKata(
       Boolean(isEditMode && initialCategory && isUnrestrictedKataCategory(initialCategory)),
     );
+    setAllowOtherCategories(
+      Boolean(
+        isEditMode &&
+          initialCategory &&
+          ((initialCategory.feederCategoryIds?.length ?? 0) > 0 ||
+            (initialCategory.feederParticipantLimit ?? 0) > 0),
+      ),
+    );
   }, [initialCategory, isEditMode, open, reset]);
 
   useEffect(() => {
@@ -122,11 +134,19 @@ export const CreateCategoryForm = ({
   }, [discipline, setValue]);
 
   const onSubmit = (data: CategoriesModels.CreateCategoryDto) => {
-    const profileOptions = { unrestrictedKata };
-    const profileErrors = validateCategoryForm(data, profileOptions);
+    const profileOptions = { unrestrictedKata, allowOtherCategories };
+    const profileErrors = [
+      ...validateCategoryForm(data, profileOptions),
+      ...otherCategorySeatErrors(data, allowOtherCategories),
+    ];
     if (profileErrors.length > 0) {
       for (const error of profileErrors) {
-        setError(error.path, { message: error.message });
+        const message =
+          error.message === "otherCategoriesRequired" ||
+          error.message === "otherCategorySeatsRequired"
+            ? t(`categories.create.validation.${error.message}`)
+            : error.message;
+        setError(error.path, { message });
       }
       return;
     }
@@ -149,6 +169,7 @@ export const CreateCategoryForm = ({
   const handleClose = () => {
     reset();
     setIsUnrestrictedKata(false);
+    setAllowOtherCategories(false);
     onClose();
   };
 
@@ -213,6 +234,10 @@ export const CreateCategoryForm = ({
               errors={errors}
               setValue={setValue}
               watch={watch}
+              otherCategoryOptions={otherCategoryOptions}
+              excludeCategoryId={initialCategory?.id}
+              allowOtherCategories={allowOtherCategories}
+              onAllowOtherCategoriesChange={setAllowOtherCategories}
             />
           )}
         </DialogContent>

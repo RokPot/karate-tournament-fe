@@ -365,6 +365,7 @@ export const CategorySelectionPanel = ({
       </div>
       <CreateCategoryForm
         open={showNewCategoryForm}
+        otherCategoryOptions={selectedCategories}
         onClose={(newCategory) => {
           setShowNewCategoryForm(false);
           if (newCategory) {
