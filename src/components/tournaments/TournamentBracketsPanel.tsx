@@ -359,7 +359,7 @@ export const TournamentBracketsPanel = ({
         className="flex max-h-[40vh] w-full shrink-0 flex-col overflow-y-auto rounded-m border border-secondary-300 bg-secondary-200 t:max-h-none t:w-72"
         aria-label={t("tournaments.brackets.categoryRail")}
       >
-        <label className="flex cursor-pointer items-start gap-2 border-b border-secondary-100 px-4 py-3">
+        <label htmlFor="hideTooFew" className="flex cursor-pointer items-start gap-2 border-b border-secondary-100 px-4 py-3">
           <Checkbox
             size="small"
             checked={hideTooFew}
@@ -370,61 +370,69 @@ export const TournamentBracketsPanel = ({
             {t("tournaments.brackets.hideTooFew")}
           </Typography>
         </label>
-        {hideTooFew && !countsLoaded ? (
-          <div className="flex justify-center py-6">
+        {
+          hideTooFew && !countsLoaded && <div className="flex justify-center py-6">
             <Loader />
           </div>
-        ) : visibleCategories.length === 0 ? (
-          <Typography
-            size="body-paragraph-s"
-            className="px-4 py-3 text-neutral-200"
-          >
-            {t("tournaments.brackets.noEligibleCategories")}
-          </Typography>
-        ) : (
-          visibleCategories.map((category) => {
-            const isSelected = category.id === selectedCategoryId;
-            const status = getCategoryStatus(category.id);
-            const count = countsByCategoryId.get(category.id) ?? 0;
-            return (
-              <button
-                key={category.id}
-                type="button"
-                className={cx(
-                  "flex w-full flex-col gap-1 border-b border-secondary-100 px-4 py-3 text-left last:border-b-0",
-                  uiOutlineClass,
-                  isSelected
-                    ? "bg-secondary-100"
-                    : "hover:bg-neutral-50 cursor-pointer",
-                )}
-                onClick={() => setSelectedCategoryId(category.id)}
+        }
+        {
+          !(hideTooFew && !countsLoaded) && <>
+            {
+              visibleCategories.length === 0 && <Typography
+                size="body-paragraph-s"
+                className="px-4 py-3 text-neutral-200"
               >
-                <Typography
-                  size="body-paragraph-m"
-                  variant="prominent-2"
-                  as="span"
-                  className="truncate"
-                >
-                  {category.name}
-                </Typography>
-                <div className="flex flex-wrap items-center gap-1">
-                  <Typography
-                    size="body-paragraph-s"
-                    className="text-neutral-200"
-                    as="span"
+                {t("tournaments.brackets.noEligibleCategories")}
+              </Typography>
+            }
+            {
+              visibleCategories.length > 0 && visibleCategories.map((category) => {
+                const isSelected = category.id === selectedCategoryId;
+                const status = getCategoryStatus(category.id);
+                const count = countsByCategoryId.get(category.id) ?? 0;
+                return (
+                  <button
+                    key={category.id}
+                    type="button"
+                    className={cx(
+                      "flex w-full flex-col gap-1 border-b border-secondary-100 px-4 py-3 text-left last:border-b-0",
+                      uiOutlineClass,
+                      isSelected
+                        ? "bg-secondary-100"
+                        : "hover:bg-neutral-50 cursor-pointer",
+                    )}
+                    onClick={() => setSelectedCategoryId(category.id)}
                   >
-                    {t("tournaments.brackets.entries", { count })}
-                  </Typography>
-                  <Pill>
-                    <Typography size="body-paragraph-s" as="span">
-                      {t(`tournaments.brackets.status.${status}`)}
+                    <Typography
+                      size="body-paragraph-m"
+                      variant="prominent-2"
+                      as="span"
+                      className="truncate"
+                    >
+                      {category.name}
                     </Typography>
-                  </Pill>
-                </div>
-              </button>
-            );
-          })
-        )}
+                    <div className="flex flex-wrap items-center gap-1">
+                      <Typography
+                        size="body-paragraph-s"
+                        className="text-neutral-200"
+                        as="span"
+                      >
+                        {t("tournaments.brackets.entries", { count })}
+                      </Typography>
+                      <Pill>
+                        <Typography size="body-paragraph-s" as="span">
+                          {t(`tournaments.brackets.status.${status}`)}
+                        </Typography>
+                      </Pill>
+                    </div>
+                  </button>
+                );
+              })
+            }
+
+          </>
+        }
+
       </nav>
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
