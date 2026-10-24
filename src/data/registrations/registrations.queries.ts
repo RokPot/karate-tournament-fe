@@ -109,6 +109,34 @@ export namespace RegistrationsQueries {
   };
 
   /**
+   * Mutation `useCreateForStaff`
+   * @summary Add a participant to a category (staff)
+   * @description Admin or owner of the hosting club. Finds or creates the participant (by email when given, otherwise club + name + date of birth) and registers them in one individual category. Tournament must be approved or in progress. Team categories are rejected.
+   * @param { RegistrationsModels.CreateStaffRegistrationDto } mutation.data Body parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<RegistrationsModels.RegistrationResponseDto> } Registration created
+   * @statusCodes [201, 400, 401, 403, 404, 409]
+   */
+  export const useCreateForStaff = (
+    options?: AppMutationOptions<
+      typeof RegistrationsApi.createForStaff,
+      { data: RegistrationsModels.CreateStaffRegistrationDto }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ data }) => RegistrationsApi.createForStaff(data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
    * Mutation `useCreateWithUser`
    * @summary Create a registration with user information (public)
    * @description Creates a user from email/name and then creates a registration. This endpoint is public and does not require authentication.
@@ -577,6 +605,35 @@ export namespace RegistrationsQueries {
   };
 
   /**
+   * Mutation `useUpdateIdentity`
+   * @summary Edit the participant behind a registration (staff)
+   * @description Admin or owner of the hosting club. Updates the participant profile (name, gender, date of birth, weight, belt) so their other registrations stay consistent, and optionally this registration&#x27;s finalWeight. Every individual category the person is registered in for this tournament is re-checked; if any no longer fits the request is rejected and nothing changes. Tournament must be approved or in progress.
+   * @param { string } mutation.id Path parameter
+   * @param { RegistrationsModels.UpdateRegistrationIdentityDto } mutation.data Body parameter
+   * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
+   * @returns { UseMutationResult<RegistrationsModels.RegistrationResponseDto> } Registration updated
+   * @statusCodes [200, 400, 401, 403, 404]
+   */
+  export const useUpdateIdentity = (
+    options?: AppMutationOptions<
+      typeof RegistrationsApi.updateIdentity,
+      { id: string; data: RegistrationsModels.UpdateRegistrationIdentityDto }
+    > &
+      InvalidateQueryOptions,
+  ) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+      mutationFn: ({ id, data }) => RegistrationsApi.updateIdentity(id, data),
+      ...options,
+      onSuccess: (...args) => {
+        invalidateQueries(queryClient, moduleName, options);
+        options?.onSuccess?.(...args);
+      },
+    });
+  };
+
+  /**
    * Mutation `useUpdate`
    * @summary Update a registration
    * @description Updates category, final weight, and/or status. Admin, staff of the registering club, or staff of the hosting club. Tournament must be approved or in progress. Category schedule is not updated automatically.
@@ -608,7 +665,7 @@ export namespace RegistrationsQueries {
   /**
    * Mutation `useRemove`
    * @summary Delete a registration
-   * @description Removes a registration. Admin, staff of the registering club, or staff of the hosting club. Tournament must be approved or in progress. Team roster rows for this registration are removed. Category schedule is not updated automatically.
+   * @description Removes a registration. Admin or owner of the hosting club. Tournament must be approved or in progress. Team roster rows for this registration are removed. Category schedule is not updated automatically.
    * @param { string } mutation.id Path parameter
    * @param { AppMutationOptions & InvalidateQueryOptions } options Mutation options
    * @returns { UseMutationResult<void> } Registration deleted

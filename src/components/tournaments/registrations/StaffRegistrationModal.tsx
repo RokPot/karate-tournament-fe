@@ -21,8 +21,17 @@ import { isTeamCategory } from "@/components/registrations/public/utils/teamOver
 import CustomDialog from "@/components/ui/overlays/CustomDialog";
 import { Typography } from "@/components/ui/text/Typography/Typography";
 import { CommonModels } from "@/data/common/common.models";
-import type { StaffParticipantPayload } from "@/data/registrations/registrations.staff";
 import { DateUtils } from "@/util/date.utils";
+
+/** Participant fields collected by the staff form. */
+export type StaffParticipantPayload = {
+  firstName: string;
+  lastName: string;
+  gender: CommonModels.ParticipantGenderEnum;
+  dateOfBirth: string;
+  weight: number;
+  beltLevel: CommonModels.BeltEnum;
+};
 
 const currentYear = new Date().getFullYear();
 const minBirthYear = 1920;

@@ -117,6 +117,11 @@ export class RestClient {
         res = await this.client[method](url, config);
       }
 
+      // a Blob (file download) has no enumerable keys, so it must skip the empty check
+      if (typeof Blob !== "undefined" && (res as unknown) instanceof Blob) {
+        return requestInfo.resSchema.parse(res) as Res;
+      }
+
       if (!Object.keys(res).length) {
         return null as Res;
       }

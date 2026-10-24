@@ -563,6 +563,38 @@ export namespace RegistrationsModels {
   >;
 
   /**
+   * CreateStaffRegistrationDtoSchema
+   * @type { object }
+   * @property { string } tournamentId Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } categoryId Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } firstName Max Length: `100`. Example: `John`
+   * @property { string } lastName Max Length: `100`. Example: `Doe`
+   * @property { string } gender Example: `male`
+   * @property { string } dateOfBirth Date of birth. Example: `2018-02-02T00:00:00.000Z`
+   * @property { string } beltLevel Example: `1-dan`
+   * @property { number } weight Weight in kg. Example: `75.5`
+   * @property { number } finalWeight Final (weigh-in) weight in kg. Example: `75.5`
+   * @property { string } clubId Participant club. Part of the participant identity when no email is given.. Example: `123e4567-e89b-12d3-a456-426614174000`
+   * @property { string } email When set, the user with this email is found or created. Otherwise club + name + date of birth identify the person.. Example: `john.doe@example.com`
+   */
+  export const CreateStaffRegistrationDtoSchema = z.object({
+    tournamentId: z.string(),
+    categoryId: z.string(),
+    firstName: z.string().max(100),
+    lastName: z.string().max(100),
+    gender: CommonModels.ParticipantGenderEnumSchema,
+    dateOfBirth: z.string().datetime({ offset: true }),
+    beltLevel: CommonModels.BeltEnumSchema,
+    weight: z.number().gte(0).optional(),
+    finalWeight: z.number().gte(0).optional(),
+    clubId: z.string().optional(),
+    email: z.string().email().optional(),
+  });
+  export type CreateStaffRegistrationDto = z.infer<
+    typeof CreateStaffRegistrationDtoSchema
+  >;
+
+  /**
    * CreateRegistrationWithUserDtoSchema
    * @type { object }
    * @property { string } email User email address (used to find or create user). Example: `john.doe@example.com`
@@ -654,6 +686,32 @@ export namespace RegistrationsModels {
   });
   export type TournamentRegistrationCountItemDto = z.infer<
     typeof TournamentRegistrationCountItemDtoSchema
+  >;
+
+  /**
+   * UpdateRegistrationIdentityDtoSchema
+   * @type { object }
+   * @property { string } firstName Max Length: `100`. Example: `John`
+   * @property { string } lastName Max Length: `100`. Example: `Doe`
+   * @property { string } gender Example: `male`
+   * @property { string } dateOfBirth Date of birth. Example: `2018-02-02T00:00:00.000Z`
+   * @property { number } weight Weight in kg. Example: `75.5`
+   * @property { string } beltLevel Example: `1-dan`
+   * @property { number } finalWeight Final (weigh-in) weight in kg for this registration. Example: `75.5`
+   */
+  export const UpdateRegistrationIdentityDtoSchema = z
+    .object({
+      firstName: z.string().max(100),
+      lastName: z.string().max(100),
+      gender: CommonModels.ParticipantGenderEnumSchema,
+      dateOfBirth: z.string().datetime({ offset: true }),
+      weight: z.number().gte(0),
+      beltLevel: CommonModels.BeltEnumSchema,
+      finalWeight: z.number().gte(0),
+    })
+    .partial();
+  export type UpdateRegistrationIdentityDto = z.infer<
+    typeof UpdateRegistrationIdentityDtoSchema
   >;
 
   /**

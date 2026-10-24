@@ -637,12 +637,17 @@
     "brackets": {
       "locked": "Začni turnir, da ustvariš žrebe.",
       "generate": "Ustvari",
+      "downloadCategory": "Prenesi PDF",
+      "downloadAll": "Prenesi vse (PDF)",
+      "downloadError": "Prenos PDF žreba ni uspel.",
       "selectCategory": "Izberi kategorijo za ogled žreba.",
       "notGenerated": "Ta kategorija še nima žreba.",
       "tooFewToGenerate": "Za žreb sta potrebni vsaj dve prijavi.",
       "generateError": "Žreba ni bilo mogoče ustvariti.",
       "noCategories": "Pred žrebom dodaj kategorije na zavihku Pregled.",
       "categoryRail": "Kategorije turnirja",
+      "hideTooFew": "Pokaži samo prijavljene",
+      "noEligibleCategories": "Nobena kategorija nima dovolj prijav za žreb.",
       "entries": "{{count}} prijav",
       "round": "Krog {{number}}",
       "status": {

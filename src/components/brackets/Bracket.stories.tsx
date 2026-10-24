@@ -3,7 +3,10 @@ import { useMemo } from "react";
 
 import { themeColors } from "@/config/theme";
 
-import { generateSingleElimination } from "@/components/brackets/core";
+import {
+  generateSingleElimination,
+  type ScoreOn,
+} from "@/components/brackets/core";
 import type { BracketColors } from "./render/bracketColors";
 import { BracketView } from "./render/BracketView";
 
@@ -38,7 +41,33 @@ type BracketDemoProps = {
   windowHeight: number;
   pageBackground: string;
   showScores: boolean;
+  /** Rounds cut off after the last generated round. 0 = full tree. */
+  stopFromEnd: number;
+  /** Score cells next to each result (plus a Sum cell). 0 = single score well. */
+  scoreCount: number;
+  sumLabel: string;
+  /** Rounds that get the score row (maps to `scoreOn`). */
+  scoreOn: ScoreOnChoice;
+  /** Fields of this size or smaller become a single layer. 0 = off. */
+  singleLayerWhenAtMost: number;
+  /** Fill the score rows with sample values. */
+  fillScoreRow: boolean;
 } & BracketColors;
+
+type ScoreOnChoice = "last" | "all" | "first" | "first and last";
+
+const toScoreOn = (choice: ScoreOnChoice, roundCount: number): ScoreOn => {
+  switch (choice) {
+    case "all":
+      return "all";
+    case "first":
+      return { rounds: [0] };
+    case "first and last":
+      return { rounds: [0, roundCount - 1] };
+    default:
+      return "last";
+  }
+};
 
 const BracketDemo = ({
   count,
@@ -47,6 +76,12 @@ const BracketDemo = ({
   windowHeight,
   pageBackground,
   showScores,
+  stopFromEnd,
+  scoreCount,
+  sumLabel,
+  scoreOn,
+  singleLayerWhenAtMost,
+  fillScoreRow,
   card,
   border,
   line,
@@ -67,7 +102,32 @@ const BracketDemo = ({
   const bracket = useMemo(() => {
     const generated = generateSingleElimination(participants, (team: Team) => team.id, {
       includeThirdPlace,
+      stopAt: stopFromEnd > 0 ? { fromEnd: stopFromEnd } : undefined,
+      singleLayerWhenAtMost:
+        singleLayerWhenAtMost > 0 ? singleLayerWhenAtMost : undefined,
     });
+    if (fillScoreRow && scoreCount > 0) {
+      return {
+        ...generated,
+        rounds: generated.rounds.map((round) => ({
+          ...round,
+          matches: round.matches.map((match) =>
+            match.data.isBye
+              ? match
+              : {
+                  ...match,
+                  data: {
+                    ...match.data,
+                    scores: Array.from(
+                      { length: scoreCount },
+                      (_, index) => index + 1,
+                    ),
+                  },
+                },
+          ),
+        })),
+      };
+    }
     if (!showScores) {
       return generated;
     }
@@ -96,7 +156,15 @@ const BracketDemo = ({
         };
       }),
     };
-  }, [participants, includeThirdPlace, showScores]);
+  }, [
+    participants,
+    includeThirdPlace,
+    showScores,
+    stopFromEnd,
+    singleLayerWhenAtMost,
+    scoreCount,
+    fillScoreRow,
+  ]);
   const viewportWindow =
     windowWidth > 0 && windowHeight > 0
       ? { width: windowWidth, height: windowHeight }
@@ -109,6 +177,9 @@ const BracketDemo = ({
         getId={(team) => team.id}
         getLabel={(team) => team.name}
         window={viewportWindow}
+        scoreCount={scoreCount}
+        scoreOn={toScoreOn(scoreOn, bracket.rounds.length)}
+        sumLabel={sumLabel}
         colors={{ card, border, line, shadow, text, highlight, score, scoreText }}
       />
     </div>
@@ -126,6 +197,12 @@ const meta: Meta<typeof BracketDemo> = {
     windowHeight: 0,
     pageBackground: themeColors.secondary[75],
     showScores: false,
+    stopFromEnd: 0,
+    scoreCount: 0,
+    sumLabel: "Sum",
+    scoreOn: "last",
+    singleLayerWhenAtMost: 0,
+    fillScoreRow: false,
     ...LIGHT_COLORS,
   },
   argTypes: {
@@ -136,6 +213,25 @@ const meta: Meta<typeof BracketDemo> = {
       control: { type: "boolean" },
     },
     showScores: {
+      control: { type: "boolean" },
+    },
+    stopFromEnd: {
+      control: { type: "number", min: 0, max: 7 },
+    },
+    scoreCount: {
+      control: { type: "number", min: 0, max: 10 },
+    },
+    sumLabel: {
+      control: { type: "text" },
+    },
+    scoreOn: {
+      control: { type: "select" },
+      options: ["last", "all", "first", "first and last"],
+    },
+    singleLayerWhenAtMost: {
+      control: { type: "number", min: 0, max: 16 },
+    },
+    fillScoreRow: {
       control: { type: "boolean" },
     },
     windowWidth: {
@@ -204,6 +300,66 @@ export const Dark: Story = {
     count: 8,
     pageBackground: themeColors.neutral[400],
     ...DARK_COLORS,
+  },
+};
+
+/** Sketch: 8 teams, quarterfinals only, 5 blank score cells and a Sum cell. */
+export const QuarterfinalSheet: Story = {
+  args: {
+    count: 8,
+    includeThirdPlace: false,
+    stopFromEnd: 2,
+    scoreCount: 5,
+  },
+};
+
+export const QuarterfinalSheetFilled: Story = {
+  args: {
+    count: 8,
+    includeThirdPlace: false,
+    stopFromEnd: 2,
+    scoreCount: 5,
+    fillScoreRow: true,
+  },
+};
+
+export const SemifinalStop: Story = {
+  args: {
+    count: 8,
+    includeThirdPlace: false,
+    stopFromEnd: 1,
+    scoreCount: 3,
+  },
+};
+
+/** 5 teams with `singleLayerWhenAtMost: 5`: one layer, byes included. */
+export const SmallFieldSingleLayer: Story = {
+  args: {
+    count: 5,
+    includeThirdPlace: true,
+    singleLayerWhenAtMost: 5,
+    scoreCount: 5,
+  },
+};
+
+/** 16 teams cut to the last two rounds: the score row sits on the last round only. */
+export const ScoresOnLastRoundOnly: Story = {
+  args: {
+    count: 16,
+    includeThirdPlace: false,
+    stopFromEnd: 2,
+    scoreCount: 5,
+    scoreOn: "last",
+  },
+};
+
+export const ScoresOnAllRounds: Story = {
+  args: {
+    count: 16,
+    includeThirdPlace: false,
+    stopFromEnd: 2,
+    scoreCount: 5,
+    scoreOn: "all",
   },
 };
 

@@ -11,6 +11,16 @@ export namespace RegistrationsApi {
     );
   };
 
+  export const createForStaff = (
+    data: RegistrationsModels.CreateStaffRegistrationDto,
+  ) => {
+    return AppRestClient.post(
+      { resSchema: RegistrationsModels.RegistrationResponseDtoSchema },
+      `/registrations/staff`,
+      data,
+    );
+  };
+
   export const createWithUser = (
     data: RegistrationsModels.CreateRegistrationWithUserDto,
   ) => {
@@ -229,6 +239,17 @@ export namespace RegistrationsApi {
     return AppRestClient.get(
       { resSchema: RegistrationsModels.RegistrationResponseDtoSchema },
       `/registrations/${id}`,
+    );
+  };
+
+  export const updateIdentity = (
+    id: string,
+    data: RegistrationsModels.UpdateRegistrationIdentityDto,
+  ) => {
+    return AppRestClient.patch(
+      { resSchema: RegistrationsModels.RegistrationResponseDtoSchema },
+      `/registrations/${id}`,
+      data,
     );
   };
 

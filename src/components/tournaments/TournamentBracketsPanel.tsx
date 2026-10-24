@@ -1,7 +1,7 @@
-import { Button } from "@mui/material";
+import { Button, Checkbox } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { cx } from "class-variance-authority";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -11,8 +11,8 @@ import {
 } from "@/components/brackets";
 import { ErrorState } from "@/components/shared/layout/ErrorState";
 import {
-  type BracketCompetitor,
   mapScheduleToBracket,
+  type BracketCompetitor,
 } from "@/components/tournaments/mapScheduleToBracket";
 import { uiOutlineClass } from "@/components/ui/global/outline";
 import Pill from "@/components/ui/Pill";
@@ -25,6 +25,7 @@ import { RegistrationsQueries } from "@/data/registrations/registrations.queries
 import { SchedulesModels } from "@/data/schedules/schedules.models";
 import { SchedulesQueries } from "@/data/schedules/schedules.queries";
 import { useThemeStore } from "@/providers/ThemeModeContext";
+import { FileUtils } from "@/util/file.utils";
 import { ApplicationException } from "@/util/vendor/error-handling";
 
 type CategoryBracketStatus = "tooFew" | "ready" | "generated";
@@ -135,11 +136,13 @@ export const TournamentBracketsPanel = ({
   const paneRef = useRef<HTMLDivElement>(null);
   const [paneSize, setPaneSize] = useState<{ width: number; height: number }>();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>();
+  const [hideTooFew, setHideTooFew] = useState(true);
 
-  const { data: counts } = RegistrationsQueries.useFindCountsByTournament(
-    { tournamentId },
-    { enabled: isUnlocked && !!tournamentId },
-  );
+  const { data: counts, isSuccess: countsLoaded } =
+    RegistrationsQueries.useFindCountsByTournament(
+      { tournamentId },
+      { enabled: isUnlocked && !!tournamentId },
+    );
 
   const countsByCategoryId = useMemo(
     () =>
@@ -149,11 +152,40 @@ export const TournamentBracketsPanel = ({
     [counts],
   );
 
-  useEffect(() => {
-    if (!selectedCategoryId && categories[0]) {
-      setSelectedCategoryId(categories[0].id);
+  const getCategoryStatus = useCallback(
+    (categoryId: string): CategoryBracketStatus => {
+      const cached =
+        queryClient.getQueryData<SchedulesModels.ScheduleResponseDto>(
+          SchedulesQueries.keys.findOne(tournamentId, categoryId),
+        );
+      if (cached) {
+        return "generated";
+      }
+      return (countsByCategoryId.get(categoryId) ?? 0) < 2 ? "tooFew" : "ready";
+    },
+    [countsByCategoryId, queryClient, tournamentId],
+  );
+
+  const visibleCategories = useMemo(() => {
+    if (!hideTooFew || !countsLoaded) {
+      return categories;
     }
-  }, [categories, selectedCategoryId]);
+    return categories.filter(
+      (category) => getCategoryStatus(category.id) !== "tooFew",
+    );
+  }, [categories, countsLoaded, getCategoryStatus, hideTooFew]);
+
+  useEffect(() => {
+    if (hideTooFew && !countsLoaded) {
+      return;
+    }
+    if (
+      visibleCategories.some((category) => category.id === selectedCategoryId)
+    ) {
+      return;
+    }
+    setSelectedCategoryId(visibleCategories[0]?.id);
+  }, [countsLoaded, hideTooFew, selectedCategoryId, visibleCategories]);
 
   const hasBracketPane = isUnlocked && categories.length > 0;
 
@@ -210,6 +242,14 @@ export const TournamentBracketsPanel = ({
     },
   });
 
+  const showDownloadError = (error: unknown) => {
+    errorToast({
+      text:
+        (error instanceof ApplicationException && error.serverMessage) ||
+        t("tournaments.brackets.downloadError"),
+    });
+  };
+
   const selectedBracket = useMemo(
     () => (schedule ? mapScheduleToBracket(schedule) : undefined),
     [schedule],
@@ -221,20 +261,66 @@ export const TournamentBracketsPanel = ({
     (isScheduleFetching && !schedule);
   const isNotGenerated = isMissingScheduleError(scheduleError);
   const paneError = isNotGenerated ? undefined : scheduleError;
-  const showGenerate =
-    canManageSetup && isNotGenerated && selectedCount >= 2;
+  const showGenerate = canManageSetup && isNotGenerated && selectedCount >= 2;
+  // A schedule exists, or the category can be generated while exporting.
+  const canDownloadCategory =
+    !!selectedCategory && !isBusy && (!!schedule || showGenerate);
 
-  const getCategoryStatus = (categoryId: string): CategoryBracketStatus => {
-    const cached = queryClient.getQueryData<
-      SchedulesModels.ScheduleResponseDto
-    >(SchedulesQueries.keys.findOne(tournamentId, categoryId));
-    if (cached) {
-      return "generated";
+  // A missing schedule is generated first when the category has none and can be generated.
+  const generateMissingOnDownload = !schedule && showGenerate;
+
+  // One category. Fetched only when the button is clicked.
+  const { refetch: refetchCategoryPdf, isFetching: isCategoryPdfFetching } =
+    SchedulesQueries.useDownloadCategory(
+      {
+        tournamentId,
+        categoryId: selectedCategoryId ?? "",
+        generateMissing: generateMissingOnDownload || undefined,
+      },
+      { enabled: false },
+    );
+
+  // Every category with a schedule (and generatable ones), one page each. Fetched on click.
+  const { refetch: refetchAllPdf, isFetching: isAllPdfFetching } =
+    SchedulesQueries.useDownloadTournament(
+      { tournamentId, generateMissing: true },
+      { enabled: false },
+    );
+
+  const handleDownloadCategory = async () => {
+    if (!selectedCategory) {
+      return;
     }
-    return (countsByCategoryId.get(categoryId) ?? 0) < 2 ? "tooFew" : "ready";
+    const generatedMissing = generateMissingOnDownload;
+    const result = await refetchCategoryPdf();
+    if (result.error || !result.data) {
+      showDownloadError(result.error);
+      return;
+    }
+    FileUtils.saveBlob(
+      result.data,
+      `${FileUtils.toSafeFileName(selectedCategory.name, "bracket")}.pdf`,
+    );
+    if (generatedMissing) {
+      queryClient
+        .invalidateQueries({ queryKey: SchedulesQueries.keys.all })
+        .catch(() => undefined);
+    }
+  };
+
+  const handleDownloadAll = async () => {
+    const result = await refetchAllPdf();
+    if (result.error || !result.data) {
+      showDownloadError(result.error);
+      return;
+    }
+    FileUtils.saveBlob(result.data, "brackets.pdf");
   };
 
   const getEmptyMessage = () => {
+    if (hideTooFew && countsLoaded && visibleCategories.length === 0) {
+      return t("tournaments.brackets.noEligibleCategories");
+    }
     if (!selectedCategory) {
       return t("tournaments.brackets.selectCategory");
     }
@@ -273,53 +359,77 @@ export const TournamentBracketsPanel = ({
         className="flex max-h-[40vh] w-full shrink-0 flex-col overflow-y-auto rounded-m border border-secondary-300 bg-secondary-200 t:max-h-none t:w-72"
         aria-label={t("tournaments.brackets.categoryRail")}
       >
-        {categories.map((category) => {
-          const isSelected = category.id === selectedCategoryId;
-          const status = getCategoryStatus(category.id);
-          const count = countsByCategoryId.get(category.id) ?? 0;
-          return (
-            <button
-              key={category.id}
-              type="button"
-              className={cx(
-                "flex w-full flex-col gap-1 border-b border-secondary-100 px-4 py-3 text-left last:border-b-0",
-                uiOutlineClass,
-                isSelected
-                  ? "bg-secondary-100"
-                  : "hover:bg-neutral-50 cursor-pointer",
-              )}
-              onClick={() => setSelectedCategoryId(category.id)}
-            >
-              <Typography
-                size="body-paragraph-m"
-                variant="prominent-2"
-                as="span"
-                className="truncate"
+        <label className="flex cursor-pointer items-start gap-2 border-b border-secondary-100 px-4 py-3">
+          <Checkbox
+            size="small"
+            checked={hideTooFew}
+            onChange={(event) => setHideTooFew(event.target.checked)}
+            sx={{ padding: 0, marginTop: "2px" }}
+          />
+          <Typography size="body-paragraph-s" as="span">
+            {t("tournaments.brackets.hideTooFew")}
+          </Typography>
+        </label>
+        {hideTooFew && !countsLoaded ? (
+          <div className="flex justify-center py-6">
+            <Loader />
+          </div>
+        ) : visibleCategories.length === 0 ? (
+          <Typography
+            size="body-paragraph-s"
+            className="px-4 py-3 text-neutral-200"
+          >
+            {t("tournaments.brackets.noEligibleCategories")}
+          </Typography>
+        ) : (
+          visibleCategories.map((category) => {
+            const isSelected = category.id === selectedCategoryId;
+            const status = getCategoryStatus(category.id);
+            const count = countsByCategoryId.get(category.id) ?? 0;
+            return (
+              <button
+                key={category.id}
+                type="button"
+                className={cx(
+                  "flex w-full flex-col gap-1 border-b border-secondary-100 px-4 py-3 text-left last:border-b-0",
+                  uiOutlineClass,
+                  isSelected
+                    ? "bg-secondary-100"
+                    : "hover:bg-neutral-50 cursor-pointer",
+                )}
+                onClick={() => setSelectedCategoryId(category.id)}
               >
-                {category.name}
-              </Typography>
-              <div className="flex flex-wrap items-center gap-1">
                 <Typography
-                  size="body-paragraph-s"
-                  className="text-neutral-200"
+                  size="body-paragraph-m"
+                  variant="prominent-2"
                   as="span"
+                  className="truncate"
                 >
-                  {t("tournaments.brackets.entries", { count })}
+                  {category.name}
                 </Typography>
-                <Pill>
-                  <Typography size="body-paragraph-s" as="span">
-                    {t(`tournaments.brackets.status.${status}`)}
+                <div className="flex flex-wrap items-center gap-1">
+                  <Typography
+                    size="body-paragraph-s"
+                    className="text-neutral-200"
+                    as="span"
+                  >
+                    {t("tournaments.brackets.entries", { count })}
                   </Typography>
-                </Pill>
-              </div>
-            </button>
-          );
-        })}
+                  <Pill>
+                    <Typography size="body-paragraph-s" as="span">
+                      {t(`tournaments.brackets.status.${status}`)}
+                    </Typography>
+                  </Pill>
+                </div>
+              </button>
+            );
+          })
+        )}
       </nav>
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-3">
-        {showGenerate && (
-          <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {showGenerate && (
             <Button
               variant="contained"
               disabled={isBusy}
@@ -335,8 +445,22 @@ export const TournamentBracketsPanel = ({
             >
               {t("tournaments.brackets.generate")}
             </Button>
-          </div>
-        )}
+          )}
+          <Button
+            variant="outlined"
+            disabled={!canDownloadCategory || isCategoryPdfFetching}
+            onClick={handleDownloadCategory}
+          >
+            {t("tournaments.brackets.downloadCategory")}
+          </Button>
+          <Button
+            variant="outlined"
+            disabled={isAllPdfFetching}
+            onClick={handleDownloadAll}
+          >
+            {t("tournaments.brackets.downloadAll")}
+          </Button>
+        </div>
 
         <div
           ref={paneRef}

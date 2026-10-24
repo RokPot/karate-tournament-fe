@@ -9,7 +9,10 @@ import { ArrowDropUpIcon } from "@/assets/icons/general/ArrowDropUp";
 import { useCategoryFormatters } from "@/components/categories/category-formatters";
 import { isTeamCategory } from "@/components/registrations/public/utils/teamOverlap";
 import { ErrorState } from "@/components/shared/layout/ErrorState";
-import { StaffRegistrationModal } from "@/components/tournaments/registrations/StaffRegistrationModal";
+import {
+  StaffRegistrationModal,
+  type StaffParticipantPayload,
+} from "@/components/tournaments/registrations/StaffRegistrationModal";
 import { ConfirmRemoveRegistrationDialog } from "@/components/tournaments/registrations/ConfirmRemoveRegistrationDialog";
 import { uiOutlineClass } from "@/components/ui/global/outline";
 import Pill from "@/components/ui/Pill";
@@ -19,10 +22,6 @@ import { Typography } from "@/components/ui/text/Typography/Typography";
 import { CommonModels } from "@/data/common/common.models";
 import { RegistrationsModels } from "@/data/registrations/registrations.models";
 import { RegistrationsQueries } from "@/data/registrations/registrations.queries";
-import {
-  RegistrationsStaffQueries,
-  type StaffParticipantPayload,
-} from "@/data/registrations/registrations.staff";
 import { DateUtils } from "@/util/date.utils";
 
 interface IProps {
@@ -65,19 +64,24 @@ export const CategoryRegistrationsAccordionItem = ({
       { enabled: isExpanded && !!tournamentId },
     );
 
-  const createMutation = RegistrationsStaffQueries.useStaffCreate({
+  const createMutation = RegistrationsQueries.useCreateForStaff({
+    invalidateCurrentModule: true,
     onSuccess: () => {
       successToast({ text: t("registrations.staff.addSuccess") });
       setModalMode(null);
     },
     onError: (mutationError) => {
       errorToast({
-        text: mutationError?.message || t("registrations.staff.addError"),
+        text:
+          mutationError?.serverMessage ||
+          mutationError?.message ||
+          t("registrations.staff.addError"),
       });
     },
   });
 
-  const updateMutation = RegistrationsStaffQueries.useStaffUpdate({
+  const updateMutation = RegistrationsQueries.useUpdateIdentity({
+    invalidateCurrentModule: true,
     onSuccess: () => {
       successToast({ text: t("registrations.staff.editSuccess") });
       setModalMode(null);
@@ -85,19 +89,26 @@ export const CategoryRegistrationsAccordionItem = ({
     },
     onError: (mutationError) => {
       errorToast({
-        text: mutationError?.message || t("registrations.staff.editError"),
+        text:
+          mutationError?.serverMessage ||
+          mutationError?.message ||
+          t("registrations.staff.editError"),
       });
     },
   });
 
-  const removeMutation = RegistrationsStaffQueries.useStaffRemove({
+  const removeMutation = RegistrationsQueries.useRemove({
+    invalidateCurrentModule: true,
     onSuccess: () => {
       successToast({ text: t("registrations.staff.removeSuccess") });
       setRemovingRegistration(null);
     },
     onError: (mutationError) => {
       errorToast({
-        text: mutationError?.message || t("registrations.staff.removeError"),
+        text:
+          mutationError?.serverMessage ||
+          mutationError?.message ||
+          t("registrations.staff.removeError"),
       });
     },
   });
@@ -150,16 +161,18 @@ export const CategoryRegistrationsAccordionItem = ({
   }) => {
     if (modalMode === "edit" && editingRegistration) {
       updateMutation.mutate({
-        registrationId: editingRegistration.id,
-        participant,
+        id: editingRegistration.id,
+        data: participant,
       });
       return;
     }
     createMutation.mutate({
-      tournamentId,
-      categoryId: category.id,
-      clubId,
-      participant,
+      data: {
+        tournamentId,
+        categoryId: category.id,
+        clubId,
+        ...participant,
+      },
     });
   };
 
@@ -301,7 +314,7 @@ export const CategoryRegistrationsAccordionItem = ({
           if (!removingRegistration) {
             return;
           }
-          removeMutation.mutate({ registrationId: removingRegistration.id });
+          removeMutation.mutate({ id: removingRegistration.id });
         }}
       />
     </div>

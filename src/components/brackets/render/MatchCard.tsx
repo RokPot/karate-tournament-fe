@@ -11,6 +11,8 @@ interface MatchCardProps {
   highlighted?: boolean;
   colors: BracketColors;
   score?: number | string | null;
+  /** Hide the score well (used when a score row is drawn beside the card). */
+  hideScore?: boolean;
 }
 
 const hasScoreValue = (score: number | string | null | undefined) =>
@@ -22,6 +24,7 @@ export const MatchCard = ({
   highlighted = false,
   colors,
   score,
+  hideScore = false,
 }: MatchCardProps) => {
   const scored = hasScoreValue(score);
 
@@ -41,22 +44,24 @@ export const MatchCard = ({
       <div className="flex min-w-0 flex-1 items-center truncate px-3">
         {children}
       </div>
-      <div
-        className="flex h-full w-9 shrink-0 items-center justify-center"
-        style={{
-          backgroundColor: colors.score,
-          color: colors.scoreText,
-        }}
-      >
-        <Typography
-          size="body-paragraph-s"
-          variant="prominent-2"
-          as="span"
-          style={{ color: colors.scoreText, opacity: scored ? 1 : 0.55 }}
+      {!hideScore && (
+        <div
+          className="flex h-full w-9 shrink-0 items-center justify-center"
+          style={{
+            backgroundColor: colors.score,
+            color: colors.scoreText,
+          }}
         >
-          {scored ? score : "—"}
-        </Typography>
-      </div>
+          <Typography
+            size="body-paragraph-s"
+            variant="prominent-2"
+            as="span"
+            style={{ color: colors.scoreText, opacity: scored ? 1 : 0.55 }}
+          >
+            {scored ? score : "—"}
+          </Typography>
+        </div>
+      )}
     </div>
   );
 };

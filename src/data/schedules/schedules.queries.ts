@@ -19,6 +19,32 @@ export namespace SchedulesQueries {
         tournamentId,
         categoryId,
       ] as const,
+    downloadTournament: (
+      tournamentId: string,
+      generateMissing?: boolean,
+      scoreCount?: number,
+    ) =>
+      [
+        ...keys.all,
+        "/tournaments/:tournamentId/brackets/pdf",
+        tournamentId,
+        generateMissing,
+        scoreCount,
+      ] as const,
+    downloadCategory: (
+      tournamentId: string,
+      categoryId: string,
+      generateMissing?: boolean,
+      scoreCount?: number,
+    ) =>
+      [
+        ...keys.all,
+        "/tournaments/:tournamentId/categories/:categoryId/bracket/pdf",
+        tournamentId,
+        categoryId,
+        generateMissing,
+        scoreCount,
+      ] as const,
   };
 
   /**
@@ -99,6 +125,85 @@ export namespace SchedulesQueries {
         invalidateQueries(queryClient, moduleName, options);
         options?.onSuccess?.(...args);
       },
+    });
+  };
+
+  /**
+   * Query `useDownloadTournament`
+   * @summary Download all category brackets as one PDF
+   * @description Admin or owning club staff. One A4 landscape page per category, in tournament category order. By default only categories that already have a schedule are printed; pass generateMissing&#x3D;true to generate schedules for categories that have at least 2 competitors (tournament must be in_progress).
+   * @param { string } object.tournamentId Path parameter. Tournament ID
+   * @param { boolean } object.generateMissing Query parameter. When true, categories that have no schedule yet are generated first (needs at least 2 competitors; tournament must be in_progress). When false or omitted, only existing schedules are printed.
+   * @param { number } object.scoreCount Query parameter. Blank handwritten score cells per match, plus one Sum cell. 0 hides the score row. Defaults to 5.. Maximum: `8`. Example: `5`
+   * @param { AppQueryOptions } options Query options
+   * @returns { UseQueryResult<z.instanceof(Blob)> } PDF file
+   * @statusCodes [200, 400, 401, 403, 404]
+   */
+  export const useDownloadTournament = <TData>(
+    {
+      tournamentId,
+      generateMissing,
+      scoreCount,
+    }: { tournamentId: string; generateMissing?: boolean; scoreCount?: number },
+    options?: AppQueryOptions<typeof SchedulesApi.downloadTournament, TData>,
+  ) => {
+    return useQuery({
+      queryKey: keys.downloadTournament(
+        tournamentId,
+        generateMissing,
+        scoreCount,
+      ),
+      queryFn: () =>
+        SchedulesApi.downloadTournament(
+          tournamentId,
+          generateMissing,
+          scoreCount,
+        ),
+      ...options,
+    });
+  };
+
+  /**
+   * Query `useDownloadCategory`
+   * @summary Download one category bracket as a PDF
+   * @description Admin or owning club staff. Same rules as the tournament export. With generateMissing&#x3D;true a missing schedule is created first (400 if the tournament is not in progress or there are fewer than 2 competitors).
+   * @param { string } object.tournamentId Path parameter. Tournament ID
+   * @param { string } object.categoryId Path parameter. Category ID
+   * @param { boolean } object.generateMissing Query parameter. When true, categories that have no schedule yet are generated first (needs at least 2 competitors; tournament must be in_progress). When false or omitted, only existing schedules are printed.
+   * @param { number } object.scoreCount Query parameter. Blank handwritten score cells per match, plus one Sum cell. 0 hides the score row. Defaults to 5.. Maximum: `8`. Example: `5`
+   * @param { AppQueryOptions } options Query options
+   * @returns { UseQueryResult<z.instanceof(Blob)> } PDF file
+   * @statusCodes [200, 400, 401, 403, 404]
+   */
+  export const useDownloadCategory = <TData>(
+    {
+      tournamentId,
+      categoryId,
+      generateMissing,
+      scoreCount,
+    }: {
+      tournamentId: string;
+      categoryId: string;
+      generateMissing?: boolean;
+      scoreCount?: number;
+    },
+    options?: AppQueryOptions<typeof SchedulesApi.downloadCategory, TData>,
+  ) => {
+    return useQuery({
+      queryKey: keys.downloadCategory(
+        tournamentId,
+        categoryId,
+        generateMissing,
+        scoreCount,
+      ),
+      queryFn: () =>
+        SchedulesApi.downloadCategory(
+          tournamentId,
+          categoryId,
+          generateMissing,
+          scoreCount,
+        ),
+      ...options,
     });
   };
 }

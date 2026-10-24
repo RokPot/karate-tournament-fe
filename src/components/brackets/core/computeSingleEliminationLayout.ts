@@ -9,6 +9,44 @@ export const BRACKET_LAYOUT = {
   roundTitleHeight: 32,
 } as const;
 
+/** Defaults for the score row drawn to the right of each match result. */
+export const BRACKET_SCORE_LAYOUT = {
+  /**
+   * Width of one score cell. Wider than the card so a number can be written
+   * in by hand on a printout. Height stays the card height.
+   */
+  scoreCellWidth: 56,
+  /** Gap between score cells, and between the last score cell and the Sum cell. */
+  scoreCellGap: 4,
+  /** Width of the Sum cell. Room for a handwritten two-digit total. */
+  sumCellWidth: 72,
+  /** Gap between the result card and the first score cell. */
+  scoreStripGap: 12,
+} as const;
+
+/**
+ * Which rounds get a score row.
+ *
+ * - `"last"` (default): only the last generated round, plus the third-place
+ *   match when there is one (it is played with that final).
+ * - `"all"`: every real match.
+ * - `{ rounds: number[] }`: these round indexes only (`0` = first round).
+ *   Indexes past the last round are ignored; an empty list draws no row.
+ */
+export type ScoreOn = "last" | "all" | { rounds: number[] };
+
+export type SingleEliminationLayoutOptions = {
+  /** Number of score cells per match (plus one Sum cell). `0` = no score row. */
+  scoreCount?: number;
+  /** Rounds that get the score row. Defaults to `"last"`. */
+  scoreOn?: ScoreOn;
+  /** Width of one score cell. Height stays the card height. */
+  scoreCellWidth?: number;
+  scoreCellGap?: number;
+  sumCellWidth?: number;
+  scoreStripGap?: number;
+};
+
 export type LayoutRect = {
   x: number;
   y: number;
@@ -37,12 +75,63 @@ export type LayoutHeader = {
   rect: LayoutRect;
 };
 
+export type LayoutScoreCell = {
+  id: string;
+  matchId: string;
+  kind: "score" | "sum";
+  /** Zero-based score index; `-1` for the Sum cell. */
+  index: number;
+  rect: LayoutRect;
+};
+
 export type SingleEliminationLayout = {
   width: number;
   height: number;
   nodes: LayoutNode[];
   connectors: LayoutConnector[];
   headers: LayoutHeader[];
+  /** Empty unless `scoreCount > 0`. */
+  scoreCells: LayoutScoreCell[];
+};
+
+type ScoreMetrics = {
+  count: number;
+  cellWidth: number;
+  cellGap: number;
+  sumWidth: number;
+  stripGap: number;
+  /** Width of the cells and gaps after the card (no leading gap). */
+  stripWidth: number;
+  /** Extra horizontal space a result card with a score row occupies. */
+  extra: number;
+};
+
+const toCount = (value: number | undefined) => {
+  if (value === undefined || !Number.isFinite(value)) {
+    return 0;
+  }
+  return Math.max(0, Math.trunc(value));
+};
+
+const resolveScoreMetrics = (
+  options: SingleEliminationLayoutOptions,
+): ScoreMetrics => {
+  const count = toCount(options.scoreCount);
+  const cellWidth = options.scoreCellWidth ?? BRACKET_SCORE_LAYOUT.scoreCellWidth;
+  const cellGap = options.scoreCellGap ?? BRACKET_SCORE_LAYOUT.scoreCellGap;
+  const sumWidth = options.sumCellWidth ?? BRACKET_SCORE_LAYOUT.sumCellWidth;
+  const stripGap = options.scoreStripGap ?? BRACKET_SCORE_LAYOUT.scoreStripGap;
+  const stripWidth =
+    count > 0 ? count * cellWidth + count * cellGap + sumWidth : 0;
+  return {
+    count,
+    cellWidth,
+    cellGap,
+    sumWidth,
+    stripGap,
+    stripWidth,
+    extra: count > 0 ? stripGap + stripWidth : 0,
+  };
 };
 
 const slotY = (slotIndex: number) =>
@@ -50,9 +139,25 @@ const slotY = (slotIndex: number) =>
   BRACKET_LAYOUT.roundTitleHeight +
   slotIndex * (BRACKET_LAYOUT.slotHeight + BRACKET_LAYOUT.slotGap);
 
-const columnX = (columnIndex: number) =>
-  BRACKET_LAYOUT.padding +
-  columnIndex * (BRACKET_LAYOUT.slotWidth + BRACKET_LAYOUT.roundGap);
+/**
+ * Column x. Every column that carries a score row pushes the columns after it
+ * to the right by the strip width (`scoreExtra`).
+ */
+const columnXFor =
+  (scoreExtra: number, stripColumns: ReadonlySet<number>) =>
+  (columnIndex: number) => {
+    let shift = 0;
+    stripColumns.forEach((stripColumn) => {
+      if (stripColumn < columnIndex) {
+        shift += scoreExtra;
+      }
+    });
+    return (
+      BRACKET_LAYOUT.padding +
+      columnIndex * (BRACKET_LAYOUT.slotWidth + BRACKET_LAYOUT.roundGap) +
+      shift
+    );
+  };
 
 const matchSlotSpan = (roundIndex: number, matchIndex: number) => {
   const span = 2 ** (roundIndex + 1);
@@ -101,8 +206,49 @@ const outcomeNodeId = (matchId: string) => `${matchId}-out`;
 
 export const computeSingleEliminationLayout = <T,>(
   bracket: Bracket<T>,
+  options: SingleEliminationLayoutOptions = {},
 ): SingleEliminationLayout => {
+  const score = resolveScoreMetrics(options);
   const firstRound = bracket.rounds[0];
+
+  // Which rounds get a score row, decided from match data before any position
+  // is computed (positions depend on which columns carry a strip).
+  const scoreOn = options.scoreOn ?? "last";
+  const lastRoundIndex = bracket.rounds.length - 1;
+  const isRoundSelected = (roundIndex: number) => {
+    if (scoreOn === "all") {
+      return true;
+    }
+    if (scoreOn === "last") {
+      return roundIndex === lastRoundIndex;
+    }
+    return scoreOn.rounds.includes(roundIndex);
+  };
+  const scoredMatchIds = new Set<string>();
+  if (score.count > 0) {
+    bracket.rounds.forEach((round, roundIndex) => {
+      if (!isRoundSelected(roundIndex)) {
+        return;
+      }
+      round.matches.forEach((match) => {
+        if (!match.data.isBye) {
+          scoredMatchIds.add(match.id);
+        }
+      });
+    });
+    // The third-place match is played with the final, so it follows that round.
+    if (bracket.thirdPlace && isRoundSelected(lastRoundIndex)) {
+      scoredMatchIds.add(bracket.thirdPlace.id);
+    }
+  }
+  // Result column of round r is column r + 1; third place shares the final's column.
+  const stripColumns = new Set<number>();
+  bracket.rounds.forEach((round, roundIndex) => {
+    if (round.matches.some((match) => scoredMatchIds.has(match.id))) {
+      stripColumns.add(roundIndex + 1);
+    }
+  });
+  const columnX = columnXFor(score.extra, stripColumns);
   const paddedSize = firstRound.matches.length * 2;
   const nodes: LayoutNode[] = [];
 
@@ -196,6 +342,15 @@ export const computeSingleEliminationLayout = <T,>(
   const nodeById = new Map(nodes.map((node) => [node.id, node]));
   const connectors: LayoutConnector[] = [];
 
+  const hasScoreRow = (node: LayoutNode) =>
+    node.kind === "outcome" && node.visible && scoredMatchIds.has(node.matchId);
+
+  /** Connectors leave from the right edge of the score row when there is one. */
+  const connectorRect = (node: LayoutNode): LayoutRect =>
+    hasScoreRow(node)
+      ? { ...node.rect, width: node.rect.width + score.extra }
+      : node.rect;
+
   const addForkOrStem = (
     connectorId: string,
     fromNodes: LayoutNode[],
@@ -208,15 +363,50 @@ export const computeSingleEliminationLayout = <T,>(
     if (visibleFrom.length === 1) {
       connectors.push({
         id: connectorId,
-        d: stemPath(visibleFrom[0].rect, to.rect),
+        d: stemPath(connectorRect(visibleFrom[0]), to.rect),
       });
       return;
     }
     connectors.push({
       id: connectorId,
-      d: forkPath(visibleFrom[0].rect, visibleFrom[1].rect, to.rect),
+      d: forkPath(
+        connectorRect(visibleFrom[0]),
+        connectorRect(visibleFrom[1]),
+        to.rect,
+      ),
     });
   };
+
+  const scoreCells: LayoutScoreCell[] = [];
+  nodes.filter(hasScoreRow).forEach((node) => {
+    const startX = rightX(node.rect) + score.stripGap;
+    for (let index = 0; index < score.count; index += 1) {
+      scoreCells.push({
+        id: `${node.matchId}-score-${index}`,
+        matchId: node.matchId,
+        kind: "score",
+        index,
+        rect: {
+          x: startX + index * (score.cellWidth + score.cellGap),
+          y: node.rect.y,
+          width: score.cellWidth,
+          height: node.rect.height,
+        },
+      });
+    }
+    scoreCells.push({
+      id: `${node.matchId}-sum`,
+      matchId: node.matchId,
+      kind: "sum",
+      index: -1,
+      rect: {
+        x: startX + score.count * (score.cellWidth + score.cellGap),
+        y: node.rect.y,
+        width: score.sumWidth,
+        height: node.rect.height,
+      },
+    });
+  });
 
   firstRound.matches.forEach((match) => {
     if (match.data.isBye) {
@@ -290,8 +480,10 @@ export const computeSingleEliminationLayout = <T,>(
     width:
       BRACKET_LAYOUT.padding * 2 +
       columnCount * BRACKET_LAYOUT.slotWidth +
-      (columnCount - 1) * BRACKET_LAYOUT.roundGap,
+      (columnCount - 1) * BRACKET_LAYOUT.roundGap +
+      stripColumns.size * score.extra,
     height: Math.max(paddedHeight, bronzeBottom),
+    scoreCells,
     nodes,
     connectors,
     headers,

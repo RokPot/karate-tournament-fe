@@ -44,9 +44,9 @@ const AdminTournamentsView = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   return (
-    <div className="mx-auto w-full max-w-7xl p-6">
-      <div className="mb-3 flex items-center justify-between">
-        <Typography size="h2">{t("shared.tournaments")}</Typography>
+    <div className="mx-auto w-full p-5">
+      <div className="mb-3 flex items-center justify-between h-14">
+        <Typography size="h3">{t("shared.tournaments")}</Typography>
         <Button variant="contained" onClick={() => setCreateDialogOpen(true)}>
           {t("tournaments.addTournament")}
         </Button>

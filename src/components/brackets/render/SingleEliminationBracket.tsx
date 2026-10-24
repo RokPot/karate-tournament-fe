@@ -6,13 +6,16 @@ import {
   computeSingleEliminationLayout,
   getMatchLoserItem,
   getMatchWinnerItem,
+  resolveSum,
   type Bracket,
   type BracketMatch,
   type BracketSlot,
+  type SingleEliminationLayoutOptions,
 } from "@/components/brackets/core";
 import type { BracketColors } from "./bracketColors";
 import { BracketConnectors } from "./BracketConnectors";
 import { MatchCard } from "./MatchCard";
+import { ScoreCell } from "./ScoreCell";
 
 export type SingleEliminationBracketProps<T> = {
   bracket: Bracket<T>;
@@ -20,7 +23,23 @@ export type SingleEliminationBracketProps<T> = {
   renderItem?: (item: T) => ReactNode;
   colors: BracketColors;
   getRoundLabel?: (columnIndex: number) => string;
+  /**
+   * Score row next to each match result: `scoreCount` cells plus a Sum cell.
+   * `0` (default) keeps the single score well on the card. Cell sizes come from
+   * `BRACKET_SCORE_LAYOUT` unless overridden here.
+   */
+  scoreCount?: SingleEliminationLayoutOptions["scoreCount"];
+  /** Rounds that get the score row. Defaults to `"last"` (final and third place). */
+  scoreOn?: SingleEliminationLayoutOptions["scoreOn"];
+  scoreCellWidth?: SingleEliminationLayoutOptions["scoreCellWidth"];
+  scoreCellGap?: SingleEliminationLayoutOptions["scoreCellGap"];
+  sumCellWidth?: SingleEliminationLayoutOptions["sumCellWidth"];
+  scoreStripGap?: SingleEliminationLayoutOptions["scoreStripGap"];
+  /** Text in an empty Sum cell. Defaults to "Sum". */
+  sumLabel?: string;
 };
+
+const DEFAULT_SUM_LABEL = "Sum";
 
 const defaultRoundLabel = (columnIndex: number) => `Round ${columnIndex + 1}`;
 
@@ -155,8 +174,25 @@ export const SingleEliminationBracket = <T,>({
   renderItem,
   colors,
   getRoundLabel = defaultRoundLabel,
+  scoreCount = 0,
+  scoreOn,
+  scoreCellWidth,
+  scoreCellGap,
+  sumCellWidth,
+  scoreStripGap,
+  sumLabel = DEFAULT_SUM_LABEL,
 }: SingleEliminationBracketProps<T>) => {
-  const layout = computeSingleEliminationLayout(bracket);
+  const layout = computeSingleEliminationLayout(bracket, {
+    scoreCount,
+    scoreOn,
+    scoreCellWidth,
+    scoreCellGap,
+    sumCellWidth,
+    scoreStripGap,
+  });
+  const scoredMatchIds = new Set(
+    layout.scoreCells.map((cell) => cell.matchId),
+  );
 
   return (
     <div
@@ -248,6 +284,7 @@ export const SingleEliminationBracket = <T,>({
             <MatchCard
               colors={colors}
               score={score}
+              hideScore={node.kind === "outcome" && scoredMatchIds.has(node.matchId)}
               highlighted={
                 node.kind !== "slot-item" &&
                 node.kind !== "slot-item2" &&
@@ -256,6 +293,35 @@ export const SingleEliminationBracket = <T,>({
             >
               {content}
             </MatchCard>
+          </div>
+        );
+      })}
+      {layout.scoreCells.map((cell) => {
+        const match = matchById(bracket, cell.matchId);
+        if (!match) {
+          return null;
+        }
+        const value =
+          cell.kind === "sum"
+            ? resolveSum(match.data.scores, match.data.sum, scoreCount)
+            : match.data.scores?.[cell.index];
+        return (
+          <div
+            key={cell.id}
+            className="absolute"
+            style={{
+              left: cell.rect.x,
+              top: cell.rect.y,
+              width: cell.rect.width,
+              height: cell.rect.height,
+            }}
+          >
+            <ScoreCell
+              colors={colors}
+              kind={cell.kind}
+              value={value}
+              sumLabel={sumLabel}
+            />
           </div>
         );
       })}

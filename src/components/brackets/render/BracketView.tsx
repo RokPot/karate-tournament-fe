@@ -3,9 +3,21 @@ import type { ReactNode } from "react";
 import type { Bracket } from "@/components/brackets/core";
 import type { BracketColors } from "./bracketColors";
 import { BracketViewport, type BracketWindow } from "./BracketViewport";
-import { SingleEliminationBracket } from "./SingleEliminationBracket";
+import {
+  SingleEliminationBracket,
+  type SingleEliminationBracketProps,
+} from "./SingleEliminationBracket";
 
-export type BracketViewProps<T> = {
+export type BracketViewProps<T> = Pick<
+  SingleEliminationBracketProps<T>,
+  | "scoreCount"
+  | "scoreOn"
+  | "scoreCellWidth"
+  | "scoreCellGap"
+  | "sumCellWidth"
+  | "scoreStripGap"
+  | "sumLabel"
+> & {
   bracket: Bracket<T>;
   getId: (item: T) => string;
   getLabel?: (item: T) => string;

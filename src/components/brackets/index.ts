@@ -4,11 +4,17 @@ export {
   getSeedOrder,
   computeSingleEliminationLayout,
   BRACKET_LAYOUT,
+  BRACKET_SCORE_LAYOUT,
   getMatchLoserItem,
   getMatchWinnerItem,
   getSlotItem,
+  resolveSum,
+  sumScores,
 } from "./core";
 export type {
+  BracketScoreValue,
+  BracketStop,
+  BracketStopAt,
   GenerateSingleEliminationOptions,
   Bracket,
   BracketKind,
@@ -21,7 +27,11 @@ export type {
   LayoutHeader,
   LayoutNode,
   LayoutRect,
+  LayoutScoreCell,
+  ResolvedSum,
+  ScoreOn,
   SingleEliminationLayout,
+  SingleEliminationLayoutOptions,
 } from "./core";
 export { BracketView } from "./render/BracketView";
 export { SingleEliminationBracket } from "./render/SingleEliminationBracket";

@@ -5,17 +5,30 @@ export type {
   BracketMatchWinner,
   BracketRound,
   BracketSlot,
+  BracketScoreValue,
   BracketSlotOutcome,
+  BracketStop,
 } from "./types";
+export { resolveSum, sumScores } from "./scores";
+export type { ResolvedSum } from "./scores";
 export {
   getMatchLoserItem,
   getMatchWinnerItem,
   getSlotItem,
 } from "./types";
-export { generateSingleElimination, nextPowerOfTwo, getSeedOrder } from "./generateSingleElimination";
-export type { GenerateSingleEliminationOptions } from "./generateSingleElimination";
+export {
+  generateSingleElimination,
+  nextPowerOfTwo,
+  getSeedOrder,
+  resolveLastRoundIndex,
+} from "./generateSingleElimination";
+export type {
+  BracketStopAt,
+  GenerateSingleEliminationOptions,
+} from "./generateSingleElimination";
 export {
   BRACKET_LAYOUT,
+  BRACKET_SCORE_LAYOUT,
   computeSingleEliminationLayout,
 } from "./computeSingleEliminationLayout";
 export type {
@@ -23,5 +36,8 @@ export type {
   LayoutHeader,
   LayoutNode,
   LayoutRect,
+  LayoutScoreCell,
+  ScoreOn,
   SingleEliminationLayout,
+  SingleEliminationLayoutOptions,
 } from "./computeSingleEliminationLayout";

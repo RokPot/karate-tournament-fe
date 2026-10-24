@@ -6,7 +6,10 @@ import { useTranslation } from "react-i18next";
 
 import { ErrorState } from "@/components/shared/layout/ErrorState";
 import { ConfirmRemoveRegistrationDialog } from "@/components/tournaments/registrations/ConfirmRemoveRegistrationDialog";
-import { StaffRegistrationModal } from "@/components/tournaments/registrations/StaffRegistrationModal";
+import {
+  StaffRegistrationModal,
+  type StaffParticipantPayload,
+} from "@/components/tournaments/registrations/StaffRegistrationModal";
 import Pill from "@/components/ui/Pill";
 import { Loader } from "@/components/ui/status/Loader/Loader";
 import { useToast } from "@/components/ui/status/Toast/useToast";
@@ -14,10 +17,6 @@ import { Typography } from "@/components/ui/text/Typography/Typography";
 import { CommonModels } from "@/data/common/common.models";
 import { RegistrationsModels } from "@/data/registrations/registrations.models";
 import { RegistrationsQueries } from "@/data/registrations/registrations.queries";
-import {
-  RegistrationsStaffQueries,
-  type StaffParticipantPayload,
-} from "@/data/registrations/registrations.staff";
 import { DateUtils } from "@/util/date.utils";
 
 type Registration = RegistrationsModels.RegistrationResponseDto;
@@ -63,7 +62,8 @@ export const ParticipantRegistrationsList = ({
       { enabled: !!tournamentId },
     );
 
-  const createMutation = RegistrationsStaffQueries.useStaffCreate({
+  const createMutation = RegistrationsQueries.useCreateForStaff({
+    invalidateCurrentModule: true,
     onSuccess: () => {
       successToast({ text: t("registrations.staff.addSuccess") });
       setModalMode(null);
@@ -71,12 +71,15 @@ export const ParticipantRegistrationsList = ({
     onError: (mutationError) => {
       errorToast({
         text:
-          mutationError?.message || t("registrations.staff.addError"),
+          mutationError?.serverMessage ||
+          mutationError?.message ||
+          t("registrations.staff.addError"),
       });
     },
   });
 
-  const updateMutation = RegistrationsStaffQueries.useStaffUpdate({
+  const updateMutation = RegistrationsQueries.useUpdateIdentity({
+    invalidateCurrentModule: true,
     onSuccess: () => {
       successToast({ text: t("registrations.staff.editSuccess") });
       setModalMode(null);
@@ -85,12 +88,15 @@ export const ParticipantRegistrationsList = ({
     onError: (mutationError) => {
       errorToast({
         text:
-          mutationError?.message || t("registrations.staff.editError"),
+          mutationError?.serverMessage ||
+          mutationError?.message ||
+          t("registrations.staff.editError"),
       });
     },
   });
 
-  const removeMutation = RegistrationsStaffQueries.useStaffRemove({
+  const removeMutation = RegistrationsQueries.useRemove({
+    invalidateCurrentModule: true,
     onSuccess: () => {
       successToast({ text: t("registrations.staff.removeSuccess") });
       setRemovingRegistration(null);
@@ -98,7 +104,9 @@ export const ParticipantRegistrationsList = ({
     onError: (mutationError) => {
       errorToast({
         text:
-          mutationError?.message || t("registrations.staff.removeError"),
+          mutationError?.serverMessage ||
+          mutationError?.message ||
+          t("registrations.staff.removeError"),
       });
     },
   });
@@ -170,8 +178,8 @@ export const ParticipantRegistrationsList = ({
   }) => {
     if (modalMode === "edit" && editingRegistration) {
       updateMutation.mutate({
-        registrationId: editingRegistration.id,
-        participant,
+        id: editingRegistration.id,
+        data: participant,
       });
       return;
     }
@@ -179,10 +187,12 @@ export const ParticipantRegistrationsList = ({
       return;
     }
     createMutation.mutate({
-      tournamentId,
-      categoryId,
-      clubId,
-      participant,
+      data: {
+        tournamentId,
+        categoryId,
+        clubId,
+        ...participant,
+      },
     });
   };
 
@@ -396,7 +406,7 @@ export const ParticipantRegistrationsList = ({
           if (!removingRegistration) {
             return;
           }
-          removeMutation.mutate({ registrationId: removingRegistration.id });
+          removeMutation.mutate({ id: removingRegistration.id });
         }}
       />
     </div>
